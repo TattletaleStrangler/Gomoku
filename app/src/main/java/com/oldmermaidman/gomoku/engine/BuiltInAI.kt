@@ -1,8 +1,8 @@
-package com.example.gomoku.engine
+package com.oldmermaidman.gomoku.engine
 
-import com.example.gomoku.model.Move
-import com.example.gomoku.model.Stone
-import com.example.gomoku.rules.ForbiddenMoves
+import com.oldmermaidman.gomoku.model.Move
+import com.oldmermaidman.gomoku.model.Stone
+import com.oldmermaidman.gomoku.rules.ForbiddenMoves
 import kotlin.random.Random
 
 /**

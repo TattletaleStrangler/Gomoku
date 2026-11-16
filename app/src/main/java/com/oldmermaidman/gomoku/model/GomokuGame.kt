@@ -1,6 +1,6 @@
-package com.example.gomoku.model
+package com.oldmermaidman.gomoku.model
 
-import com.example.gomoku.rules.ForbiddenMoves
+import com.oldmermaidman.gomoku.rules.ForbiddenMoves
 
 /** Result of trying to place a stone. */
 enum class PlaceOutcome {

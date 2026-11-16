@@ -1,4 +1,4 @@
-package com.example.gomoku.ui
+package com.oldmermaidman.gomoku.ui
 
 import android.content.Context
 import android.graphics.Canvas
@@ -7,8 +7,8 @@ import android.graphics.Typeface
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
-import com.example.gomoku.model.GomokuGame
-import com.example.gomoku.model.Stone
+import com.oldmermaidman.gomoku.model.GomokuGame
+import com.oldmermaidman.gomoku.model.Stone
 import kotlin.math.min
 import kotlin.math.roundToInt
 
@@ -20,6 +20,11 @@ class BoardView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null
 ) : View(context, attrs) {
+
+    companion object {
+        /** Largest supported board (13 / 15 / 19). */
+        private const val MAX_BOARD = 19
+    }
 
     var game: GomokuGame? = null
     var theme: GomokuTheme = Themes.LIGHT
@@ -35,6 +40,16 @@ class BoardView @JvmOverloads constructor(
     private val ringPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.STROKE
     }
+
+    /**
+     * Reused move-number buffer. Allocating this inside [onDraw] would create a
+     * garbage object on every frame (lint: DrawAllocation).
+     */
+    private val numbers = Array(MAX_BOARD) { IntArray(MAX_BOARD) }
+
+    /** Grid cell of the most recent tap; consumed by [performClick]. */
+    private var pendingX = -1
+    private var pendingY = -1
 
     private var cellSize = 0f
     private var originX = 0f
@@ -57,6 +72,7 @@ class BoardView @JvmOverloads constructor(
 
         // Grid.
         linePaint.color = theme.boardLine
+        linePaint.style = Paint.Style.STROKE
         linePaint.strokeWidth = 1.5f
         val extent = cellSize * (size - 1)
         for (i in 0 until size) {
@@ -68,8 +84,8 @@ class BoardView @JvmOverloads constructor(
 
         drawHoshi(canvas, size)
 
-        // Move numbers map (1-based order).
-        val numbers = Array(size) { IntArray(size) }
+        // Move numbers map (1-based order), filled into the reused buffer.
+        for (i in 0 until size) numbers[i].fill(0, 0, size)
         g.history.forEachIndexed { index, m -> numbers[m.y][m.x] = index + 1 }
 
         for (y in 0 until size) {
@@ -147,11 +163,28 @@ class BoardView @JvmOverloads constructor(
         if (event.action == MotionEvent.ACTION_UP) {
             val g = game ?: return true
             computeGeometry()
-            val x = ((event.x - originX) / cellSize).roundToInt()
-            val y = ((event.y - originY) / cellSize).roundToInt()
-            if (x in 0 until g.size && y in 0 until g.size) {
-                onCellTapped?.invoke(x, y)
+            pendingX = ((event.x - originX) / cellSize).roundToInt()
+            pendingY = ((event.y - originY) / cellSize).roundToInt()
+            if (pendingX in 0 until g.size && pendingY in 0 until g.size) {
+                // Route the tap through performClick() so assistive services that
+                // invoke the click action reach the same code path
+                // (lint: ClickableViewAccessibility).
+                performClick()
             }
+        }
+        return true
+    }
+
+    /**
+     * Performs the tap that [onTouchEvent] registered. Keeping the actual action
+     * here — rather than only calling super — is what lets accessibility services
+     * activate the board, and it satisfies lint's EmptySuperCall check.
+     */
+    override fun performClick(): Boolean {
+        super.performClick()
+        val g = game
+        if (g != null && pendingX in 0 until g.size && pendingY in 0 until g.size) {
+            onCellTapped?.invoke(pendingX, pendingY)
         }
         return true
     }

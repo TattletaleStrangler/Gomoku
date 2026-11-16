@@ -1,4 +1,4 @@
-package com.example.gomoku
+package com.oldmermaidman.gomoku
 
 import android.content.res.ColorStateList
 import android.graphics.Color
@@ -6,12 +6,15 @@ import android.os.Bundle
 import android.widget.Button
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.graphics.drawable.toDrawable
+import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
-import com.example.gomoku.databinding.ActivityMainBinding
-import com.example.gomoku.ui.GomokuTheme
-import com.example.gomoku.ui.SettingsDialog
-import com.example.gomoku.ui.Themes
+import androidx.core.view.WindowInsetsCompat
 import com.google.android.material.button.MaterialButton
+import com.oldmermaidman.gomoku.databinding.ActivityMainBinding
+import com.oldmermaidman.gomoku.ui.GomokuTheme
+import com.oldmermaidman.gomoku.ui.SettingsDialog
+import com.oldmermaidman.gomoku.ui.Themes
 
 class MainActivity : AppCompatActivity() {
 
@@ -22,6 +25,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        applySystemBarInsets()
 
         binding.boardView.onCellTapped = { x, y -> viewModel.onBoardTapped(x, y) }
         binding.btnNew.setOnClickListener { viewModel.startNewGame() }
@@ -47,14 +52,44 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * targetSdk 35+ enforces edge-to-edge: the window spans the whole screen and
+     * the app must keep its content clear of the system bars itself. The root
+     * view is padded by the merged system-bar / display-cutout insets, so the
+     * board is never hidden behind the status or navigation bar.
+     */
+    private fun applySystemBarInsets() {
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, insets ->
+            val bars = insets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout()
+            )
+            view.setPadding(bars.left, bars.top, bars.right, bars.bottom)
+            WindowInsetsCompat.CONSUMED
+        }
+    }
+
     private fun openSettings() {
         SettingsDialog.show(this, viewModel.currentSettings) { result ->
             viewModel.applySettings(result)
         }
     }
 
+    /**
+     * Applies one of the three themes to every view (TZ §6.2). Called on each
+     * state change, so switching the theme is immediate and needs no recreation.
+     *
+     * `statusBarColor` / `navigationBarColor` are deprecated on API 35+ (where
+     * edge-to-edge ignores them) but still take effect on older devices, so they
+     * are kept deliberately.
+     */
+    @Suppress("DEPRECATION")
     private fun applyTheme(theme: GomokuTheme) {
         binding.root.setBackgroundColor(theme.background)
+
+        // The root is padded by the system-bar insets, so the window background
+        // colours the bar areas behind it with the same theme colour.
+        window.setBackgroundDrawable(theme.background.toDrawable())
+
         binding.topBar.setBackgroundColor(theme.background)
         binding.tvTitle.setTextColor(theme.statusText)
         binding.tvStatus.setTextColor(theme.statusText)
@@ -72,6 +107,8 @@ class MainActivity : AppCompatActivity() {
         window.navigationBarColor = theme.background
         WindowCompat.getInsetsController(window, window.decorView)
             .isAppearanceLightStatusBars = !theme.isDark
+        WindowCompat.getInsetsController(window, window.decorView)
+            .isAppearanceLightNavigationBars = !theme.isDark
     }
 
     private fun styleButton(button: Button, theme: GomokuTheme) {

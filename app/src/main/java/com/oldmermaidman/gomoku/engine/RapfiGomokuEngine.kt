@@ -1,8 +1,8 @@
-package com.example.gomoku.engine
+package com.oldmermaidman.gomoku.engine
 
 import android.util.Log
-import com.example.gomoku.model.Move
-import com.example.gomoku.model.Stone
+import com.oldmermaidman.gomoku.model.Move
+import com.oldmermaidman.gomoku.model.Stone
 import java.io.BufferedReader
 import java.io.BufferedWriter
 import java.io.InputStreamReader

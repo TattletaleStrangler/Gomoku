@@ -1,4 +1,4 @@
-package com.example.gomoku.model
+package com.oldmermaidman.gomoku.model
 
 /**
  * A single move on the board.

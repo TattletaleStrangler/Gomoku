@@ -1,4 +1,4 @@
-package com.example.gomoku.engine
+package com.oldmermaidman.gomoku.engine
 
 import android.content.Context
 import android.util.Log

@@ -1,20 +1,20 @@
-package com.example.gomoku
+package com.oldmermaidman.gomoku
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.example.gomoku.engine.BuiltInAI
-import com.example.gomoku.engine.NativeExe
-import com.example.gomoku.engine.RapfiGomokuEngine
-import com.example.gomoku.model.GomokuGame
-import com.example.gomoku.model.Move
-import com.example.gomoku.model.PlaceOutcome
-import com.example.gomoku.model.Stone
-import com.example.gomoku.prefs.AppSettings
-import com.example.gomoku.rules.ForbiddenMoves
-import com.example.gomoku.ui.SettingsDialog
+import com.oldmermaidman.gomoku.engine.BuiltInAI
+import com.oldmermaidman.gomoku.engine.NativeExe
+import com.oldmermaidman.gomoku.engine.RapfiGomokuEngine
+import com.oldmermaidman.gomoku.model.GomokuGame
+import com.oldmermaidman.gomoku.model.Move
+import com.oldmermaidman.gomoku.model.PlaceOutcome
+import com.oldmermaidman.gomoku.model.Stone
+import com.oldmermaidman.gomoku.prefs.AppSettings
+import com.oldmermaidman.gomoku.rules.ForbiddenMoves
+import com.oldmermaidman.gomoku.ui.SettingsDialog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -153,8 +153,8 @@ class GomokuViewModel(app: Application) : AndroidViewModel(app) {
 
     override fun onCleared() {
         aiJob?.cancel()
-        engine.stop()
-        super.onCleared()
+        engine.stop()   // sends END and force-kills if needed (TZ §4.3)
+        // No super.onCleared() call: ViewModel.onCleared() is empty.
     }
 
     // ---- AI ---------------------------------------------------------------

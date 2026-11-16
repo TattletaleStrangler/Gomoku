@@ -15,10 +15,10 @@
 #
 # Usage:
 #   pwsh -File tools\test_rapfi_adb.ps1
-#   pwsh -File tools\test_rapfi_adb.ps1 -Package com.example.gomoku
+#   pwsh -File tools\test_rapfi_adb.ps1 -Package com.oldmermaidman.gomoku
 
 param(
-    [string]$Package = "com.example.gomoku",
+    [string]$Package = "com.oldmermaidman.gomoku",
     [string]$Adb = "$env:LOCALAPPDATA\Android\Sdk\platform-tools\adb.exe"
 )
 

@@ -1,6 +1,6 @@
-package com.example.gomoku.rules
+package com.oldmermaidman.gomoku.rules
 
-import com.example.gomoku.model.Stone
+import com.oldmermaidman.gomoku.model.Stone
 
 /**
  * Renju forbidden-move logic for black, plus the shared "five in a row" check.

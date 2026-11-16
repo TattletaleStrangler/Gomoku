@@ -1,13 +1,13 @@
-package com.example.gomoku.ui
+package com.oldmermaidman.gomoku.ui
 
 import android.content.Context
 import android.view.LayoutInflater
 import android.widget.RadioGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SwitchCompat
-import com.example.gomoku.R
-import com.example.gomoku.model.Stone
-import com.example.gomoku.prefs.AppSettings
+import com.oldmermaidman.gomoku.R
+import com.oldmermaidman.gomoku.model.Stone
+import com.oldmermaidman.gomoku.prefs.AppSettings
 
 /**
  * Bottom-style settings dialog (board size, color, difficulty, forbidden moves,

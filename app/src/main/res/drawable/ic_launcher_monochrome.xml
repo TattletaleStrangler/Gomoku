@@ -1,0 +1,27 @@
+<!--
+    Monochrome layer for themed launcher icons (Android 13+). The system tints
+    this layer itself, so every shape must be a single solid colour: only the
+    alpha channel is used, and the row of five stones reads as a silhouette.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M30,54 m -7,0 a 7,7 0 1,0 14,0 a 7,7 0 1,0 -14,0" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M42,54 m -7,0 a 7,7 0 1,0 14,0 a 7,7 0 1,0 -14,0" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M54,54 m -7,0 a 7,7 0 1,0 14,0 a 7,7 0 1,0 -14,0" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M66,54 m -7,0 a 7,7 0 1,0 14,0 a 7,7 0 1,0 -14,0" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M78,54 m -7,0 a 7,7 0 1,0 14,0 a 7,7 0 1,0 -14,0" />
+</vector>

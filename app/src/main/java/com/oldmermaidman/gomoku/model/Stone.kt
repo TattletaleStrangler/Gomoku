@@ -1,4 +1,4 @@
-package com.example.gomoku.model
+package com.oldmermaidman.gomoku.model
 
 /** Stone color on the board. */
 enum class Stone {

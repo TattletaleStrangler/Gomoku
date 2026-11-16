@@ -1,9 +1,10 @@
-package com.example.gomoku.prefs
+package com.oldmermaidman.gomoku.prefs
 
 import android.content.Context
 import android.content.SharedPreferences
-import com.example.gomoku.model.GomokuGame
-import com.example.gomoku.model.Stone
+import androidx.core.content.edit
+import com.oldmermaidman.gomoku.model.GomokuGame
+import com.oldmermaidman.gomoku.model.Stone
 
 /**
  * SharedPreferences-backed settings plus the current game state.
@@ -16,30 +17,30 @@ class AppSettings(context: Context) {
 
     var boardSize: Int
         get() = prefs.getInt(KEY_SIZE, 15)
-        set(value) = prefs.edit().putInt(KEY_SIZE, value).apply()
+        set(value) = prefs.edit { putInt(KEY_SIZE, value) }
 
     var playerColor: Stone
         get() = if (prefs.getString(KEY_COLOR, "BLACK") == "WHITE") Stone.WHITE else Stone.BLACK
-        set(value) = prefs.edit().putString(KEY_COLOR, value.name).apply()
+        set(value) = prefs.edit { putString(KEY_COLOR, value.name) }
 
     var forbiddenMoves: Boolean
         get() = prefs.getBoolean(KEY_FORBIDDEN, false)
-        set(value) = prefs.edit().putBoolean(KEY_FORBIDDEN, value).apply()
+        set(value) = prefs.edit { putBoolean(KEY_FORBIDDEN, value) }
 
     var showMoveNumbers: Boolean
         get() = prefs.getBoolean(KEY_NUMBERS, true)
-        set(value) = prefs.edit().putBoolean(KEY_NUMBERS, value).apply()
+        set(value) = prefs.edit { putBoolean(KEY_NUMBERS, value) }
 
     var aiLevel: Int
         get() = prefs.getInt(KEY_LEVEL, LEVEL_NORMAL)
-        set(value) = prefs.edit().putInt(KEY_LEVEL, value).apply()
+        set(value) = prefs.edit { putInt(KEY_LEVEL, value) }
 
     var theme: Int
         get() = prefs.getInt(KEY_THEME, THEME_LIGHT)
-        set(value) = prefs.edit().putInt(KEY_THEME, value).apply()
+        set(value) = prefs.edit { putInt(KEY_THEME, value) }
 
     fun saveGame(game: GomokuGame) {
-        prefs.edit().putString(KEY_GAME, game.encode()).apply()
+        prefs.edit { putString(KEY_GAME, game.encode()) }
     }
 
     fun restoreGame(): GomokuGame {

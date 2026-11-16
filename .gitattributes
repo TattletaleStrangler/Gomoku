@@ -7,6 +7,10 @@
 *.bat   text eol=crlf
 *.ps1   text eol=crlf
 
+# The Unix Gradle wrapper has no extension, so it needs an explicit rule:
+# with CRLF it fails on Linux/macOS/WSL ("bad interpreter: /bin/sh^M").
+/gradlew  text eol=lf
+
 # Engine binary and its model weights are never line-ending converted.
 *.so    binary
 *.bin   binary
