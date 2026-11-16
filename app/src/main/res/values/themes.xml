@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+        Neutral base theme. The three user-selectable themes (light / dark / warm)
+        are applied programmatically at runtime so that switching them is immediate
+        and does not recreate the Activity (TZ §6.2).
+    -->
+    <style name="Theme.Gomoku" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/accent_default</item>
+        <item name="colorPrimaryVariant">@color/accent_default</item>
+        <item name="colorOnPrimary">@android:color/white</item>
+        <item name="android:windowBackground">@color/bg_default</item>
+        <item name="android:statusBarColor">@color/bg_default</item>
+        <item name="android:navigationBarColor">@color/bg_default</item>
+        <item name="android:windowLightStatusBar">true</item>
+    </style>
+</resources>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Base theme colors (used before the dynamic theme is applied, and for the launcher icon). -->
+    <color name="bg_default">#FAFAFA</color>
+    <color name="accent_default">#4A90D9</color>
+    <color name="ic_launcher_background">#4A90D9</color>
+</resources>

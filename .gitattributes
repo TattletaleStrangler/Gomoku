@@ -1,0 +1,13 @@
+# Normalize line endings so the same source works on Windows and Linux.
+
+# Shell scripts must keep LF, otherwise bash fails with "bad interpreter: ^M".
+*.sh    text eol=lf
+# Windows-only helpers.
+*.cmd   text eol=crlf
+*.bat   text eol=crlf
+*.ps1   text eol=crlf
+
+# Engine binary and its model weights are never line-ending converted.
+*.so    binary
+*.bin   binary
+*.lz4   binary

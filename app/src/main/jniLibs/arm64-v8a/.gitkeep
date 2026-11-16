@@ -1,0 +1,6 @@
+# This directory holds the Rapfi engine binary, renamed to librapfi.so so that
+# the Android build system treats it as a native library and places it in
+# nativeLibraryDir — the only location where Android 10+ allows exec().
+#
+# Build scripts (tools/build_rapfi.cmd / .sh) place the binary here automatically.
+# For the app to work without the engine, the built-in AI fallback is used.
