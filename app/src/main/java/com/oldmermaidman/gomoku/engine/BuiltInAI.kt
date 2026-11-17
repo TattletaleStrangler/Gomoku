@@ -6,27 +6,47 @@ import com.oldmermaidman.gomoku.rules.ForbiddenMoves
 import kotlin.random.Random
 
 /**
- * Fallback engine: iterative-deepening alpha-beta with a transposition table,
- * killer / history heuristics, PVS, null-move pruning, quiescence search and
- * a richer pattern-based evaluation.
+ * Fallback engine used on boards other than 15×15 (Rapfi only plays 15×15) and
+ * whenever the native engine is unavailable.
  *
- * Single self-contained class — no external dependencies (TZ §5).
- * Hard time budget per move: **3 s**. The search stops cleanly between
- * iterations regardless of depth.
+ * Structure:
+ *  - **Forced-move ladder** — before searching, a handful of provably forced
+ *    situations are resolved directly: win, block a five, make an open four,
+ *    block an opponent's open four (which is also the "block a three/four" case).
+ *  - **Iterative deepening PVS** over a transposition table, with killer/history
+ *    ordering and Zobrist hashing.
+ *  - **Forced-reply quiescence** — at the horizon only forcing moves are
+ *    explored; if the opponent threatens five, only blocking moves are legal.
+ *  - **Window evaluation** — every 5-cell window on the board is scored, so
+ *    broken shapes (`XX.X`, `X.XX`, `X.X.X`) are seen as well as solid runs.
+ *
+ * Deliberately absent: null-move pruning. In gomoku a "pass" is never safe —
+ * threats dominate — so it produced bad cutoffs; ordering plus the forced-reply
+ * quiescence recovers the speed more safely.
+ *
+ * Single self-contained class, no external dependencies (TZ §5).
  */
 class BuiltInAI {
 
     // ---- constants ---------------------------------------------------------
 
     companion object {
-        private const val WIN_SCORE      = 1_000_000
-        private const val INF            = 200_000_000
-        private const val TT_SIZE        = 1 shl 18          // 262144 entries
-        private const val TT_MASK        = TT_SIZE - 1L
-        private const val MAX_PLY        = 64
-        private const val MAX_CANDIDATES = 24
-        private const val NULL_REDUCTION = 3
-        private const val MAX_BOARD      = 19
+        private const val WIN_SCORE  = 10_000_000
+        private const val INF        = 1_000_000_000
+        private const val TT_SIZE    = 1 shl 18                 // 262144 entries
+        private const val TT_MASK    = TT_SIZE - 1L
+        private const val MAX_PLY    = 64
+        private const val MAX_BOARD  = 19
+
+        /** Candidates searched at the root / inside the tree. */
+        private const val ROOT_CANDIDATES = 24
+        private const val NODE_CANDIDATES = 12
+
+        /**
+         * A candidate scoring at least this much makes or blocks a four, so it is
+         * never dropped by the candidate cap.
+         */
+        private const val CRITICAL_SCORE = 50_000
 
         private val DIRS = arrayOf(
             intArrayOf(1, 0),
@@ -34,7 +54,20 @@ class BuiltInAI {
             intArrayOf(1, 1),
             intArrayOf(1, -1)
         )
+
+        /** Score of a clean 5-window holding this many of one colour. */
+        private val WINDOW = intArrayOf(0, 10, 100, 1_000, 100_000, WIN_SCORE)
     }
+
+    // ---- diagnostics (used by tests) ---------------------------------------
+
+    /** Depth of the last fully completed iteration. */
+    var lastDepth: Int = 0
+        private set
+
+    /** Nodes visited during the last search. */
+    var lastNodes: Long = 0
+        private set
 
     // ---- transposition table -----------------------------------------------
 
@@ -45,22 +78,10 @@ class BuiltInAI {
         var depth: Int = -1,
         var score: Int = 0,
         var type: NodeType = NodeType.EXACT,
-        var bestX: Int = -1,
-        var bestY: Int = -1
+        var bestIdx: Int = -1
     )
 
     private val tt = Array(TT_SIZE) { TTEntry() }
-
-    private fun ttStore(key: Long, depth: Int, score: Int, type: NodeType, bx: Int, by: Int) {
-        val i = (key and TT_MASK).toInt()
-        tt[i].key = key; tt[i].depth = depth; tt[i].score = score; tt[i].type = type
-        tt[i].bestX = bx; tt[i].bestY = by
-    }
-
-    private fun ttProbe(key: Long): TTEntry? {
-        val e = tt[(key and TT_MASK).toInt()]
-        return if (e.key == key) e else null
-    }
 
     // ---- instance state ----------------------------------------------------
 
@@ -72,7 +93,6 @@ class BuiltInAI {
     private var deadlineMs = 0L
     private var stopped = false
 
-    // Zobrist — allocated once for max supported board
     private val zobrist = Array(MAX_BOARD) { Array(MAX_BOARD) { LongArray(3) } }
     private var hashKey = 0L
 
@@ -84,6 +104,18 @@ class BuiltInAI {
     private var rootBestX = -1
     private var rootBestY = -1
 
+    // reusable buffers (no allocation inside the search)
+    private val stamp = IntArray(MAX_BOARD * MAX_BOARD)
+    private var stampVal = 0
+    private val candList = IntArray(MAX_BOARD * MAX_BOARD)
+    private var candCount = 0
+
+    private val moveBuf = Array(MAX_PLY) { IntArray(MAX_BOARD * MAX_BOARD) }
+    private val scoreBuf = Array(MAX_PLY) { IntArray(MAX_BOARD * MAX_BOARD) }
+
+    private val lineBuf = IntArray(MAX_BOARD)      // 0 = empty, 1 = ai, 2 = opp
+    private val winBuf = CharArray(9)
+
     // ---- public API --------------------------------------------------------
 
     init {
@@ -93,8 +125,9 @@ class BuiltInAI {
     }
 
     /**
-     * @param maxDepth   ignored (ID runs until time runs out); kept for compatibility
-     * @param timeLimitMs hard time budget, default **3 s**
+     * @param maxDepth     upper bound for iterative deepening (search usually stops
+     *                     on the time budget first)
+     * @param timeLimitMs  hard time budget per move
      */
     fun nextMove(
         current: Array<Array<Stone>>,
@@ -111,8 +144,9 @@ class BuiltInAI {
         deadlineMs = System.currentTimeMillis() + timeLimitMs
         stopped = false
         rootBestX = -1; rootBestY = -1
+        lastDepth = 0
+        lastNodes = 0
 
-        // reset history & killers (only the cells that exist on this board)
         val n = size * size
         for (p in 0 until MAX_PLY) {
             for (i in 0 until n) history[p][i] = 0
@@ -120,73 +154,135 @@ class BuiltInAI {
         }
         clearTT()
 
-        // rebuild Zobrist key
         hashKey = 0L
         for (y in 0 until size) for (x in 0 until size) {
             val c = board[y][x]
             if (c != Stone.EMPTY) hashKey = hashKey xor zobrist[y][x][c.ordinal]
         }
 
-        // root candidate moves
-        val rootMoves = genMoves(ai, MAX_CANDIDATES, true)
-        if (rootMoves.isEmpty()) return null
+        // 1. Resolve forced situations without searching.
+        forcedMove()?.let { return it }
 
-        // immediate win?
-        for (m in rootMoves) {
-            if (isWinMove(m)) return m
-        }
-        // block opponent's immediate win
-        for (m in genMoves(opp, MAX_CANDIDATES, false)) {
-            if (isWinMove(m)) return m
+        // 2. Iterative deepening.
+        // genMoves() writes packed cell indices into moveBuf[0] and returns the count.
+        val rootCount = genMoves(ai, ROOT_CANDIDATES, 0)
+        if (rootCount == 0) return null
+        val rootBuf = moveBuf[0]
+        val rootMoves = ArrayList<Move>(rootCount)
+        for (i in 0 until rootCount) {
+            val idx = rootBuf[i]
+            rootMoves.add(Move(idx % size, idx / size, ai))
         }
 
-        // ID loop
-        for (depth in 1..MAX_PLY) {
-            searchRoot(depth, rootMoves)
-            if (stopped) break
+        val depthLimit = if (maxDepth < 1) 1 else minOf(maxDepth, MAX_PLY)
+        for (depth in 1..depthLimit) {
+            val completed = searchRoot(depth, rootMoves)
+            if (!completed) break
+            lastDepth = depth
+            if (outOfTime()) break
         }
 
         return if (rootBestX >= 0) Move(rootBestX, rootBestY, ai) else rootMoves.first()
     }
 
-    // ---- iterative deepening root ------------------------------------------
+    // ---- forced-move ladder ------------------------------------------------
 
-    private fun searchRoot(depth: Int, rootMoves: List<Move>) {
+    /**
+     * Resolves the situations where the right move is not a matter of judgement.
+     * Returns null when the position needs a real search.
+     *
+     *   1. I can make five                 → play it
+     *   2. the opponent can make five      → block it
+     *   3. I can make an open four         → play it (wins next move)
+     *   4. the opponent can make an open four → block it
+     *
+     * Step 4 is also the answer to "the opponent has three in a row": the cell
+     * where they would create an open four is exactly the cell that must be taken.
+     */
+    private fun forcedMove(): Move? {
+        buildCandidates()
+        if (candCount == 0) return null
+
+        // 1. my five
+        for (i in 0 until candCount) {
+            val idx = candList[i]; val x = idx % size; val y = idx / size
+            if (!legalIfBlack(x, y)) continue
+            if (maxRunIfPlaced(x, y, ai) >= 5) return Move(x, y, ai)
+        }
+
+        // 2. block the opponent's five
+        for (i in 0 until candCount) {
+            val idx = candList[i]; val x = idx % size; val y = idx / size
+            if (maxRunIfPlaced(x, y, opp) >= 5 && legalIfBlack(x, y)) return Move(x, y, ai)
+        }
+
+        // 3. my open four (two winning points, therefore unstoppable)
+        for (i in 0 until candCount) {
+            val idx = candList[i]; val x = idx % size; val y = idx / size
+            if (!legalIfBlack(x, y)) continue
+            if (maxRunIfPlaced(x, y, ai) != 4) continue
+            makeMove(x, y, ai)
+            val winPoints = countWinningPoints(x, y, ai)
+            undoMove(x, y, ai)
+            if (winPoints >= 2) return Move(x, y, ai)
+        }
+
+        // 4. block the opponent's open four
+        for (i in 0 until candCount) {
+            val idx = candList[i]; val x = idx % size; val y = idx / size
+            if (!legalIfBlack(x, y)) continue
+            if (maxRunIfPlaced(x, y, opp) != 4) continue
+            makeMove(x, y, opp)
+            val winPoints = countWinningPoints(x, y, opp)
+            undoMove(x, y, opp)
+            if (winPoints >= 2) return Move(x, y, ai)
+        }
+
+        return null
+    }
+
+    // ---- root --------------------------------------------------------------
+
+    /** @return true when the iteration ran to completion. */
+    private fun searchRoot(depth: Int, moves: MutableList<Move>): Boolean {
         var alpha = -INF
         val beta = INF
         var bestScore = -INF
+        var bestX = -1
+        var bestY = -1
 
-        for (m in rootMoves) {
-            if (outOfTime()) break
-
+        for (m in moves) {
+            if (outOfTime()) return false
             makeMove(m.x, m.y, ai)
-            val score = -pvs(-beta, -alpha, depth - 1, opp, 1, false)
+            val score = -pvs(-beta, -alpha, depth - 1, opp, 1)
             undoMove(m.x, m.y, ai)
 
             if (score > bestScore) {
-                bestScore = score
-                rootBestX = m.x; rootBestY = m.y
+                bestScore = score; bestX = m.x; bestY = m.y
             }
             if (score > alpha) alpha = score
         }
 
-        if (!stopped && rootBestX >= 0)
-            ttStore(hashKey, depth, bestScore, NodeType.EXACT, rootBestX, rootBestY)
+        if (bestX < 0) return false
+
+        rootBestX = bestX
+        rootBestY = bestY
+        ttStore(hashKey, depth, bestScore, NodeType.EXACT, bestY * size + bestX)
+
+        // Search the previous best move first on the next iteration.
+        val at = moves.indexOfFirst { it.x == bestX && it.y == bestY }
+        if (at > 0) moves.add(0, moves.removeAt(at))
+        return true
     }
 
-    // ---- PVS search --------------------------------------------------------
+    // ---- principal variation search ---------------------------------------
 
-    private fun pvs(alpha: Int, beta: Int, depth: Int, color: Stone, ply: Int, isNull: Boolean): Int {
+    private fun pvs(alpha: Int, beta: Int, depth: Int, color: Stone, ply: Int): Int {
+        lastNodes++
         if (outOfTime()) return evaluateFor(color)
-
-        // leaf — quiescence search
         if (depth <= 0) return qSearch(alpha, beta, color, ply)
+        if (ply >= MAX_PLY) return evaluateFor(color)
 
-        // no moves → draw
-        val moves = genMoves(color, MAX_CANDIDATES, false)
-        if (moves.isEmpty()) return 0
-
-        // TT probe
         val entry = ttProbe(hashKey)
         if (entry != null && entry.depth >= depth) {
             when (entry.type) {
@@ -196,47 +292,46 @@ class BuiltInAI {
             }
         }
 
-        // null-move pruning
-        if (!isNull && depth >= NULL_REDUCTION + 1 && !isInCheck(color)) {
-            val nullScore = -pvs(-beta, -beta + 1, depth - NULL_REDUCTION - 1, color.opponent(), ply + 1, true)
-            if (nullScore >= beta) return beta
-        }
+        val n = genMoves(color, NODE_CANDIDATES, ply)
+        if (n == 0) return 0
 
+        val buf = moveBuf[ply]
         var a = alpha
         var best = -INF
-        var bestX = -1
-        var bestY = -1
+        var bestIdx = -1
         var first = true
 
-        for (m in moves) {
+        for (i in 0 until n) {
             if (outOfTime()) return best
 
-            makeMove(m.x, m.y, color)
-            var score = 0
+            val idx = buf[i]
+            val x = idx % size; val y = idx / size
+            makeMove(x, y, color)
+
+            var score: Int
             if (first) {
-                score = -pvs(-beta, -a, depth - 1, color.opponent(), ply + 1, false)
+                score = -pvs(-beta, -a, depth - 1, color.opponent(), ply + 1)
                 first = false
             } else {
-                // zero-window search first, then re-search full window if promising
-                score = -pvs(-a - 1, -a, depth - 1, color.opponent(), ply + 1, false)
+                score = -pvs(-a - 1, -a, depth - 1, color.opponent(), ply + 1)
                 if (score > a && score < beta) {
-                    score = -pvs(-beta, -a, depth - 1, color.opponent(), ply + 1, false)
+                    score = -pvs(-beta, -a, depth - 1, color.opponent(), ply + 1)
                 }
             }
-            undoMove(m.x, m.y, color)
+            undoMove(x, y, color)
 
             if (score > best) {
-                best = score; bestX = m.x; bestY = m.y
+                best = score; bestIdx = idx
             }
             if (best > a) a = best
             if (a >= beta) {
-                // beta cutoff → store killer
-                val idx = bestY * size + bestX
-                if (bestX >= 0 && killers[ply][0] != idx) {
-                    killers[ply][1] = killers[ply][0]
-                    killers[ply][0] = idx
+                if (bestIdx >= 0) {
+                    if (killers[ply][0] != bestIdx) {
+                        killers[ply][1] = killers[ply][0]
+                        killers[ply][0] = bestIdx
+                    }
+                    history[ply][bestIdx] += depth * depth
                 }
-                history[ply][idx] += depth * depth
                 break
             }
         }
@@ -246,50 +341,118 @@ class BuiltInAI {
             best >= beta  -> NodeType.LOWER
             else          -> NodeType.EXACT
         }
-        if (!stopped && bestX >= 0)
-            ttStore(hashKey, depth, best, type, bestX, bestY)
-
+        if (!stopped && bestIdx >= 0) ttStore(hashKey, depth, best, type, bestIdx)
         return best
     }
 
-    // ---- quiescence search ------------------------------------------------
+    // ---- forced-reply quiescence ------------------------------------------
 
+    /**
+     * At the horizon only forcing moves are examined. If the opponent can make
+     * five, their winning cells are the *only* moves considered — the old version
+     * looked exclusively at its own threats, which is why it could not see that a
+     * block was required.
+     */
     private fun qSearch(alpha: Int, beta: Int, color: Stone, ply: Int): Int {
+        lastNodes++
         if (outOfTime()) return evaluateFor(color)
         if (ply >= MAX_PLY) return evaluateFor(color)
+
+        buildCandidates()
+
+        // Must-block: the opponent threatens five.
+        var forced = 0
+        val forcedBuf = moveBuf[ply]
+        for (i in 0 until candCount) {
+            val idx = candList[i]
+            val x = idx % size; val y = idx / size
+            if (maxRunIfPlaced(x, y, color.opponent()) >= 5) forcedBuf[forced++] = idx
+        }
+        if (forced > 0) {
+            var a = alpha
+            var best = -INF
+            for (i in 0 until forced) {
+                val idx = forcedBuf[i]
+                val x = idx % size; val y = idx / size
+                makeMove(x, y, color)
+                val score = if (maxRunIfPlaced(x, y, color) >= 5) {
+                    WIN_SCORE - ply
+                } else {
+                    -qSearch(-beta, -a, color.opponent(), ply + 1)
+                }
+                undoMove(x, y, color)
+                if (score > best) best = score
+                if (best > a) a = best
+                if (a >= beta) return a
+            }
+            return best
+        }
 
         val standPat = evaluateFor(color)
         if (standPat >= beta) return beta
         var a = if (standPat > alpha) standPat else alpha
 
-        val captures = genQmoves(color)
-        for (m in captures) {
-            makeMove(m.x, m.y, color)
-            val threat = isThreat(m.x, m.y, color)
-            val score = if (threat) -qSearch(-beta, -a, color.opponent(), ply + 1) else standPat
-            undoMove(m.x, m.y, color)
-            if (!threat) continue
-            if (score >= beta) return beta
+        // Otherwise: my own forcing moves only (a four or better).
+        for (i in 0 until candCount) {
+            val idx = candList[i]
+            val x = idx % size; val y = idx / size
+            if (maxRunIfPlaced(x, y, color) < 4) continue
+            if (color == Stone.BLACK && forbidBlack && !legalIfBlack(x, y)) continue
+            makeMove(x, y, color)
+            val score = if (maxRunIfPlaced(x, y, color) >= 5) {
+                WIN_SCORE - ply
+            } else {
+                -qSearch(-beta, -a, color.opponent(), ply + 1)
+            }
+            undoMove(x, y, color)
             if (score > a) a = score
+            if (a >= beta) return a
         }
         return a
     }
 
     // ---- evaluation --------------------------------------------------------
 
+    /**
+     * Sliding 5-window evaluation. Every window containing stones of one colour
+     * only is scored by how many stones it holds, so a broken shape like `XX.X`
+     * (two windows with four stones) scores far above a live two, unlike a
+     * consecutive-run scan which saw only "two in a row".
+     */
     private fun evaluate(): Int {
         var score = 0
-        for (y in 0 until size) {
-            for (x in 0 until size) {
-                val c = board[y][x]
-                if (c == Stone.EMPTY) continue
-                val sign = if (c == ai) 1 else -1
-                for (d in DIRS) {
-                    val px = x - d[0]; val py = y - d[1]
-                    if (px in 0 until size && py in 0 until size && board[py][px] == c) continue
+        for (d in DIRS) {
+            val dx = d[0]; val dy = d[1]
+            for (y in 0 until size) {
+                for (x in 0 until size) {
+                    // Only walk lines from their first cell.
+                    val px = x - dx; val py = y - dy
+                    if (px in 0 until size && py in 0 until size) continue
 
-                    val pair = scanRun(x, y, d[0], d[1], c)
-                    score += sign * patternScore(pair.first, pair.second)
+                    var len = 0
+                    var cx = x; var cy = y
+                    while (cx in 0 until size && cy in 0 until size) {
+                        val c = board[cy][cx]
+                        lineBuf[len++] = if (c == ai) 1 else if (c == opp) 2 else 0
+                        cx += dx; cy += dy
+                    }
+                    if (len < 5) continue
+
+                    var mine = 0; var theirs = 0
+                    for (i in 0 until 5) {
+                        val v = lineBuf[i]
+                        if (v == 1) mine++ else if (v == 2) theirs++
+                    }
+                    for (i in 0..len - 5) {
+                        if (i > 0) {
+                            val out = lineBuf[i - 1]
+                            if (out == 1) mine-- else if (out == 2) theirs--
+                            val inn = lineBuf[i + 4]
+                            if (inn == 1) mine++ else if (inn == 2) theirs++
+                        }
+                        if (mine > 0 && theirs == 0) score += WINDOW[mine]
+                        else if (theirs > 0 && mine == 0) score -= WINDOW[theirs]
+                    }
                 }
             }
         }
@@ -299,165 +462,197 @@ class BuiltInAI {
     private fun evaluateFor(color: Stone): Int =
         if (color == ai) evaluate() else -evaluate()
 
-    /** Returns (length, openEnds) for the run starting at (sx,sy). */
-    private fun scanRun(sx: Int, sy: Int, dx: Int, dy: Int, color: Stone): Pair<Int, Int> {
-        var len = 0
-        var nx = sx; var ny = sy
-        while (nx in 0 until size && ny in 0 until size && board[ny][nx] == color) {
-            len++; nx += dx; ny += dy
-        }
-        val open2 = if (nx in 0 until size && ny in 0 until size && board[ny][nx] == Stone.EMPTY) 1 else 0
-        val open1 = if (sx - dx in 0 until size && sy - dy in 0 until size && board[sy - dy][sx - dx] == Stone.EMPTY) 1 else 0
-        return len to (open1 + open2)
-    }
+    // ---- tactical helpers --------------------------------------------------
 
-    private fun patternScore(len: Int, openEnds: Int): Int = when {
-        len >= 5 -> WIN_SCORE
-        openEnds == 0 -> 0
-        len == 4 && openEnds == 2 -> 240_000
-        len == 4 && openEnds == 1 -> 30_000
-        len == 3 && openEnds == 2 -> 18_000
-        len == 3 && openEnds == 1 -> 1_200
-        len == 2 && openEnds == 2 -> 700
-        len == 2 && openEnds == 1 -> 80
-        len == 1 && openEnds == 2 -> 30
-        len == 1 && openEnds == 1 -> 4
-        else -> 0
-    }
-
-    /** True when placing [color] at (x,y) creates a direct threat (4 or open-3). */
-    private fun isThreat(x: Int, y: Int, color: Stone): Boolean {
+    /**
+     * Longest run of [color] through (x,y) if a stone of that colour were placed
+     * there. Cheap; used to filter candidates before the precise checks.
+     */
+    private fun maxRunIfPlaced(x: Int, y: Int, color: Stone): Int {
+        var best = 1
         for (d in DIRS) {
-            val line = countLine(x, y, d[0], d[1], color)
-            if (line >= 5) return true
-            val px = x - d[0]; val py = y - d[1]
-            val nx = x + d[0] * line; val ny = y + d[1] * line
-            val open1 = px in 0 until size && py in 0 until size && board[py][px] == Stone.EMPTY
-            val open2 = nx in 0 until size && ny in 0 until size && board[ny][nx] == Stone.EMPTY
-            if (line == 4 && (open1 || open2)) return true
-            if (line == 3 && open1 && open2) return true
+            val dx = d[0]; val dy = d[1]
+            var run = 1
+            var nx = x + dx; var ny = y + dy
+            while (nx in 0 until size && ny in 0 until size && board[ny][nx] == color) {
+                run++; nx += dx; ny += dy
+            }
+            nx = x - dx; ny = y - dy
+            while (nx in 0 until size && ny in 0 until size && board[ny][nx] == color) {
+                run++; nx -= dx; ny -= dy
+            }
+            if (run > best) best = run
         }
-        return false
+        return best
+    }
+
+    /**
+     * Number of distinct empty cells that would complete a five for [color] on the
+     * lines through (x,y), assuming (x,y) already holds that colour.
+     *
+     * `>= 2` means an open four (unstoppable), `1` means a simple four (forcing).
+     */
+    private fun countWinningPoints(x: Int, y: Int, color: Stone): Int {
+        var count = 0
+        for (d in DIRS) {
+            for (k in -4..4) {
+                if (k == 0) continue
+                val nx = x + d[0] * k
+                val ny = y + d[1] * k
+                if (nx !in 0 until size || ny !in 0 until size) continue
+                if (board[ny][nx] != Stone.EMPTY) continue
+                makeMove(nx, ny, color)
+                val win = ForbiddenMoves.hasFive(board, nx, ny, color)
+                undoMove(nx, ny, color)
+                if (win) count++
+            }
+        }
+        return count
     }
 
     // ---- move generation ---------------------------------------------------
 
-    private fun genMoves(color: Stone, cap: Int, sort: Boolean): List<Move> {
-        val n = size * size
-        val seen = BooleanArray(n)
-        val pts = ArrayList<Pair<Int, Int>>()
-        var hasStone = false
+    /** Fills [candList] with empty cells within two cells of an existing stone. */
+    private fun buildCandidates() {
+        stampVal++
+        candCount = 0
+        var anyStone = false
 
         for (y in 0 until size) {
             for (x in 0 until size) {
                 if (board[y][x] == Stone.EMPTY) continue
-                hasStone = true
+                anyStone = true
                 for (dy in -2..2) {
                     for (dx in -2..2) {
                         val nx = x + dx; val ny = y + dy
-                        if (nx in 0 until size && ny in 0 until size && board[ny][nx] == Stone.EMPTY) {
-                            val idx = ny * size + nx
-                            if (!seen[idx]) { seen[idx] = true; pts.add(nx to ny) }
-                        }
+                        if (nx !in 0 until size || ny !in 0 until size) continue
+                        if (board[ny][nx] != Stone.EMPTY) continue
+                        val idx = ny * size + nx
+                        if (stamp[idx] == stampVal) continue
+                        stamp[idx] = stampVal
+                        candList[candCount++] = idx
                     }
                 }
             }
         }
-        if (!hasStone) return listOf(Move(size / 2, size / 2, color))
 
-        var raw: List<Move> = pts.map { (x, y) -> Move(x, y, color) }
-        if (color == Stone.BLACK && forbidBlack) raw = raw.filter { isLegal(it) }
-        if (!sort) return raw.take(cap)
-
-        // sort by history + quick eval
-        val scored = raw.map { m ->
-            val idx = m.y * size + m.x
-            var sc = history[0][idx] * 2
-            makeMove(m.x, m.y, color)
-            sc += evalQuick(color)
-            undoMove(m.x, m.y, color)
-            m to sc
-        }.sortedByDescending { it.second }.map { it.first }
-
-        return scored.take(cap)
+        if (!anyStone) {
+            val c = size / 2
+            candList[0] = c * size + c
+            candCount = 1
+        }
     }
 
-    private fun genQmoves(color: Stone): List<Move> {
-        val n = size * size
-        val seen = BooleanArray(n)
-        val pts = ArrayList<Move>()
-        for (y in 0 until size) {
-            for (x in 0 until size) {
-                if (board[y][x] == Stone.EMPTY) continue
-                for (dy in -1..1) {
-                    for (dx in -1..1) {
-                        val nx = x + dx; val ny = y + dy
-                        if (nx in 0 until size && ny in 0 until size && board[ny][nx] == Stone.EMPTY) {
-                            val idx = ny * size + nx
-                            if (!seen[idx]) { seen[idx] = true; pts.add(Move(nx, ny, color)) }
-                        }
-                    }
-                }
-            }
+    /**
+     * Writes up to `cap` packed cell indices into `moveBuf[ply]` and returns the
+     * count. Moves that make or block a four always survive the cap.
+     */
+    private fun genMoves(color: Stone, cap: Int, ply: Int): Int {
+        buildCandidates()
+        val buf = moveBuf[ply]
+        val scores = scoreBuf[ply]
+
+        var n = 0
+        for (i in 0 until candCount) {
+            val idx = candList[i]
+            val x = idx % size; val y = idx / size
+            if (color == Stone.BLACK && forbidBlack && !legalIfBlack(x, y)) continue
+            buf[n] = idx
+            scores[n] = orderingScore(x, y, color, ply)
+            n++
         }
-        return pts
+        if (n == 0) return 0
+        if (n <= cap) {
+            sortDesc(buf, scores, 0, n)
+            return n
+        }
+        return orderMoves(buf, scores, n, cap)
     }
 
-    /** Lightweight evaluation for move ordering. */
-    private fun evalQuick(color: Stone): Int {
-        var s = 0
-        for (y in 0 until size) {
-            for (x in 0 until size) {
-                if (board[y][x] != color) continue
-                for (d in DIRS) {
-                    val px = x - d[0]; val py = y - d[1]
-                    if (px in 0 until size && py in 0 until size && board[py][px] == color) continue
-                    val pair = scanRun(x, y, d[0], d[1], color)
-                    s += patternScore(pair.first, pair.second)
-                }
-            }
-        }
+    /** Cheap ordering value: my gain, plus what the move denies the opponent. */
+    private fun orderingScore(x: Int, y: Int, color: Stone, ply: Int): Int {
+        val idx = y * size + x
+        val mine = runWeight(maxRunIfPlaced(x, y, color))
+        val denied = runWeight(maxRunIfPlaced(x, y, color.opponent()))
+        var s = mine * 2 + denied
+        s += history[ply][idx]
+        if (killers[ply][0] == idx) s += 50_000
+        else if (killers[ply][1] == idx) s += 25_000
         return s
+    }
+
+    private fun runWeight(run: Int): Int = when {
+        run >= 5 -> 1_000_000
+        run == 4 -> 100_000
+        run == 3 -> 1_000
+        run == 2 -> 100
+        else -> 10
+    }
+
+    /**
+     * Partitions out the critical moves (four-making or four-blocking), sorts them
+     * first, then fills the rest of the budget with the best remaining moves.
+     */
+    private fun orderMoves(buf: IntArray, scores: IntArray, n: Int, cap: Int): Int {
+        var write = 0
+        for (i in 0 until n) {
+            if (scores[i] >= CRITICAL_SCORE) {
+                if (i != write) {
+                    val tb = buf[i]; buf[i] = buf[write]; buf[write] = tb
+                    val ts = scores[i]; scores[i] = scores[write]; scores[write] = ts
+                }
+                write++
+            }
+        }
+        val critical = write
+        sortDesc(buf, scores, 0, critical)
+
+        if (critical >= cap) {
+            val take = minOf(critical, cap * 2)
+            return take
+        }
+        val got = selectTopDesc(buf, scores, critical, n, cap - critical)
+        return critical + got
+    }
+
+    /** Insertion sort by score, descending (ranges are small). */
+    private fun sortDesc(buf: IntArray, scores: IntArray, from: Int, to: Int) {
+        for (i in from + 1 until to) {
+            val b = buf[i]; val s = scores[i]
+            var j = i - 1
+            while (j >= from && scores[j] < s) {
+                buf[j + 1] = buf[j]; scores[j + 1] = scores[j]
+                j--
+            }
+            buf[j + 1] = b; scores[j + 1] = s
+        }
+    }
+
+    /** Moves the best `k` entries of [from,to) to the front; returns how many. */
+    private fun selectTopDesc(buf: IntArray, scores: IntArray, from: Int, to: Int, k: Int): Int {
+        val limit = minOf(k, to - from)
+        for (i in 0 until limit) {
+            var bestAt = from + i
+            for (j in from + i + 1 until to) {
+                if (scores[j] > scores[bestAt]) bestAt = j
+            }
+            if (bestAt != from + i) {
+                val tb = buf[bestAt]; buf[bestAt] = buf[from + i]; buf[from + i] = tb
+                val ts = scores[bestAt]; scores[bestAt] = scores[from + i]; scores[from + i] = ts
+            }
+        }
+        return limit
     }
 
     // ---- helpers -----------------------------------------------------------
 
-    private fun countLine(x: Int, y: Int, dx: Int, dy: Int, color: Stone): Int {
-        var c = 0
-        var nx = x; var ny = y
-        while (nx in 0 until size && ny in 0 until size && board[ny][nx] == color) { c++; nx += dx; ny += dy }
-        return c
-    }
-
-    private fun isWinMove(m: Move): Boolean {
-        makeMove(m.x, m.y, m.color)
-        val win = ForbiddenMoves.hasFive(board, m.x, m.y, m.color)
-        undoMove(m.x, m.y, m.color)
-        return win
-    }
-
-    private fun isLegal(m: Move): Boolean {
-        if (m.color != Stone.BLACK || !forbidBlack) return true
-        makeMove(m.x, m.y, Stone.BLACK)
-        val ok = !ForbiddenMoves.isForbidden(board, m.x, m.y)
-        undoMove(m.x, m.y, Stone.BLACK)
+    private fun legalIfBlack(x: Int, y: Int): Boolean {
+        if (ai != Stone.BLACK || !forbidBlack) return true
+        makeMove(x, y, Stone.BLACK)
+        val ok = !ForbiddenMoves.isForbidden(board, x, y)
+        undoMove(x, y, Stone.BLACK)
         return ok
     }
-
-    private fun isInCheck(color: Stone): Boolean {
-        for (y in 0 until size) {
-            for (x in 0 until size) {
-                if (board[y][x] != Stone.EMPTY) continue
-                makeMove(x, y, color.opponent())
-                val win = ForbiddenMoves.hasFive(board, x, y, color.opponent())
-                undoMove(x, y, color.opponent())
-                if (win) return true
-            }
-        }
-        return false
-    }
-
-    // ---- board mutation ----------------------------------------------------
 
     private fun makeMove(x: Int, y: Int, c: Stone) {
         board[y][x] = c
@@ -467,6 +662,17 @@ class BuiltInAI {
     private fun undoMove(x: Int, y: Int, c: Stone) {
         board[y][x] = Stone.EMPTY
         hashKey = hashKey xor zobrist[y][x][c.ordinal]
+    }
+
+    private fun ttStore(key: Long, depth: Int, score: Int, type: NodeType, bestIdx: Int) {
+        val e = tt[(key and TT_MASK).toInt()]
+        if (e.depth > depth && e.key == key) return
+        e.key = key; e.depth = depth; e.score = score; e.type = type; e.bestIdx = bestIdx
+    }
+
+    private fun ttProbe(key: Long): TTEntry? {
+        val e = tt[(key and TT_MASK).toInt()]
+        return if (e.key == key) e else null
     }
 
     private fun outOfTime(): Boolean {
