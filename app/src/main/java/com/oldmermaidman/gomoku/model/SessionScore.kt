@@ -52,4 +52,11 @@ class SessionScore {
         losses = 0
         draws = 0
     }
+
+    /** Restores counters read from storage; negative values are clamped to zero. */
+    fun set(wins: Int, losses: Int, draws: Int) {
+        this.wins = wins.coerceAtLeast(0)
+        this.losses = losses.coerceAtLeast(0)
+        this.draws = draws.coerceAtLeast(0)
+    }
 }

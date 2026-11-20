@@ -2,6 +2,7 @@ package com.oldmermaidman.gomoku.ui
 
 import android.content.Context
 import android.view.LayoutInflater
+import android.widget.Button
 import android.widget.RadioGroup
 import android.widget.SeekBar
 import android.widget.TextView
@@ -14,9 +15,14 @@ import com.oldmermaidman.gomoku.prefs.AppSettings
 
 /**
  * Settings dialog: colour, difficulty (which also selects the engine), forbidden
- * moves, move numbering, sound and theme. Values are returned through [onApply].
+ * moves, move numbering, sound, theme and the statistics with a reset button.
+ * Values are returned through [onApply].
  *
  * The board is always 15×15, so there is no size option.
+ *
+ * @param statsProvider formatted statistics of a level, e.g. for
+ *   [AppSettings.LEVEL_NORMAL]; called again after the reset so the labels refresh
+ * @param onResetStats clears the statistics of every level
  */
 class SettingsDialog private constructor() {
 
@@ -31,7 +37,13 @@ class SettingsDialog private constructor() {
     )
 
     companion object {
-        fun show(context: Context, s: AppSettings, onApply: (Result) -> Unit) {
+        fun show(
+            context: Context,
+            s: AppSettings,
+            statsProvider: (Int) -> String,
+            onResetStats: () -> Unit,
+            onApply: (Result) -> Unit
+        ) {
             val view = LayoutInflater.from(context).inflate(R.layout.dialog_settings, null)
 
             val rgColor = view.findViewById<RadioGroup>(R.id.rgColor)
@@ -42,6 +54,9 @@ class SettingsDialog private constructor() {
             val swSound = view.findViewById<SwitchCompat>(R.id.swSound)
             val sbVolume = view.findViewById<SeekBar>(R.id.sbVolume)
             val tvVolume = view.findViewById<TextView>(R.id.tvVolumeValue)
+            val tvStatsNormal = view.findViewById<TextView>(R.id.tvStatsNormal)
+            val tvStatsHard = view.findViewById<TextView>(R.id.tvStatsHard)
+            val btnResetStats = view.findViewById<Button>(R.id.btnResetStats)
 
             rgColor.check(if (s.playerColor == Stone.WHITE) R.id.rbColorWhite else R.id.rbColorBlack)
             rgLevel.check(if (s.aiLevel == AppSettings.LEVEL_STRONG) R.id.rbLevelStrong else R.id.rbLevelNormal)
@@ -73,6 +88,24 @@ class SettingsDialog private constructor() {
 
                 override fun onStopTrackingTouch(seekBar: SeekBar?) = Unit
             })
+
+            fun refreshStats() {
+                tvStatsNormal.text = statsProvider(AppSettings.LEVEL_NORMAL)
+                tvStatsHard.text = statsProvider(AppSettings.LEVEL_STRONG)
+            }
+            refreshStats()
+
+            btnResetStats.setOnClickListener {
+                AlertDialog.Builder(context)
+                    .setTitle(R.string.reset_stats_title)
+                    .setMessage(R.string.reset_stats_message)
+                    .setPositiveButton(R.string.reset) { _, _ ->
+                        onResetStats()
+                        refreshStats()
+                    }
+                    .setNegativeButton(R.string.cancel, null)
+                    .show()
+            }
 
             AlertDialog.Builder(context)
                 .setTitle(R.string.settings_title)

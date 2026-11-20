@@ -133,9 +133,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun openSettings() {
-        SettingsDialog.show(this, viewModel.currentSettings) { result ->
-            viewModel.applySettings(result)
-        }
+        SettingsDialog.show(
+            context = this,
+            s = viewModel.currentSettings,
+            statsProvider = { level -> viewModel.statsLine(level) },
+            onResetStats = { viewModel.resetStats() },
+            onApply = { result -> viewModel.applySettings(result) }
+        )
     }
 
     /**

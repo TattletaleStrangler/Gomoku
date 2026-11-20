@@ -29,6 +29,14 @@
     <string name="theme_dark">Тёмная</string>
     <string name="theme_warm">Тёплая</string>
 
+    <!-- Statistics: cumulative, kept per difficulty level and stored between launches -->
+    <string name="stats_title">Статистика</string>
+    <string name="stats_line">%1$s — победы: %2$d, поражения: %3$d, ничьи: %4$d</string>
+    <string name="reset_stats">Сбросить статистику</string>
+    <string name="reset_stats_title">Сбросить статистику?</string>
+    <string name="reset_stats_message">Победы, поражения и ничьи по обоим уровням сложности будут обнулены.</string>
+    <string name="reset">Сбросить</string>
+
     <!-- Status -->
     <string name="your_turn">Ваш ход</string>
     <string name="computer_turn">Ход компьютера…</string>
@@ -44,7 +52,6 @@
     <string name="result_draw">Ничья</string>
     <string name="play_again">Ещё</string>
     <string name="close">Закрыть</string>
-    <string name="session_score">Счёт за сессию — победы: %1$d, поражения: %2$d, ничьи: %3$d</string>
 
     <!--
         Header shows the selected difficulty rather than the engine name: the

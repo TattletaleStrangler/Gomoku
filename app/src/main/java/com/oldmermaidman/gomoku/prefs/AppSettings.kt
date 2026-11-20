@@ -4,12 +4,13 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.oldmermaidman.gomoku.model.GomokuGame
+import com.oldmermaidman.gomoku.model.ScoreBoard
 import com.oldmermaidman.gomoku.model.SoundVolume
 import com.oldmermaidman.gomoku.model.Stone
 
 /**
- * SharedPreferences-backed settings plus the current game state.
- * Everything survives process death (TZ §8, criterion 6).
+ * SharedPreferences-backed settings, cumulative statistics and the current game
+ * state. Everything survives process death and app restarts (TZ §8, criterion 6).
  *
  * The board is always 15×15 — that is the size Rapfi plays, and the built-in AI
  * is offered as an alternative opponent on the same board. The difficulty level
@@ -70,10 +71,21 @@ class AppSettings(context: Context) {
     fun newGame(): GomokuGame =
         GomokuGame(GomokuGame.BOARD_SIZE, playerColor, forbiddenMoves)
 
+    /** Cumulative wins / losses / draws, one set per difficulty level. */
+    fun loadScores(): ScoreBoard =
+        ScoreBoard.decode(prefs.getString(KEY_STATS, null), LEVEL_COUNT)
+
+    fun saveScores(board: ScoreBoard) {
+        prefs.edit { putString(KEY_STATS, board.encode()) }
+    }
+
     companion object {
         /** Difficulty levels; they also select the engine (see [aiLevel]). */
         const val LEVEL_NORMAL = 0
         const val LEVEL_STRONG = 1
+
+        /** Number of difficulty levels, i.e. the size of the stored statistics. */
+        const val LEVEL_COUNT = 2
 
         const val THEME_LIGHT = 0
         const val THEME_DARK = 1
@@ -88,5 +100,6 @@ class AppSettings(context: Context) {
         private const val KEY_LEVEL = "ai_level"
         private const val KEY_THEME = "theme"
         private const val KEY_GAME = "game_state"
+        private const val KEY_STATS = "stats_by_level"
     }
 }

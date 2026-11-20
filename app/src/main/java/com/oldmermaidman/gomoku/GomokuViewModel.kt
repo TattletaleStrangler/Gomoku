@@ -12,7 +12,6 @@ import com.oldmermaidman.gomoku.model.GameResult
 import com.oldmermaidman.gomoku.model.GomokuGame
 import com.oldmermaidman.gomoku.model.Move
 import com.oldmermaidman.gomoku.model.PlaceOutcome
-import com.oldmermaidman.gomoku.model.SessionScore
 import com.oldmermaidman.gomoku.model.Stone
 import com.oldmermaidman.gomoku.model.resultOf
 import com.oldmermaidman.gomoku.prefs.AppSettings
@@ -35,7 +34,7 @@ data class GameUiState(
     val difficultyLabel: String,
     /** Result from the player's point of view; empty while the game is running. */
     val resultTitle: String,
-    /** Result detail plus the session score; empty while the game is running. */
+    /** Result detail plus the statistics of the current level; empty while running. */
     val resultMessage: String
 )
 
@@ -67,6 +66,9 @@ private data class GameSnapshot(
  * The board is always 15×15. The difficulty level doubles as the engine choice:
  * **Сложный** runs Rapfi, **Нормальный** runs the built-in AI. If Rapfi cannot
  * start, the hard level falls back to the built-in AI and says so in the header.
+ *
+ * Statistics are cumulative, kept separately for each difficulty level and stored
+ * between launches.
  */
 class GomokuViewModel(app: Application) : AndroidViewModel(app) {
 
@@ -89,19 +91,23 @@ class GomokuViewModel(app: Application) : AndroidViewModel(app) {
     private var aiJob: Job? = null
     private var engineChecked = false
 
-    /** Wins / losses / draws of this session. */
-    private val score = SessionScore()
+    /** Cumulative wins / losses / draws, per difficulty level. */
+    private val scores = settings.loadScores()
 
-    /** Result already added to [score]; null while the running game has none. */
+    /** Result already added to [scores]; null while the running game has none. */
     private var countedResult: GameResult? = null
+
+    /** Level the result was counted for, so undo can roll back the right one. */
+    private var countedLevel: Int = AppSettings.LEVEL_NORMAL
 
     /** False when the restored game was already finished before this session. */
     private var countedByThisSession = false
 
     init {
         // A game restored from disk may already be finished. It must not be added
-        // to this session's score, but undo still has to clear its result.
+        // to the statistics again, but undo still has to clear its result.
         countedResult = resultOf(game)
+        countedLevel = settings.aiLevel
         countedByThisSession = false
 
         checkEngineInBackground()
@@ -141,6 +147,21 @@ class GomokuViewModel(app: Application) : AndroidViewModel(app) {
         publish()
     }
 
+    // ---- statistics -------------------------------------------------------
+
+    /** Formatted statistics of one difficulty level; see [AppSettings.LEVEL_NORMAL]. */
+    fun statsLine(level: Int): String {
+        val s = scores.scoreOf(level)
+        return context.getString(R.string.stats_line, levelName(level), s.wins, s.losses, s.draws)
+    }
+
+    /** Clears the statistics of every level and stores the reset. */
+    fun resetStats() {
+        scores.reset()
+        settings.saveScores(scores)
+        publish()
+    }
+
     // ---- game actions -----------------------------------------------------
 
     fun onBoardTapped(x: Int, y: Int) {
@@ -160,12 +181,17 @@ class GomokuViewModel(app: Application) : AndroidViewModel(app) {
      * lost to a surprise five can replay that move instead of starting over.
      *
      * A result that was already counted is taken back with the move: losing,
-     * undoing and then winning leaves only the win in the score.
+     * undoing and then winning leaves only the win in the statistics.
      */
     fun undo() {
         if (thinking) return
         if (game.undo()) {
-            countedResult?.let { if (countedByThisSession) score.rollback(it) }
+            countedResult?.let {
+                if (countedByThisSession) {
+                    scores.rollback(countedLevel, it)
+                    settings.saveScores(scores)
+                }
+            }
             countedResult = null
             countedByThisSession = false
 
@@ -187,7 +213,7 @@ class GomokuViewModel(app: Application) : AndroidViewModel(app) {
         generation++
         aiJob?.cancel()
         thinking = false
-        // The previous result stays in the session score; the new game starts clean.
+        // The finished result stays in the statistics; the new game starts clean.
         countedResult = null
         countedByThisSession = false
 
@@ -298,11 +324,17 @@ class GomokuViewModel(app: Application) : AndroidViewModel(app) {
 
     // ---- UI state ---------------------------------------------------------
 
-    /** Adds a freshly finished game to the session score, once. */
+    /**
+     * Adds a freshly finished game to the statistics, once. The result is
+     * attributed to the level that was selected when the game ended.
+     */
     private fun syncScore() {
         val result = resultOf(game) ?: return
         if (countedResult != null) return
-        score.record(result)
+
+        countedLevel = settings.aiLevel
+        scores.record(countedLevel, result)
+        settings.saveScores(scores)
         countedResult = result
         countedByThisSession = true
     }
@@ -340,8 +372,11 @@ class GomokuViewModel(app: Application) : AndroidViewModel(app) {
         else -> context.getString(R.string.result_loss)
     }
 
-    private fun buildResultMessage(): String = buildStatus() + "\n\n" + context.getString(
-        R.string.session_score, score.wins, score.losses, score.draws
+    private fun buildResultMessage(): String =
+        buildStatus() + "\n\n" + statsLine(settings.aiLevel)
+
+    private fun levelName(level: Int): String = context.getString(
+        if (level == AppSettings.LEVEL_STRONG) R.string.level_strong else R.string.level_normal
     )
 
     /**
@@ -352,11 +387,10 @@ class GomokuViewModel(app: Application) : AndroidViewModel(app) {
      * a silent fallback to the weaker engine would otherwise mislead the player.
      */
     private fun buildDifficultyLabel(): String {
-        val levelName = context.getString(
-            if (settings.aiLevel == AppSettings.LEVEL_STRONG) R.string.level_strong
-            else R.string.level_normal
+        val base = context.getString(
+            R.string.difficulty_label,
+            levelName(settings.aiLevel)
         )
-        val base = context.getString(R.string.difficulty_label, levelName)
 
         val hardWithoutEngine = settings.aiLevel == AppSettings.LEVEL_STRONG &&
             engineChecked && !engine.available
