@@ -21,6 +21,9 @@
     <string name="level_strong">Сложный</string>
     <string name="forbidden_moves">Запрещённые ходы чёрных (рендзю)</string>
     <string name="show_numbers">Показывать номера ходов</string>
+    <string name="sound_enabled">Звук хода</string>
+    <string name="sound_volume">Громкость</string>
+    <string name="volume_percent">%1$d %%</string>
     <string name="choose_theme">Тема оформления</string>
     <string name="theme_light">Светлая</string>
     <string name="theme_dark">Тёмная</string>

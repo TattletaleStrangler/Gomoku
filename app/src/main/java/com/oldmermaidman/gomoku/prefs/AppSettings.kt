@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.oldmermaidman.gomoku.model.GomokuGame
+import com.oldmermaidman.gomoku.model.SoundVolume
 import com.oldmermaidman.gomoku.model.Stone
 
 /**
@@ -30,6 +31,16 @@ class AppSettings(context: Context) {
     var showMoveNumbers: Boolean
         get() = prefs.getBoolean(KEY_NUMBERS, true)
         set(value) = prefs.edit { putBoolean(KEY_NUMBERS, value) }
+
+    /** Move sound on/off. */
+    var soundEnabled: Boolean
+        get() = prefs.getBoolean(KEY_SOUND, true)
+        set(value) = prefs.edit { putBoolean(KEY_SOUND, value) }
+
+    /** Volume slider position, `0..SoundVolume.STEPS-1`; see [SoundVolume.percentOf]. */
+    var soundVolumeStep: Int
+        get() = prefs.getInt(KEY_VOLUME, SoundVolume.DEFAULT_STEP)
+        set(value) = prefs.edit { putInt(KEY_VOLUME, value.coerceIn(0, SoundVolume.STEPS - 1)) }
 
     /**
      * Difficulty, which doubles as the engine choice:
@@ -72,6 +83,8 @@ class AppSettings(context: Context) {
         private const val KEY_COLOR = "player_color"
         private const val KEY_FORBIDDEN = "forbidden_moves"
         private const val KEY_NUMBERS = "show_move_numbers"
+        private const val KEY_SOUND = "sound_enabled"
+        private const val KEY_VOLUME = "sound_volume_step"
         private const val KEY_LEVEL = "ai_level"
         private const val KEY_THEME = "theme"
         private const val KEY_GAME = "game_state"

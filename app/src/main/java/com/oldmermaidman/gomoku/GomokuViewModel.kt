@@ -120,6 +120,8 @@ class GomokuViewModel(app: Application) : AndroidViewModel(app) {
         settings.playerColor = r.playerColor
         settings.forbiddenMoves = r.forbidden
         settings.showMoveNumbers = r.showNumbers
+        settings.soundEnabled = r.soundEnabled
+        settings.soundVolumeStep = r.soundVolumeStep
         settings.aiLevel = r.aiLevel
         settings.theme = r.theme
 

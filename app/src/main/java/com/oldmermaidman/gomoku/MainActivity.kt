@@ -13,14 +13,21 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import com.google.android.material.button.MaterialButton
 import com.oldmermaidman.gomoku.databinding.ActivityMainBinding
+import com.oldmermaidman.gomoku.model.SoundVolume
 import com.oldmermaidman.gomoku.ui.GomokuTheme
 import com.oldmermaidman.gomoku.ui.SettingsDialog
+import com.oldmermaidman.gomoku.ui.SoundPlayer
 import com.oldmermaidman.gomoku.ui.Themes
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private val viewModel: GomokuViewModel by viewModels()
+
+    private val soundPlayer = SoundPlayer()
+
+    /** History length seen on the previous state; used to detect a new stone. */
+    private var lastHistorySize = -1
 
     /** True once the result dialog has been raised for the current finished game. */
     private var resultDialogShown = false
@@ -58,6 +65,12 @@ class MainActivity : AppCompatActivity() {
             binding.btnUndo.isEnabled = !state.thinking && state.game.history.isNotEmpty()
             binding.btnResign.isEnabled = !state.thinking && !state.game.gameOver
 
+            // Click for every stone that appears, the computer's included. The
+            // first state after launch is skipped, so a restored game stays silent.
+            val historySize = state.game.history.size
+            if (lastHistorySize in 0 until historySize) playMoveSound()
+            lastHistorySize = historySize
+
             // The result dialog is raised when a game ends while the app is
             // running. A game that was already finished when the app started is
             // not announced again — its result is visible in the status line.
@@ -76,10 +89,22 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    override fun onDestroy() {
+        soundPlayer.release()
+        super.onDestroy()
+    }
+
+    private fun playMoveSound() {
+        val settings = viewModel.currentSettings
+        if (!settings.soundEnabled) return
+        soundPlayer.play(SoundVolume.percentOf(settings.soundVolumeStep))
+    }
+
     /**
-     * Shown when a game is over. Besides the result it offers to take the last
-     * move back: the computer can complete five unexpectedly, and the player
-     * often wants to replay that move rather than start a new game.
+     * Shown when a game is over. Besides the result and the session score it
+     * offers to take the last move back: the computer can complete five
+     * unexpectedly, and the player often wants to replay that move rather than
+     * start a new game.
      */
     private fun showResultDialog(state: GameUiState) {
         AlertDialog.Builder(this)
