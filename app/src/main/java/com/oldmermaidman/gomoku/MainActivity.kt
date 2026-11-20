@@ -5,6 +5,7 @@ import android.graphics.Color
 import android.os.Bundle
 import android.widget.Button
 import androidx.activity.viewModels
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.drawable.toDrawable
 import androidx.core.view.ViewCompat
@@ -20,6 +21,12 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private val viewModel: GomokuViewModel by viewModels()
+
+    /** True once the result dialog has been raised for the current finished game. */
+    private var resultDialogShown = false
+
+    /** Used to tell a fresh launch from a game that ended while the app ran. */
+    private var firstState = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,7 +57,38 @@ class MainActivity : AppCompatActivity() {
 
             binding.btnUndo.isEnabled = !state.thinking && state.game.history.isNotEmpty()
             binding.btnResign.isEnabled = !state.thinking && !state.game.gameOver
+
+            // The result dialog is raised when a game ends while the app is
+            // running. A game that was already finished when the app started is
+            // not announced again — its result is visible in the status line.
+            if (firstState) {
+                firstState = false
+                resultDialogShown = state.game.gameOver
+            }
+            if (state.game.gameOver) {
+                if (!resultDialogShown) {
+                    resultDialogShown = true
+                    showResultDialog(state)
+                }
+            } else {
+                resultDialogShown = false
+            }
         }
+    }
+
+    /**
+     * Shown when a game is over. Besides the result it offers to take the last
+     * move back: the computer can complete five unexpectedly, and the player
+     * often wants to replay that move rather than start a new game.
+     */
+    private fun showResultDialog(state: GameUiState) {
+        AlertDialog.Builder(this)
+            .setTitle(state.resultTitle)
+            .setMessage(state.status)
+            .setPositiveButton(R.string.play_again) { _, _ -> viewModel.startNewGame() }
+            .setNeutralButton(R.string.undo_move) { _, _ -> viewModel.undo() }
+            .setNegativeButton(R.string.close, null)
+            .show()
     }
 
     /**

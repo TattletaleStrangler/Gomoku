@@ -29,7 +29,9 @@ data class GameUiState(
      * Selected difficulty, e.g. "Сложность: Сложный". It implies which engine
      * plays, so the engine is not named separately in the header.
      */
-    val difficultyLabel: String
+    val difficultyLabel: String,
+    /** Result from the player's point of view; empty while the game is running. */
+    val resultTitle: String
 )
 
 /** Immutable snapshot of the position passed to the AI on a background thread. */
@@ -132,6 +134,10 @@ class GomokuViewModel(app: Application) : AndroidViewModel(app) {
         if (!game.gameOver) requestAiMove()
     }
 
+    /**
+     * Takes back the last round. It also reopens a finished game, so a player who
+     * lost to a surprise five can replay that move instead of starting over.
+     */
     fun undo() {
         if (thinking) return
         if (game.undo()) {
@@ -267,7 +273,8 @@ class GomokuViewModel(app: Application) : AndroidViewModel(app) {
             revision = revision,
             thinking = thinking,
             status = buildStatus(),
-            difficultyLabel = buildDifficultyLabel()
+            difficultyLabel = buildDifficultyLabel(),
+            resultTitle = if (game.gameOver) buildResultTitle() else ""
         )
     }
 
@@ -281,6 +288,13 @@ class GomokuViewModel(app: Application) : AndroidViewModel(app) {
         thinking -> context.getString(R.string.computer_thinking)
         game.currentTurn == game.playerColor -> context.getString(R.string.your_turn)
         else -> context.getString(R.string.computer_turn)
+    }
+
+    /** Result of a finished game, phrased from the player's point of view. */
+    private fun buildResultTitle(): String = when {
+        game.winner == null -> context.getString(R.string.result_draw)
+        game.winner == game.playerColor -> context.getString(R.string.result_win)
+        else -> context.getString(R.string.result_loss)
     }
 
     /**

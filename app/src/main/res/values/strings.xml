@@ -5,6 +5,7 @@
     <!-- Action buttons -->
     <string name="new_game">Новая игра</string>
     <string name="undo">Отмена</string>
+    <string name="undo_move">Отменить ход</string>
     <string name="resign">Сдаться</string>
     <string name="theme">Тема</string>
 
@@ -33,6 +34,13 @@
     <string name="white_wins">Победили белые</string>
     <string name="draw">Ничья</string>
     <string name="forbidden_loss">Чёрные нарушили правило — победили белые</string>
+
+    <!-- Game over dialog -->
+    <string name="result_win">Вы победили!</string>
+    <string name="result_loss">Вы проиграли</string>
+    <string name="result_draw">Ничья</string>
+    <string name="play_again">Ещё</string>
+    <string name="close">Закрыть</string>
 
     <!--
         Header shows the selected difficulty rather than the engine name: the
