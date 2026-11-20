@@ -6,6 +6,7 @@ import com.oldmermaidman.gomoku.rules.ForbiddenMoves
 enum class PlaceOutcome {
     OK,        // stone placed, game continues
     WIN,       // stone placed, five in a row -> current player wins
+    DRAW,      // stone placed, board is full and nobody has five
     FORBIDDEN, // black placed a forbidden move under renju rules -> black loses
     INVALID,   // out of bounds or game already over
     OCCUPIED   // cell is not empty
@@ -86,6 +87,14 @@ class GomokuGame(
         }
 
         currentTurn = color.opponent()
+
+        // A full board without a five is a draw. Without this check the game would
+        // simply run out of legal moves and never declare a result.
+        if (history.size == size * size) {
+            gameOver = true          // winner stays null
+            return PlaceOutcome.DRAW
+        }
+
         return PlaceOutcome.OK
     }
 
