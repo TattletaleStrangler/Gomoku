@@ -1,0 +1,214 @@
+package com.oldmermaidman.gomoku.ui
+
+import android.app.Activity
+import android.content.Context
+import android.content.Intent
+import android.os.Bundle
+import android.view.View
+import android.widget.Button
+import android.widget.RadioGroup
+import android.widget.SeekBar
+import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.SwitchCompat
+import com.oldmermaidman.gomoku.R
+import com.oldmermaidman.gomoku.model.ScoreBoard
+import com.oldmermaidman.gomoku.model.SoundVolume
+import com.oldmermaidman.gomoku.model.Stone
+import com.oldmermaidman.gomoku.prefs.AppSettings
+
+/**
+ * Settings as a full screen rather than a modal dialog: a dialog interrupts the
+ * game and cramps its content, while a screen has room for the whole list —
+ * including the statistics table.
+ *
+ * The chosen values travel back to [com.oldmermaidman.gomoku.MainActivity] as an
+ * activity result, so the game state itself stays owned by the view model.
+ */
+class SettingsActivity : AppCompatActivity() {
+
+    companion object {
+        private const val EXTRA_PLAYER_COLOR = "player_color"
+        private const val EXTRA_FORBIDDEN = "forbidden"
+        private const val EXTRA_SHOW_NUMBERS = "show_numbers"
+        private const val EXTRA_AI_LEVEL = "ai_level"
+        private const val EXTRA_THEME = "theme"
+        private const val EXTRA_SOUND_ENABLED = "sound_enabled"
+        private const val EXTRA_SOUND_VOLUME = "sound_volume"
+
+        /** Set when the statistics were cleared on this screen. */
+        const val EXTRA_STATS_RESET = "stats_reset"
+
+        fun intent(context: Context): Intent = Intent(context, SettingsActivity::class.java)
+
+        /** Reads the chosen values back; null when the intent carries none. */
+        fun valuesFrom(data: Intent): SettingsValues? {
+            if (!data.hasExtra(EXTRA_AI_LEVEL)) return null
+            return SettingsValues(
+                playerColor = if (data.getStringExtra(EXTRA_PLAYER_COLOR) == Stone.WHITE.name) {
+                    Stone.WHITE
+                } else {
+                    Stone.BLACK
+                },
+                forbidden = data.getBooleanExtra(EXTRA_FORBIDDEN, false),
+                showNumbers = data.getBooleanExtra(EXTRA_SHOW_NUMBERS, true),
+                aiLevel = data.getIntExtra(EXTRA_AI_LEVEL, AppSettings.LEVEL_NORMAL),
+                theme = data.getIntExtra(EXTRA_THEME, AppSettings.THEME_LIGHT),
+                soundEnabled = data.getBooleanExtra(EXTRA_SOUND_ENABLED, true),
+                soundVolumeStep = data.getIntExtra(EXTRA_SOUND_VOLUME, SoundVolume.DEFAULT_STEP)
+            )
+        }
+    }
+
+    private lateinit var settings: AppSettings
+
+    /** True when the statistics were cleared here and must be reloaded by the caller. */
+    private var statsReset = false
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_settings)
+
+        settings = AppSettings(this)
+        val root: View = findViewById(R.id.settingsRoot)
+        ThemeSupport.applySystemBarInsets(root)
+
+        val rgColor = findViewById<RadioGroup>(R.id.rgColor)
+        val rgLevel = findViewById<RadioGroup>(R.id.rgLevel)
+        val rgTheme = findViewById<RadioGroup>(R.id.rgTheme)
+        val swForbidden = findViewById<SwitchCompat>(R.id.swForbidden)
+        val swNumbers = findViewById<SwitchCompat>(R.id.swNumbers)
+        val swSound = findViewById<SwitchCompat>(R.id.swSound)
+        val sbVolume = findViewById<SeekBar>(R.id.sbVolume)
+        val tvVolume = findViewById<TextView>(R.id.tvVolumeValue)
+
+        val tvNormalWins = findViewById<TextView>(R.id.tvNormalWins)
+        val tvNormalLosses = findViewById<TextView>(R.id.tvNormalLosses)
+        val tvNormalDraws = findViewById<TextView>(R.id.tvNormalDraws)
+        val tvHardWins = findViewById<TextView>(R.id.tvHardWins)
+        val tvHardLosses = findViewById<TextView>(R.id.tvHardLosses)
+        val tvHardDraws = findViewById<TextView>(R.id.tvHardDraws)
+
+        // ---- local helpers -------------------------------------------------
+
+        fun showVolume(step: Int) {
+            tvVolume.text = getString(R.string.volume_percent, SoundVolume.percentOf(step))
+        }
+
+        fun refreshStats() {
+            val board: ScoreBoard = settings.loadScores()
+            val normal = board.scoreOf(AppSettings.LEVEL_NORMAL)
+            val hard = board.scoreOf(AppSettings.LEVEL_STRONG)
+            tvNormalWins.text = getString(R.string.stats_value, normal.wins)
+            tvNormalLosses.text = getString(R.string.stats_value, normal.losses)
+            tvNormalDraws.text = getString(R.string.stats_value, normal.draws)
+            tvHardWins.text = getString(R.string.stats_value, hard.wins)
+            tvHardLosses.text = getString(R.string.stats_value, hard.losses)
+            tvHardDraws.text = getString(R.string.stats_value, hard.draws)
+        }
+
+        fun selectedTheme(): GomokuTheme = Themes.byId(
+            when (rgTheme.checkedRadioButtonId) {
+                R.id.rbThemeDark -> AppSettings.THEME_DARK
+                R.id.rbThemeWarm -> AppSettings.THEME_WARM
+                else -> AppSettings.THEME_LIGHT
+            }
+        )
+
+        // The theme is previewed as soon as it is picked, but only saved on Apply.
+        fun previewTheme() {
+            val theme = selectedTheme()
+            ThemeSupport.applyWindow(this, root, theme)
+            ThemeSupport.tintHierarchy(root, theme)
+        }
+
+        fun applyAndFinish() {
+            val data = Intent().apply {
+                putExtra(
+                    EXTRA_PLAYER_COLOR,
+                    if (rgColor.checkedRadioButtonId == R.id.rbColorWhite) Stone.WHITE.name
+                    else Stone.BLACK.name
+                )
+                putExtra(EXTRA_FORBIDDEN, swForbidden.isChecked)
+                putExtra(EXTRA_SHOW_NUMBERS, swNumbers.isChecked)
+                putExtra(
+                    EXTRA_AI_LEVEL,
+                    if (rgLevel.checkedRadioButtonId == R.id.rbLevelStrong) AppSettings.LEVEL_STRONG
+                    else AppSettings.LEVEL_NORMAL
+                )
+                putExtra(
+                    EXTRA_THEME,
+                    when (rgTheme.checkedRadioButtonId) {
+                        R.id.rbThemeDark -> AppSettings.THEME_DARK
+                        R.id.rbThemeWarm -> AppSettings.THEME_WARM
+                        else -> AppSettings.THEME_LIGHT
+                    }
+                )
+                putExtra(EXTRA_SOUND_ENABLED, swSound.isChecked)
+                putExtra(EXTRA_SOUND_VOLUME, sbVolume.progress)
+                putExtra(EXTRA_STATS_RESET, statsReset)
+            }
+            setResult(Activity.RESULT_OK, data)
+            finish()
+        }
+
+        // ---- initial values ------------------------------------------------
+
+        rgColor.check(if (settings.playerColor == Stone.WHITE) R.id.rbColorWhite else R.id.rbColorBlack)
+        rgLevel.check(
+            if (settings.aiLevel == AppSettings.LEVEL_STRONG) R.id.rbLevelStrong
+            else R.id.rbLevelNormal
+        )
+        rgTheme.check(
+            when (settings.theme) {
+                AppSettings.THEME_DARK -> R.id.rbThemeDark
+                AppSettings.THEME_WARM -> R.id.rbThemeWarm
+                else -> R.id.rbThemeLight
+            }
+        )
+        swForbidden.isChecked = settings.forbiddenMoves
+        swNumbers.isChecked = settings.showMoveNumbers
+
+        // Volume is chosen in five steps of 20 %; the slider position is the step,
+        // so the maximum comes from SoundVolume rather than from the layout.
+        sbVolume.max = SoundVolume.STEPS - 1
+        sbVolume.progress = settings.soundVolumeStep
+        swSound.isChecked = settings.soundEnabled
+        sbVolume.isEnabled = settings.soundEnabled
+        showVolume(sbVolume.progress)
+
+        refreshStats()
+
+        // ---- listeners -----------------------------------------------------
+
+        swSound.setOnCheckedChangeListener { _, checked -> sbVolume.isEnabled = checked }
+        sbVolume.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) =
+                showVolume(progress)
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) = Unit
+
+            override fun onStopTrackingTouch(seekBar: SeekBar?) = Unit
+        })
+        rgTheme.setOnCheckedChangeListener { _, _ -> previewTheme() }
+
+        findViewById<Button>(R.id.btnResetStats).setOnClickListener {
+            AlertDialog.Builder(this)
+                .setTitle(R.string.reset_stats_title)
+                .setMessage(R.string.reset_stats_message)
+                .setPositiveButton(R.string.reset) { _, _ ->
+                    settings.saveScores(ScoreBoard(AppSettings.LEVEL_COUNT))
+                    statsReset = true
+                    refreshStats()
+                }
+                .setNegativeButton(R.string.cancel, null)
+                .show()
+        }
+
+        findViewById<Button>(R.id.btnCancel).setOnClickListener { finish() }
+        findViewById<Button>(R.id.btnApply).setOnClickListener { applyAndFinish() }
+
+        previewTheme()
+    }
+}

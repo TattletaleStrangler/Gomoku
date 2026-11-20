@@ -16,7 +16,7 @@ import com.oldmermaidman.gomoku.model.Stone
 import com.oldmermaidman.gomoku.model.resultOf
 import com.oldmermaidman.gomoku.prefs.AppSettings
 import com.oldmermaidman.gomoku.rules.ForbiddenMoves
-import com.oldmermaidman.gomoku.ui.SettingsDialog
+import com.oldmermaidman.gomoku.ui.SettingsValues
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -31,11 +31,7 @@ data class GameUiState(
      * Selected difficulty, e.g. "Сложность: Сложный". It implies which engine
      * plays, so the engine is not named separately in the header.
      */
-    val difficultyLabel: String,
-    /** Result from the player's point of view; empty while the game is running. */
-    val resultTitle: String,
-    /** Result detail plus the statistics of the current level; empty while running. */
-    val resultMessage: String
+    val difficultyLabel: String
 )
 
 /** Immutable snapshot of the position passed to the AI on a background thread. */
@@ -67,6 +63,9 @@ private data class GameSnapshot(
  * **Сложный** runs Rapfi, **Нормальный** runs the built-in AI. If Rapfi cannot
  * start, the hard level falls back to the built-in AI and says so in the header.
  *
+ * The outcome of a finished game is reported through the status line — there is
+ * no result dialog, so nothing interrupts the game.
+ *
  * Statistics are cumulative, kept separately for each difficulty level and stored
  * between launches.
  */
@@ -92,7 +91,7 @@ class GomokuViewModel(app: Application) : AndroidViewModel(app) {
     private var engineChecked = false
 
     /** Cumulative wins / losses / draws, per difficulty level. */
-    private val scores = settings.loadScores()
+    private var scores = settings.loadScores()
 
     /** Result already added to [scores]; null while the running game has none. */
     private var countedResult: GameResult? = null
@@ -120,7 +119,7 @@ class GomokuViewModel(app: Application) : AndroidViewModel(app) {
 
     // ---- settings ---------------------------------------------------------
 
-    fun applySettings(r: SettingsDialog.Result) {
+    fun applySettings(r: SettingsValues) {
         val colorChanged = r.playerColor != settings.playerColor
 
         settings.playerColor = r.playerColor
@@ -147,18 +146,17 @@ class GomokuViewModel(app: Application) : AndroidViewModel(app) {
         publish()
     }
 
-    // ---- statistics -------------------------------------------------------
-
-    /** Formatted statistics of one difficulty level; see [AppSettings.LEVEL_NORMAL]. */
-    fun statsLine(level: Int): String {
-        val s = scores.scoreOf(level)
-        return context.getString(R.string.stats_line, levelName(level), s.wins, s.losses, s.draws)
-    }
-
-    /** Clears the statistics of every level and stores the reset. */
-    fun resetStats() {
-        scores.reset()
-        settings.saveScores(scores)
+    /**
+     * Re-reads the statistics from storage, for example after the settings screen
+     * cleared them.
+     *
+     * The bookkeeping of an already counted result is dropped as well: that result
+     * no longer exists in the statistics, so it must not be rolled back later.
+     */
+    fun reloadStats() {
+        scores = settings.loadScores()
+        countedResult = null
+        countedByThisSession = false
         publish()
     }
 
@@ -347,12 +345,11 @@ class GomokuViewModel(app: Application) : AndroidViewModel(app) {
             revision = revision,
             thinking = thinking,
             status = buildStatus(),
-            difficultyLabel = buildDifficultyLabel(),
-            resultTitle = if (game.gameOver) buildResultTitle() else "",
-            resultMessage = if (game.gameOver) buildResultMessage() else ""
+            difficultyLabel = buildDifficultyLabel()
         )
     }
 
+    /** Also carries the result of a finished game — that is the only report shown. */
     private fun buildStatus(): String = when {
         game.gameOver -> when {
             game.forbiddenLoss -> context.getString(R.string.forbidden_loss)
@@ -364,16 +361,6 @@ class GomokuViewModel(app: Application) : AndroidViewModel(app) {
         game.currentTurn == game.playerColor -> context.getString(R.string.your_turn)
         else -> context.getString(R.string.computer_turn)
     }
-
-    /** Result of a finished game, phrased from the player's point of view. */
-    private fun buildResultTitle(): String = when {
-        game.winner == null -> context.getString(R.string.result_draw)
-        game.winner == game.playerColor -> context.getString(R.string.result_win)
-        else -> context.getString(R.string.result_loss)
-    }
-
-    private fun buildResultMessage(): String =
-        buildStatus() + "\n\n" + statsLine(settings.aiLevel)
 
     private fun levelName(level: Int): String = context.getString(
         if (level == AppSettings.LEVEL_STRONG) R.string.level_strong else R.string.level_normal
@@ -387,10 +374,7 @@ class GomokuViewModel(app: Application) : AndroidViewModel(app) {
      * a silent fallback to the weaker engine would otherwise mislead the player.
      */
     private fun buildDifficultyLabel(): String {
-        val base = context.getString(
-            R.string.difficulty_label,
-            levelName(settings.aiLevel)
-        )
+        val base = context.getString(R.string.difficulty_label, levelName(settings.aiLevel))
 
         val hardWithoutEngine = settings.aiLevel == AppSettings.LEVEL_STRONG &&
             engineChecked && !engine.available

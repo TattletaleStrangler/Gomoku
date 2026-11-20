@@ -5,11 +5,10 @@
     <!-- Action buttons -->
     <string name="new_game">Новая игра</string>
     <string name="undo">Отмена</string>
-    <string name="undo_move">Отменить ход</string>
     <string name="resign">Сдаться</string>
     <string name="theme">Тема</string>
 
-    <!-- Settings dialog -->
+    <!-- Settings screen -->
     <string name="settings_title">Настройки</string>
     <string name="apply">Применить</string>
     <string name="cancel">Отмена</string>
@@ -29,9 +28,14 @@
     <string name="theme_dark">Тёмная</string>
     <string name="theme_warm">Тёплая</string>
 
-    <!-- Statistics: cumulative, kept per difficulty level and stored between launches -->
+    <!-- Statistics table: cumulative, per difficulty level, stored between launches -->
     <string name="stats_title">Статистика</string>
-    <string name="stats_line">%1$s — победы: %2$d, поражения: %3$d, ничьи: %4$d</string>
+    <string name="stats_level">Уровень</string>
+    <string name="stats_wins">Победы</string>
+    <string name="stats_losses">Поражения</string>
+    <string name="stats_draws">Ничьи</string>
+    <!-- A bare number, formatted through a resource so the digits follow the locale. -->
+    <string name="stats_value">%1$d</string>
     <string name="reset_stats">Сбросить статистику</string>
     <string name="reset_stats_title">Сбросить статистику?</string>
     <string name="reset_stats_message">Победы, поражения и ничьи по обоим уровням сложности будут обнулены.</string>
@@ -45,13 +49,6 @@
     <string name="white_wins">Победили белые</string>
     <string name="draw">Ничья</string>
     <string name="forbidden_loss">Чёрные нарушили правило — победили белые</string>
-
-    <!-- Game over dialog -->
-    <string name="result_win">Вы победили!</string>
-    <string name="result_loss">Вы проиграли</string>
-    <string name="result_draw">Ничья</string>
-    <string name="play_again">Ещё</string>
-    <string name="close">Закрыть</string>
 
     <!--
         Header shows the selected difficulty rather than the engine name: the
