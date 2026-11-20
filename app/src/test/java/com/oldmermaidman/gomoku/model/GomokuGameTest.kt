@@ -118,4 +118,55 @@ class GomokuGameTest {
         assertEquals(Stone.WHITE, game.winner)
         assertTrue(game.forbiddenLoss)
     }
+
+    // ---- winning line ------------------------------------------------------
+
+    @Test
+    fun winningLineIsReported() {
+        val game = newGame()
+        for (x in 3..6) game.place(x, 7, Stone.BLACK)
+        game.place(7, 7, Stone.BLACK)
+
+        val line = game.winningLine
+
+        assertEquals(5, line.size)
+        assertEquals(listOf(3, 4, 5, 6, 7), line.map { it.x })
+        assertTrue("the whole line lies on row 7", line.all { it.y == 7 })
+    }
+
+    @Test
+    fun winningLineSurvivesEncodeDecode() {
+        val game = newGame()
+        for (x in 3..6) game.place(x, 7, Stone.BLACK)
+        game.place(7, 7, Stone.BLACK)
+
+        val restored = GomokuGame.decode(game.encode())
+
+        assertTrue(restored != null)
+        assertEquals(5, restored!!.winningLine.size)
+    }
+
+    @Test
+    fun winningLineIsClearedByUndo() {
+        val game = newGame()
+        for (x in 3..6) game.place(x, 7, Stone.BLACK)
+        game.place(7, 7, Stone.BLACK)
+
+        game.undo()
+
+        assertTrue("undo must drop the highlight", game.winningLine.isEmpty())
+    }
+
+    @Test
+    fun noWinningLineWhenBlackLosesByForbiddenMove() {
+        val game = newGame(forbidden = true)
+        game.place(5, 7, Stone.BLACK)
+        game.place(6, 7, Stone.BLACK)
+        game.place(7, 5, Stone.BLACK)
+        game.place(7, 6, Stone.BLACK)
+        game.place(7, 7, Stone.BLACK)
+
+        assertTrue(game.forbiddenLoss)
+        assertTrue("white never made five, so there is no line", game.winningLine.isEmpty())
+    }
 }

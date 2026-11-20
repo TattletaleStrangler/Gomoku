@@ -8,6 +8,7 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
 import com.oldmermaidman.gomoku.model.GomokuGame
+import com.oldmermaidman.gomoku.model.Move
 import com.oldmermaidman.gomoku.model.Stone
 import kotlin.math.min
 import kotlin.math.roundToInt
@@ -34,6 +35,9 @@ class BoardView @JvmOverloads constructor(
     var showMoveNumbers: Boolean = true
     var onCellTapped: ((Int, Int) -> Unit)? = null
 
+    /** Cells of the winning line; empty unless the game was won. */
+    var winningLine: List<Move> = emptyList()
+
     private val stonePaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val linePaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val textPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
@@ -42,6 +46,10 @@ class BoardView @JvmOverloads constructor(
     }
     private val ringPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.STROKE
+    }
+    private val winPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        style = Paint.Style.STROKE
+        strokeCap = Paint.Cap.ROUND
     }
 
     /**
@@ -106,6 +114,20 @@ class BoardView @JvmOverloads constructor(
             ringPaint.color = theme.lastMoveRing
             ringPaint.strokeWidth = cellSize * 0.08f
             canvas.drawCircle(cx, cy, stoneRadius * 0.68f, ringPaint)
+        }
+
+        // Winning line, drawn over the stones so it reads on every theme.
+        if (winningLine.size >= 2) {
+            val first = winningLine.first()
+            val last = winningLine.last()
+            winPaint.color = theme.lastMoveRing
+            winPaint.alpha = 150
+            winPaint.strokeWidth = cellSize * 0.16f
+            canvas.drawLine(
+                originX + first.x * cellSize, originY + first.y * cellSize,
+                originX + last.x * cellSize, originY + last.y * cellSize,
+                winPaint
+            )
         }
     }
 

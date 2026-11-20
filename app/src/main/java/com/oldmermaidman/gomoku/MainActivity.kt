@@ -42,6 +42,7 @@ class MainActivity : AppCompatActivity() {
             binding.boardView.game = state.game
             binding.boardView.theme = theme
             binding.boardView.showMoveNumbers = viewModel.currentSettings.showMoveNumbers
+            binding.boardView.winningLine = state.game.winningLine
             binding.boardView.invalidate()
 
             binding.tvStatus.text = state.status

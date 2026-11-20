@@ -44,6 +44,14 @@ class GomokuGame(
     var lastMove: Move? = null
         private set
 
+    /**
+     * Cells of the winning five (or more) in a row, in board order. Empty when
+     * there is no winning line — for instance when black lost by a forbidden
+     * move and white never made five.
+     */
+    var winningLine: List<Move> = emptyList()
+        private set
+
     val aiColor: Stone get() = playerColor.opponent()
 
     fun inBounds(x: Int, y: Int): Boolean = x in 0 until size && y in 0 until size
@@ -68,12 +76,14 @@ class GomokuGame(
             winner = Stone.WHITE
             gameOver = true
             forbiddenLoss = true
+            winningLine = emptyList()
             return PlaceOutcome.FORBIDDEN
         }
 
         if (ForbiddenMoves.hasFive(board, x, y, color)) {
             winner = color
             gameOver = true
+            winningLine = findWinningLine(color) ?: emptyList()
             return PlaceOutcome.WIN
         }
 
@@ -83,6 +93,7 @@ class GomokuGame(
             winner = Stone.WHITE
             gameOver = true
             forbiddenLoss = true
+            winningLine = emptyList()
             return PlaceOutcome.FORBIDDEN
         }
 
@@ -100,8 +111,10 @@ class GomokuGame(
 
     /**
      * Undo a full round: the AI's last stone and, if present, the player's stone before it.
-     * Returns false when there is nothing to undo. Undo is disallowed while the computer is
-     * thinking (the caller checks that) and simply reverts otherwise.
+     * Returns false when there is nothing to undo.
+     *
+     * Undo also clears a finished game, so a player who lost to a surprise five
+     * can take the move back and play on.
      */
     fun undo(): Boolean {
         if (history.isEmpty()) return false
@@ -117,6 +130,7 @@ class GomokuGame(
         winner = null
         gameOver = false
         forbiddenLoss = false
+        winningLine = emptyList()
         currentTurn = if (history.isEmpty()) Stone.BLACK else history.last().color.opponent()
         return true
     }
@@ -126,6 +140,7 @@ class GomokuGame(
         if (gameOver) return
         winner = aiColor
         gameOver = true
+        winningLine = emptyList()
     }
 
     /** Places a stone without rule checks — used only to reconstruct a saved game. */
@@ -141,6 +156,29 @@ class GomokuGame(
         val m = history.removeAt(history.size - 1)
         board[m.y][m.x] = Stone.EMPTY
         lastMove = history.lastOrNull()
+    }
+
+    /**
+     * Finds the stones that won the game: the first run of five or more of
+     * [color] on the board. Returns null when that colour has no such run.
+     */
+    private fun findWinningLine(color: Stone): List<Move>? {
+        for (y in 0 until size) {
+            for (x in 0 until size) {
+                if (board[y][x] != color) continue
+                for (d in LINE_DIRS) {
+                    val px = x - d[0]
+                    val py = y - d[1]
+                    // Start only from the first stone of a run.
+                    if (px in 0 until size && py in 0 until size && board[py][px] == color) continue
+                    val len = ForbiddenMoves.countLine(board, x, y, d[0], d[1], color)
+                    if (len >= 5) {
+                        return (0 until len).map { Move(x + d[0] * it, y + d[1] * it, color) }
+                    }
+                }
+            }
+        }
+        return null
     }
 
     /** Compact persistence format (see README.md, "State persistence"). */
@@ -162,6 +200,13 @@ class GomokuGame(
          * AI is offered as an alternative opponent on the same board.
          */
         const val BOARD_SIZE = 15
+
+        private val LINE_DIRS = arrayOf(
+            intArrayOf(1, 0),
+            intArrayOf(0, 1),
+            intArrayOf(1, 1),
+            intArrayOf(1, -1)
+        )
 
         /** Inverse of [encode]. Returns null on malformed input. */
         fun decode(raw: String): GomokuGame? {
@@ -189,6 +234,11 @@ class GomokuGame(
                 game.winner = winner
                 game.gameOver = over
                 game.forbiddenLoss = forbiddenLoss
+                // The line is recomputed instead of stored: saved games written by
+                // an older build keep working, and the highlight survives a restart.
+                if (over && winner != null) {
+                    game.winningLine = game.findWinningLine(winner) ?: emptyList()
+                }
                 game
             } catch (e: Exception) {
                 null
