@@ -1,5 +1,6 @@
 package com.oldmermaidman.gomoku.engine
 
+import com.oldmermaidman.gomoku.model.GomokuGame
 import com.oldmermaidman.gomoku.model.Move
 import com.oldmermaidman.gomoku.model.Stone
 import org.junit.Assert.assertEquals
@@ -8,7 +9,8 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 /**
- * Regression tests for the built-in engine.
+ * Regression tests for the built-in engine — the one behind the "normal"
+ * difficulty, and the fallback for "hard" when Rapfi is unavailable.
  *
  * They encode the behaviour that used to be broken: the engine ignored the
  * opponent's threats because (a) the evaluation only saw solid runs, (b) the
@@ -16,10 +18,10 @@ import org.junit.Test
  * examined only its own threats.
  *
  * The engine is pure Kotlin (no Android dependencies), so these run as plain
- * JVM unit tests.
+ * JVM unit tests. The board is always 15×15.
  *
  * Note on the positions: only moves that are *forced* are asserted. When the
- * engine can make an open four it must play that instead of blocking, so test
+ * engine can make an open four it must play that instead of blocking, so most
  * positions deliberately avoid giving the engine its own counter-threat.
  */
 class BuiltInAITest {
@@ -28,8 +30,10 @@ class BuiltInAITest {
 
     // ---- helpers -----------------------------------------------------------
 
-    private fun emptyBoard(n: Int = 15): Array<Array<Stone>> =
-        Array(n) { Array(n) { Stone.EMPTY } }
+    private fun emptyBoard(): Array<Array<Stone>> {
+        val n = GomokuGame.BOARD_SIZE
+        return Array(n) { Array(n) { Stone.EMPTY } }
+    }
 
     private fun Array<Array<Stone>>.putAll(stone: Stone, vararg cells: Pair<Int, Int>) {
         for ((x, y) in cells) this[y][x] = stone
@@ -126,6 +130,25 @@ class BuiltInAITest {
         )
     }
 
+    /**
+     * Documented rule: an open four wins next move, so it outranks blocking the
+     * opponent's three. This is the rule that made a badly built "must block"
+     * test fail for the wrong reason, so it is pinned down here explicitly.
+     */
+    @Test
+    fun prefersOpenFourOverBlocking() {
+        val board = emptyBoard()
+        board.putAll(Stone.WHITE, 5 to 5, 6 to 5, 7 to 5)           // opponent open three
+        board.putAll(Stone.BLACK, 9 to 4, 10 to 3, 11 to 2)         // black three, anti-diagonal
+
+        val move = moveOf(board, Stone.BLACK)
+
+        assertTrue(
+            "expected the winning open four at (12,1), got (${move.x},${move.y})",
+            move.isOneOf(12 to 1)
+        )
+    }
+
     // ---- basics ------------------------------------------------------------
 
     /** Empty board: the centre is the only sensible opening. */
@@ -136,37 +159,19 @@ class BuiltInAITest {
         assertEquals(7, move.y)
     }
 
-    /** The engine must stay inside its time budget on the largest board. */
+    /** The engine must stay inside its time budget. */
     @Test
-    fun respectsTimeBudgetOn19x19() {
-        val board = emptyBoard(19)
-        board.putAll(Stone.WHITE, 8 to 8, 9 to 8, 10 to 8)
-        board.putAll(Stone.BLACK, 9 to 9, 10 to 10, 8 to 9)
+    fun respectsTimeBudget() {
+        val board = emptyBoard()
+        board.putAll(Stone.WHITE, 7 to 7, 8 to 7, 9 to 7)
+        board.putAll(Stone.BLACK, 8 to 8, 9 to 9, 7 to 8)
 
         val started = System.currentTimeMillis()
         val move = ai.nextMove(board, Stone.BLACK, 99, 3000, false)
         val elapsed = System.currentTimeMillis() - started
 
-        assertNotNull("engine returned no move on 19x19", move)
+        assertNotNull("engine returned no move", move)
         assertTrue("took ${elapsed}ms, budget was 3000ms", elapsed < 7000)
-    }
-
-    /**
-     * The board the user actually plays on: 19×19 must answer a three as well.
-     * Black's stones are the four corners, so they are mutually non-adjacent.
-     */
-    @Test
-    fun blocksOpenThreeOn19x19() {
-        val board = emptyBoard(19)
-        board.putAll(Stone.WHITE, 8 to 9, 9 to 9, 10 to 9)
-        board.putAll(Stone.BLACK, 4 to 4, 14 to 4, 4 to 14, 14 to 14)
-
-        val move = moveOf(board, Stone.BLACK, 3000)
-
-        assertTrue(
-            "expected the three to be blocked at (7,9) or (11,9), got (${move.x},${move.y})",
-            move.isOneOf(7 to 9, 11 to 9)
-        )
     }
 
     /**

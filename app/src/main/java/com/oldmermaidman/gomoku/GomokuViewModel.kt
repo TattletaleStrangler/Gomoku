@@ -24,10 +24,12 @@ data class GameUiState(
     val game: GomokuGame,
     val revision: Int,
     val thinking: Boolean,
-    val engineAvailable: Boolean,
-    val engineChecked: Boolean,
     val status: String,
-    val engineBadge: String
+    /**
+     * Selected difficulty, e.g. "Сложность: Сложный". It implies which engine
+     * plays, so the engine is not named separately in the header.
+     */
+    val difficultyLabel: String
 )
 
 /** Immutable snapshot of the position passed to the AI on a background thread. */
@@ -52,6 +54,13 @@ private data class GameSnapshot(
     )
 }
 
+/**
+ * Game state holder.
+ *
+ * The board is always 15×15. The difficulty level doubles as the engine choice:
+ * **Сложный** runs Rapfi, **Нормальный** runs the built-in AI. If Rapfi cannot
+ * start, the hard level falls back to the built-in AI and says so in the header.
+ */
 class GomokuViewModel(app: Application) : AndroidViewModel(app) {
 
     private val context = app
@@ -85,10 +94,8 @@ class GomokuViewModel(app: Application) : AndroidViewModel(app) {
     // ---- settings ---------------------------------------------------------
 
     fun applySettings(r: SettingsDialog.Result) {
-        val sizeChanged = r.boardSize != settings.boardSize
         val colorChanged = r.playerColor != settings.playerColor
 
-        settings.boardSize = r.boardSize
         settings.playerColor = r.playerColor
         settings.forbiddenMoves = r.forbidden
         settings.showMoveNumbers = r.showNumbers
@@ -98,9 +105,10 @@ class GomokuViewModel(app: Application) : AndroidViewModel(app) {
         // The forbidden-move rule applies to future moves immediately.
         game.forbiddenMoves = r.forbidden
 
-        if (sizeChanged || colorChanged) {
-            startNewGame()
-        }
+        // Changing colour restarts the game. The engine follows the difficulty
+        // and is chosen per move, so switching difficulty needs no restart.
+        if (colorChanged) startNewGame()
+
         settings.saveGame(game)
         publish()
     }
@@ -145,7 +153,7 @@ class GomokuViewModel(app: Application) : AndroidViewModel(app) {
         generation++
         aiJob?.cancel()
         thinking = false
-        game = GomokuGame(settings.boardSize, settings.playerColor, settings.forbiddenMoves)
+        game = settings.newGame()
         settings.saveGame(game)
         publish()
         if (game.currentTurn == game.aiColor) requestAiMove()
@@ -186,7 +194,10 @@ class GomokuViewModel(app: Application) : AndroidViewModel(app) {
 
     private fun computeAiMove(snapshot: GameSnapshot): Move? {
         var move: Move? = null
-        if (snapshot.size == 15 && engine.available) {
+
+        // Difficulty selects the engine: "hard" plays Rapfi, "normal" the
+        // built-in AI. If Rapfi is unavailable the built-in AI takes over.
+        if (settings.aiLevel == AppSettings.LEVEL_STRONG && engine.available) {
             // Stones are passed in move order — Rapfi derives its own color from
             // the first BOARD entry (see RapfiGomokuEngine).
             move = engine.nextMove(
@@ -198,12 +209,13 @@ class GomokuViewModel(app: Application) : AndroidViewModel(app) {
             )
             if (move != null && !isValidAiMove(snapshot, move)) move = null
         }
+
         if (move == null) {
             move = builtIn.nextMove(
                 current = snapshot.board,
                 aiColor = snapshot.aiColor,
                 maxDepth = 99,                            // ID controls depth
-                timeLimitMs = aiTimeBudget(),
+                timeLimitMs = builtInTimeBudget(),
                 forbiddenMoves = snapshot.forbidden
             )
         }
@@ -223,17 +235,18 @@ class GomokuViewModel(app: Application) : AndroidViewModel(app) {
         return true
     }
 
-    /** Time budget for the built-in AI (TZ: ≤3 s per move). */
-    private fun aiTimeBudget(): Long =
+    /**
+     * Time budget for the built-in AI. It plays the "normal" level, and also
+     * serves as the fallback when Rapfi is unavailable at the "hard" level.
+     */
+    private fun builtInTimeBudget(): Long =
         if (settings.aiLevel == AppSettings.LEVEL_STRONG) 3000L else 1500L
 
     /**
-     * Time budget handed to Rapfi as INFO timeout_turn. Kept comfortably below
-     * RapfiGomokuEngine's 12 s reply timeout. Rapfi searches deeper than the
-     * built-in AI in the same wall-clock time.
+     * Time budget handed to Rapfi as `INFO timeout_turn`, kept comfortably below
+     * RapfiGomokuEngine's 12 s reply timeout.
      */
-    private fun rapfiTimeBudget(): Long =
-        if (settings.aiLevel == AppSettings.LEVEL_STRONG) 5000L else 2000L
+    private fun rapfiTimeBudget(): Long = 5000L
 
     private fun checkEngineInBackground() {
         viewModelScope.launch(Dispatchers.IO) {
@@ -253,10 +266,8 @@ class GomokuViewModel(app: Application) : AndroidViewModel(app) {
             game = game,
             revision = revision,
             thinking = thinking,
-            engineAvailable = engine.available,
-            engineChecked = engineChecked,
             status = buildStatus(),
-            engineBadge = buildEngineBadge()
+            difficultyLabel = buildDifficultyLabel()
         )
     }
 
@@ -272,13 +283,26 @@ class GomokuViewModel(app: Application) : AndroidViewModel(app) {
         else -> context.getString(R.string.computer_turn)
     }
 
-    private fun buildEngineBadge(): String {
-        val base = when {
-            !engineChecked -> context.getString(R.string.engine_checking)
-            engine.available && game.size == 15 -> context.getString(R.string.engine_rapfi)
-            else -> context.getString(R.string.engine_builtin)
+    /**
+     * The header shows the difficulty rather than the engine name, because the
+     * difficulty already implies which engine plays.
+     *
+     * The only addition is a short hint when the "hard" level cannot use Rapfi:
+     * a silent fallback to the weaker engine would otherwise mislead the player.
+     */
+    private fun buildDifficultyLabel(): String {
+        val levelName = context.getString(
+            if (settings.aiLevel == AppSettings.LEVEL_STRONG) R.string.level_strong
+            else R.string.level_normal
+        )
+        val base = context.getString(R.string.difficulty_label, levelName)
+
+        val hardWithoutEngine = settings.aiLevel == AppSettings.LEVEL_STRONG &&
+            engineChecked && !engine.available
+        return if (hardWithoutEngine) {
+            base + context.getString(R.string.engine_fallback_suffix)
+        } else {
+            base
         }
-        val err = engine.lastError
-        return if (!engine.available && err != null) "$base ($err)" else base
     }
 }

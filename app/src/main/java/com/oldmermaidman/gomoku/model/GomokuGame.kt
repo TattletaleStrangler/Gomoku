@@ -148,6 +148,12 @@ class GomokuGame(
     }
 
     companion object {
+        /**
+         * The only supported board size. Rapfi plays 15×15 only, and the built-in
+         * AI is offered as an alternative opponent on the same board.
+         */
+        const val BOARD_SIZE = 15
+
         /** Inverse of [encode]. Returns null on malformed input. */
         fun decode(raw: String): GomokuGame? {
             return try {

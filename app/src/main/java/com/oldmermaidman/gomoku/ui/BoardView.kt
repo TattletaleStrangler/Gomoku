@@ -22,8 +22,11 @@ class BoardView @JvmOverloads constructor(
 ) : View(context, attrs) {
 
     companion object {
-        /** Largest supported board (13 / 15 / 19). */
-        private const val MAX_BOARD = 19
+        /** The only supported board size: Rapfi plays 15×15. */
+        private const val MAX_BOARD = GomokuGame.BOARD_SIZE
+
+        /** Star points of the 15×15 board, stored flat as x,y pairs. */
+        private val HOSHI = intArrayOf(3, 3, 3, 11, 11, 3, 11, 11, 7, 7)
     }
 
     var game: GomokuGame? = null
@@ -130,22 +133,15 @@ class BoardView @JvmOverloads constructor(
     }
 
     private fun drawHoshi(canvas: Canvas, size: Int) {
-        val points = when (size) {
-            15 -> listOf(3 to 3, 3 to 11, 11 to 3, 11 to 11, 7 to 7)
-            19 -> listOf(
-                3 to 3, 3 to 9, 3 to 15,
-                9 to 3, 9 to 9, 9 to 15,
-                15 to 3, 15 to 9, 15 to 15
-            )
-            13 -> listOf(3 to 3, 3 to 9, 9 to 3, 9 to 9, 6 to 6)
-            else -> emptyList()
-        }
+        if (size != GomokuGame.BOARD_SIZE) return
         linePaint.color = theme.boardLine
         linePaint.style = Paint.Style.FILL
-        for ((hx, hy) in points) {
-            val cx = originX + hx * cellSize
-            val cy = originY + hy * cellSize
+        var i = 0
+        while (i < HOSHI.size) {
+            val cx = originX + HOSHI[i] * cellSize
+            val cy = originY + HOSHI[i + 1] * cellSize
             canvas.drawCircle(cx, cy, cellSize * 0.08f, linePaint)
+            i += 2
         }
     }
 

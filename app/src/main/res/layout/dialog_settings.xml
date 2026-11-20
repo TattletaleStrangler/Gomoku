@@ -16,38 +16,6 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/board_size"
-            android:textStyle="bold" />
-
-        <RadioGroup
-            android:id="@+id/rgSize"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <RadioButton
-                android:id="@+id/rbSize15"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/board_15" />
-
-            <RadioButton
-                android:id="@+id/rbSize13"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/board_13" />
-
-            <RadioButton
-                android:id="@+id/rbSize19"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/board_19" />
-        </RadioGroup>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
             android:text="@string/play_as"
             android:textStyle="bold" />
 
@@ -74,7 +42,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="@string/ai_level"
+            android:text="@string/difficulty"
             android:textStyle="bold" />
 
         <RadioGroup

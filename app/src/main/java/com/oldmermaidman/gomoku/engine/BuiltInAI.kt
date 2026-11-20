@@ -6,8 +6,8 @@ import com.oldmermaidman.gomoku.rules.ForbiddenMoves
 import kotlin.random.Random
 
 /**
- * Fallback engine used on boards other than 15×15 (Rapfi only plays 15×15) and
- * whenever the native engine is unavailable.
+ * Engine behind the "normal" difficulty, and the fallback for the "hard" level
+ * when the native Rapfi engine is unavailable. The board is always 15×15.
  *
  * Structure:
  *  - **Forced-move ladder** — before searching, a handful of provably forced
@@ -36,7 +36,8 @@ class BuiltInAI {
         private const val TT_SIZE    = 1 shl 18                 // 262144 entries
         private const val TT_MASK    = TT_SIZE - 1L
         private const val MAX_PLY    = 64
-        private const val MAX_BOARD  = 19
+        /** The only supported board size (Rapfi plays 15×15). */
+        private const val MAX_BOARD  = 15
 
         /** Candidates searched at the root / inside the tree. */
         private const val ROOT_CANDIDATES = 24

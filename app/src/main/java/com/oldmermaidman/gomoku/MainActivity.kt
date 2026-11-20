@@ -45,7 +45,7 @@ class MainActivity : AppCompatActivity() {
             binding.boardView.invalidate()
 
             binding.tvStatus.text = state.status
-            binding.tvEngine.text = state.engineBadge
+            binding.tvDifficulty.text = state.difficultyLabel
 
             binding.btnUndo.isEnabled = !state.thinking && state.game.history.isNotEmpty()
             binding.btnResign.isEnabled = !state.thinking && !state.game.gameOver
@@ -93,7 +93,7 @@ class MainActivity : AppCompatActivity() {
         binding.topBar.setBackgroundColor(theme.background)
         binding.tvTitle.setTextColor(theme.statusText)
         binding.tvStatus.setTextColor(theme.statusText)
-        binding.tvEngine.setTextColor(theme.accent)
+        binding.tvDifficulty.setTextColor(theme.accent)
 
         val tint = ColorStateList.valueOf(theme.statusText)
         binding.btnTheme.imageTintList = tint

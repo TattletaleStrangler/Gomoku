@@ -10,13 +10,14 @@ import com.oldmermaidman.gomoku.model.Stone
 import com.oldmermaidman.gomoku.prefs.AppSettings
 
 /**
- * Bottom-style settings dialog (board size, color, difficulty, forbidden moves,
- * move numbering, theme). Values are returned through [onApply].
+ * Settings dialog: colour, difficulty (which also selects the engine), forbidden
+ * moves, move numbering and theme. Values are returned through [onApply].
+ *
+ * The board is always 15×15, so there is no size option.
  */
 class SettingsDialog private constructor() {
 
     data class Result(
-        val boardSize: Int,
         val playerColor: Stone,
         val forbidden: Boolean,
         val showNumbers: Boolean,
@@ -28,20 +29,12 @@ class SettingsDialog private constructor() {
         fun show(context: Context, s: AppSettings, onApply: (Result) -> Unit) {
             val view = LayoutInflater.from(context).inflate(R.layout.dialog_settings, null)
 
-            val rgSize = view.findViewById<RadioGroup>(R.id.rgSize)
             val rgColor = view.findViewById<RadioGroup>(R.id.rgColor)
             val rgLevel = view.findViewById<RadioGroup>(R.id.rgLevel)
             val swForbidden = view.findViewById<SwitchCompat>(R.id.swForbidden)
             val swNumbers = view.findViewById<SwitchCompat>(R.id.swNumbers)
             val rgTheme = view.findViewById<RadioGroup>(R.id.rgTheme)
 
-            rgSize.check(
-                when (s.boardSize) {
-                    13 -> R.id.rbSize13
-                    19 -> R.id.rbSize19
-                    else -> R.id.rbSize15
-                }
-            )
             rgColor.check(if (s.playerColor == Stone.WHITE) R.id.rbColorWhite else R.id.rbColorBlack)
             rgLevel.check(if (s.aiLevel == AppSettings.LEVEL_STRONG) R.id.rbLevelStrong else R.id.rbLevelNormal)
             swForbidden.isChecked = s.forbiddenMoves
@@ -60,11 +53,6 @@ class SettingsDialog private constructor() {
                 .setPositiveButton(R.string.apply) { _, _ ->
                     onApply(
                         Result(
-                            boardSize = when (rgSize.checkedRadioButtonId) {
-                                R.id.rbSize13 -> 13
-                                R.id.rbSize19 -> 19
-                                else -> 15
-                            },
                             playerColor = if (rgColor.checkedRadioButtonId == R.id.rbColorWhite) Stone.WHITE else Stone.BLACK,
                             forbidden = swForbidden.isChecked,
                             showNumbers = swNumbers.isChecked,

@@ -12,16 +12,12 @@
     <string name="settings_title">Настройки</string>
     <string name="apply">Применить</string>
     <string name="cancel">Отмена</string>
-    <string name="board_size">Размер доски</string>
-    <string name="board_15">15×15 (Rapfi)</string>
-    <string name="board_13">13×13 (встроенный AI)</string>
-    <string name="board_19">19×19 (встроенный AI)</string>
     <string name="play_as">Вы играете</string>
     <string name="play_black">Чёрными (первый ход)</string>
     <string name="play_white">Белыми (второй ход)</string>
-    <string name="ai_level">Уровень AI</string>
-    <string name="level_normal">Обычный</string>
-    <string name="level_strong">Сильный</string>
+    <string name="difficulty">Сложность</string>
+    <string name="level_normal">Нормальный</string>
+    <string name="level_strong">Сложный</string>
     <string name="forbidden_moves">Запрещённые ходы чёрных (рендзю)</string>
     <string name="show_numbers">Показывать номера ходов</string>
     <string name="choose_theme">Тема оформления</string>
@@ -38,8 +34,11 @@
     <string name="draw">Ничья</string>
     <string name="forbidden_loss">Чёрные нарушили правило — победили белые</string>
 
-    <!-- Engine badge -->
-    <string name="engine_rapfi">Движок: Rapfi</string>
-    <string name="engine_builtin">Движок: встроенный</string>
-    <string name="engine_checking">Движок: проверка…</string>
+    <!--
+        Header shows the selected difficulty rather than the engine name: the
+        difficulty already implies which engine plays. The fallback suffix is
+        appended only when the hard level cannot use Rapfi.
+    -->
+    <string name="difficulty_label">Сложность: %1$s</string>
+    <string name="engine_fallback_suffix"> · встроенный</string>
 </resources>

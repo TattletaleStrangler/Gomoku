@@ -19,8 +19,8 @@ import java.util.concurrent.TimeUnit
  *  - a self-check runs one real move before the engine is marked available;
  *  - every reply is read with a timeout; on failure the process is restarted
  *    and the position is replayed once;
- *  - only 15×15 boards are sent to Rapfi — the caller selects the built-in AI
- *    for 13×13 / 19×19.
+ *  - the board is always 15×15 (the only supported size), so Rapfi is used
+ *    whenever its self-check succeeded.
  *
  * Two Rapfi-specific details are handled here (see its `command/gomocup.cpp`):
  *
