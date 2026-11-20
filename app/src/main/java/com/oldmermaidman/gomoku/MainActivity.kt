@@ -84,7 +84,7 @@ class MainActivity : AppCompatActivity() {
     private fun showResultDialog(state: GameUiState) {
         AlertDialog.Builder(this)
             .setTitle(state.resultTitle)
-            .setMessage(state.status)
+            .setMessage(state.resultMessage)
             .setPositiveButton(R.string.play_again) { _, _ -> viewModel.startNewGame() }
             .setNeutralButton(R.string.undo_move) { _, _ -> viewModel.undo() }
             .setNegativeButton(R.string.close, null)

@@ -8,10 +8,13 @@ import androidx.lifecycle.viewModelScope
 import com.oldmermaidman.gomoku.engine.BuiltInAI
 import com.oldmermaidman.gomoku.engine.NativeExe
 import com.oldmermaidman.gomoku.engine.RapfiGomokuEngine
+import com.oldmermaidman.gomoku.model.GameResult
 import com.oldmermaidman.gomoku.model.GomokuGame
 import com.oldmermaidman.gomoku.model.Move
 import com.oldmermaidman.gomoku.model.PlaceOutcome
+import com.oldmermaidman.gomoku.model.SessionScore
 import com.oldmermaidman.gomoku.model.Stone
+import com.oldmermaidman.gomoku.model.resultOf
 import com.oldmermaidman.gomoku.prefs.AppSettings
 import com.oldmermaidman.gomoku.rules.ForbiddenMoves
 import com.oldmermaidman.gomoku.ui.SettingsDialog
@@ -31,7 +34,9 @@ data class GameUiState(
      */
     val difficultyLabel: String,
     /** Result from the player's point of view; empty while the game is running. */
-    val resultTitle: String
+    val resultTitle: String,
+    /** Result detail plus the session score; empty while the game is running. */
+    val resultMessage: String
 )
 
 /** Immutable snapshot of the position passed to the AI on a background thread. */
@@ -84,7 +89,21 @@ class GomokuViewModel(app: Application) : AndroidViewModel(app) {
     private var aiJob: Job? = null
     private var engineChecked = false
 
+    /** Wins / losses / draws of this session. */
+    private val score = SessionScore()
+
+    /** Result already added to [score]; null while the running game has none. */
+    private var countedResult: GameResult? = null
+
+    /** False when the restored game was already finished before this session. */
+    private var countedByThisSession = false
+
     init {
+        // A game restored from disk may already be finished. It must not be added
+        // to this session's score, but undo still has to clear its result.
+        countedResult = resultOf(game)
+        countedByThisSession = false
+
         checkEngineInBackground()
         if (!game.gameOver && game.currentTurn == game.aiColor) {
             requestAiMove()
@@ -137,10 +156,17 @@ class GomokuViewModel(app: Application) : AndroidViewModel(app) {
     /**
      * Takes back the last round. It also reopens a finished game, so a player who
      * lost to a surprise five can replay that move instead of starting over.
+     *
+     * A result that was already counted is taken back with the move: losing,
+     * undoing and then winning leaves only the win in the score.
      */
     fun undo() {
         if (thinking) return
         if (game.undo()) {
+            countedResult?.let { if (countedByThisSession) score.rollback(it) }
+            countedResult = null
+            countedByThisSession = false
+
             settings.saveGame(game)
             publish()
             // Undoing the AI's first move (human plays white) puts black back to move.
@@ -159,6 +185,10 @@ class GomokuViewModel(app: Application) : AndroidViewModel(app) {
         generation++
         aiJob?.cancel()
         thinking = false
+        // The previous result stays in the session score; the new game starts clean.
+        countedResult = null
+        countedByThisSession = false
+
         game = settings.newGame()
         settings.saveGame(game)
         publish()
@@ -266,7 +296,17 @@ class GomokuViewModel(app: Application) : AndroidViewModel(app) {
 
     // ---- UI state ---------------------------------------------------------
 
+    /** Adds a freshly finished game to the session score, once. */
+    private fun syncScore() {
+        val result = resultOf(game) ?: return
+        if (countedResult != null) return
+        score.record(result)
+        countedResult = result
+        countedByThisSession = true
+    }
+
     private fun publish() {
+        syncScore()
         revision++
         _uiState.value = GameUiState(
             game = game,
@@ -274,7 +314,8 @@ class GomokuViewModel(app: Application) : AndroidViewModel(app) {
             thinking = thinking,
             status = buildStatus(),
             difficultyLabel = buildDifficultyLabel(),
-            resultTitle = if (game.gameOver) buildResultTitle() else ""
+            resultTitle = if (game.gameOver) buildResultTitle() else "",
+            resultMessage = if (game.gameOver) buildResultMessage() else ""
         )
     }
 
@@ -296,6 +337,10 @@ class GomokuViewModel(app: Application) : AndroidViewModel(app) {
         game.winner == game.playerColor -> context.getString(R.string.result_win)
         else -> context.getString(R.string.result_loss)
     }
+
+    private fun buildResultMessage(): String = buildStatus() + "\n\n" + context.getString(
+        R.string.session_score, score.wins, score.losses, score.draws
+    )
 
     /**
      * The header shows the difficulty rather than the engine name, because the

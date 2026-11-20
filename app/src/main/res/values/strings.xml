@@ -41,6 +41,7 @@
     <string name="result_draw">Ничья</string>
     <string name="play_again">Ещё</string>
     <string name="close">Закрыть</string>
+    <string name="session_score">Счёт за сессию — победы: %1$d, поражения: %2$d, ничьи: %3$d</string>
 
     <!--
         Header shows the selected difficulty rather than the engine name: the
