@@ -14,6 +14,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SwitchCompat
 import com.oldmermaidman.gomoku.R
+import com.oldmermaidman.gomoku.crash.CrashStore
 import com.oldmermaidman.gomoku.model.ScoreBoard
 import com.oldmermaidman.gomoku.model.SoundVolume
 import com.oldmermaidman.gomoku.model.Stone
@@ -69,6 +70,9 @@ class SettingsActivity : AppCompatActivity() {
 
     /** True when the statistics were cleared here and must be reloaded by the caller. */
     private var statsReset = false
+
+    /** Journal button; its label carries the number of saved reports. */
+    private lateinit var crashLogButton: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -254,9 +258,23 @@ class SettingsActivity : AppCompatActivity() {
                 .show()
         }
 
+        crashLogButton = findViewById(R.id.btnCrashLog)
+        crashLogButton.setOnClickListener { startActivity(CrashLogActivity.intent(this)) }
+
         findViewById<Button>(R.id.btnCancel).setOnClickListener { finish() }
         findViewById<Button>(R.id.btnApply).setOnClickListener { applyAndFinish() }
 
         previewTheme()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // The journal can be cleared on its own screen.
+        val count = CrashStore.inFilesDir(filesDir).count()
+        crashLogButton.text = if (count == 0) {
+            getString(R.string.crash_log)
+        } else {
+            getString(R.string.crash_log_with_count, getString(R.string.crash_log), count)
+        }
     }
 }

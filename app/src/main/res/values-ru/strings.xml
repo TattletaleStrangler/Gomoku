@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Russian translations. The default resources in ../values are English, so a
+    device in any other language falls back to English (see README.md,
+    "Localization"). Every key of the default file must be translated here.
+-->
+<resources>
+    <string name="app_name">Гомоку</string>
+
+    <!-- Action buttons -->
+    <string name="new_game">Новая игра</string>
+    <string name="undo">Отмена</string>
+    <string name="resign">Сдаться</string>
+    <string name="theme">Тема</string>
+    <!-- Buttons shared by several screens -->
+    <string name="close">Закрыть</string>
+    <string name="clear">Очистить</string>
+
+    <!-- Settings screen -->
+    <string name="settings_title">Настройки</string>
+    <string name="apply">Применить</string>
+    <string name="cancel">Отмена</string>
+    <string name="play_as">Вы играете</string>
+    <string name="play_black">Чёрными (первый ход)</string>
+    <string name="play_white">Белыми (второй ход)</string>
+    <string name="difficulty">Сложность</string>
+    <string name="level_normal">Нормальный</string>
+    <string name="level_strong">Сложный</string>
+    <string name="forbidden_moves">Запрещённые ходы чёрных (рендзю)</string>
+    <string name="show_numbers">Показывать номера ходов</string>
+    <string name="sound_enabled">Звук хода</string>
+    <string name="sound_volume">Громкость</string>
+    <string name="volume_percent">%1$d %%</string>
+    <string name="choose_theme">Тема оформления</string>
+    <string name="theme_light">Светлая</string>
+    <string name="theme_dark">Тёмная</string>
+    <string name="theme_warm">Тёплая</string>
+
+    <!--
+        Game mode: casual play without a clock, or one of the three preset controls.
+        Only the name of a mode is stored here; the numbers come from TimeControl,
+        so the label cannot drift away from the control it describes.
+    -->
+    <string name="game_mode">Режим игры</string>
+    <string name="mode_none">Без таймера</string>
+    <string name="mode_classic">Классика</string>
+    <string name="mode_rapid">Рапид</string>
+    <string name="mode_blitz">Блиц</string>
+    <string name="mode_timing">%1$s — %2$d мин + %3$d с</string>
+
+    <!-- Statistics table: cumulative, per difficulty level, stored between launches -->
+    <string name="stats_title">Статистика</string>
+    <string name="stats_level">Уровень</string>
+    <string name="stats_wins">Победы</string>
+    <string name="stats_losses">Поражения</string>
+    <string name="stats_draws">Ничьи</string>
+    <!-- A bare number, formatted through a resource so the digits follow the locale. -->
+    <string name="stats_value">%1$d</string>
+    <string name="reset_stats">Сбросить статистику</string>
+    <string name="reset_stats_title">Сбросить статистику?</string>
+    <string name="reset_stats_message">Победы, поражения и ничьи по обоим уровням сложности будут обнулены.</string>
+    <string name="reset">Сбросить</string>
+
+    <!--
+        Move history screen. Browsing a move only previews the position; the game
+        is rolled back solely by the "continue" button.
+    -->
+    <string name="history_title">История партии</string>
+    <string name="history_moves_count">Ходов: %1$d</string>
+    <string name="history_selected">Ход %1$d: %2$s, %3$s</string>
+    <string name="history_empty">Ходов пока нет</string>
+    <string name="history_continue">Продолжить с этого хода</string>
+    <string name="history_no_rollback"> · партия проиграна по времени, откат недоступен</string>
+    <string name="move_index">%1$d.</string>
+    <string name="side_black">чёрные</string>
+    <string name="side_white">белые</string>
+
+    <!-- Status -->
+    <string name="your_turn">Ваш ход</string>
+    <string name="computer_turn">Ход компьютера…</string>
+    <string name="computer_thinking">Компьютер думает…</string>
+    <string name="black_wins">Победили чёрные</string>
+    <string name="white_wins">Победили белые</string>
+    <string name="draw">Ничья</string>
+    <string name="forbidden_loss">Чёрные нарушили правило — победили белые</string>
+    <string name="time_loss">Время вышло — победил компьютер</string>
+    <!-- The player's clock, mm:ss; the seconds always take two digits. -->
+    <string name="clock_format">%1$d:%2$02d</string>
+
+    <!--
+        Header shows the selected difficulty rather than the engine name: the
+        difficulty already implies which engine plays. The fallback suffix is
+        appended only when the hard level cannot use Rapfi.
+    -->
+    <string name="difficulty_label">Сложность: %1$s</string>
+    <string name="engine_fallback_suffix"> · встроенный</string>
+
+    <!--
+        Crash journal: reports are written to the app's private storage and leave the
+        device only when the player shares them by hand.
+    -->
+    <string name="crash_log">Журнал сбоев</string>
+    <string name="crash_log_with_count">%1$s (%2$d)</string>
+    <string name="crash_log_summary">Записей: %1$d</string>
+    <string name="crash_log_empty">Сбоев не было</string>
+    <string name="crash_log_hint">При сбое приложение сохраняет стектрейс в своей папке на этом устройстве. Отправить его можно только вручную — кнопкой ниже.</string>
+    <string name="crash_log_send">Отправить</string>
+    <string name="crash_log_subject">Гомоку: журнал сбоев</string>
+    <string name="crash_log_clear_title">Очистить журнал?</string>
+    <string name="crash_log_clear_message">Все сохранённые отчёты о сбоях будут удалены.</string>
+</resources>

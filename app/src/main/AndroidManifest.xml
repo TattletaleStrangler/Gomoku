@@ -1,14 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- No network and no storage permissions are requested: the app is fully offline (TZ §7). -->
+    <!--
+        No network and no storage permissions are requested: the app is fully offline
+        (TZ §7). localeConfig feeds the Android 13+ per-app language picker; older
+        versions ignore the attribute, which is what tools:targetApi records for lint.
+    -->
     <application
+        android:name=".GomokuApp"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
+        android:localeConfig="@xml/locales_config"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Gomoku">
+        android:theme="@style/Theme.Gomoku"
+        tools:targetApi="33">
 
         <!-- Orientation is intentionally NOT locked: Android 16+ ignores a fixed
              orientation on large screens, and a square board adapts fine. -->
@@ -32,6 +40,12 @@
             android:name=".ui.HistoryActivity"
             android:exported="false"
             android:label="@string/history_title"
+            android:parentActivityName=".MainActivity" />
+
+        <activity
+            android:name=".ui.CrashLogActivity"
+            android:exported="false"
+            android:label="@string/crash_log"
             android:parentActivityName=".MainActivity" />
     </application>
 

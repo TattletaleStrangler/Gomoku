@@ -1,82 +1,89 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+    Default resources, in English: a device in a language the app does not ship
+    falls back to these. Russian lives in ../values-ru (see README.md,
+    "Localization").
+-->
 <resources>
-    <string name="app_name">Гомоку</string>
+    <string name="app_name">Gomoku</string>
 
     <!-- Action buttons -->
-    <string name="new_game">Новая игра</string>
-    <string name="undo">Отмена</string>
-    <string name="resign">Сдаться</string>
-    <string name="theme">Тема</string>
+    <string name="new_game">New game</string>
+    <string name="undo">Undo</string>
+    <string name="resign">Resign</string>
+    <string name="theme">Theme</string>
+    <!-- Buttons shared by several screens -->
+    <string name="close">Close</string>
+    <string name="clear">Clear</string>
 
     <!-- Settings screen -->
-    <string name="settings_title">Настройки</string>
-    <string name="apply">Применить</string>
-    <string name="cancel">Отмена</string>
-    <string name="play_as">Вы играете</string>
-    <string name="play_black">Чёрными (первый ход)</string>
-    <string name="play_white">Белыми (второй ход)</string>
-    <string name="difficulty">Сложность</string>
-    <string name="level_normal">Нормальный</string>
-    <string name="level_strong">Сложный</string>
-    <string name="forbidden_moves">Запрещённые ходы чёрных (рендзю)</string>
-    <string name="show_numbers">Показывать номера ходов</string>
-    <string name="sound_enabled">Звук хода</string>
-    <string name="sound_volume">Громкость</string>
+    <string name="settings_title">Settings</string>
+    <string name="apply">Apply</string>
+    <string name="cancel">Cancel</string>
+    <string name="play_as">You play</string>
+    <string name="play_black">Black (first move)</string>
+    <string name="play_white">White (second move)</string>
+    <string name="difficulty">Difficulty</string>
+    <string name="level_normal">Normal</string>
+    <string name="level_strong">Hard</string>
+    <string name="forbidden_moves">Forbidden moves for black (renju)</string>
+    <string name="show_numbers">Show move numbers</string>
+    <string name="sound_enabled">Move sound</string>
+    <string name="sound_volume">Volume</string>
     <string name="volume_percent">%1$d %%</string>
-    <string name="choose_theme">Тема оформления</string>
-    <string name="theme_light">Светлая</string>
-    <string name="theme_dark">Тёмная</string>
-    <string name="theme_warm">Тёплая</string>
+    <string name="choose_theme">Color theme</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
+    <string name="theme_warm">Warm</string>
 
     <!--
         Game mode: casual play without a clock, or one of the three preset controls.
         Only the name of a mode is stored here; the numbers come from TimeControl,
         so the label cannot drift away from the control it describes.
     -->
-    <string name="game_mode">Режим игры</string>
-    <string name="mode_none">Без таймера</string>
-    <string name="mode_classic">Классика</string>
-    <string name="mode_rapid">Рапид</string>
-    <string name="mode_blitz">Блиц</string>
-    <string name="mode_timing">%1$s — %2$d мин + %3$d с</string>
+    <string name="game_mode">Game mode</string>
+    <string name="mode_none">No clock</string>
+    <string name="mode_classic">Classical</string>
+    <string name="mode_rapid">Rapid</string>
+    <string name="mode_blitz">Blitz</string>
+    <string name="mode_timing">%1$s — %2$d min + %3$d s</string>
 
     <!-- Statistics table: cumulative, per difficulty level, stored between launches -->
-    <string name="stats_title">Статистика</string>
-    <string name="stats_level">Уровень</string>
-    <string name="stats_wins">Победы</string>
-    <string name="stats_losses">Поражения</string>
-    <string name="stats_draws">Ничьи</string>
+    <string name="stats_title">Statistics</string>
+    <string name="stats_level">Level</string>
+    <string name="stats_wins">Wins</string>
+    <string name="stats_losses">Losses</string>
+    <string name="stats_draws">Draws</string>
     <!-- A bare number, formatted through a resource so the digits follow the locale. -->
     <string name="stats_value">%1$d</string>
-    <string name="reset_stats">Сбросить статистику</string>
-    <string name="reset_stats_title">Сбросить статистику?</string>
-    <string name="reset_stats_message">Победы, поражения и ничьи по обоим уровням сложности будут обнулены.</string>
-    <string name="reset">Сбросить</string>
+    <string name="reset_stats">Reset statistics</string>
+    <string name="reset_stats_title">Reset statistics?</string>
+    <string name="reset_stats_message">Wins, losses and draws will be cleared for both difficulty levels.</string>
+    <string name="reset">Reset</string>
 
     <!--
         Move history screen. Browsing a move only previews the position; the game
         is rolled back solely by the "continue" button.
     -->
-    <string name="history_title">История партии</string>
-    <string name="history_moves_count">Ходов: %1$d</string>
-    <string name="history_selected">Ход %1$d: %2$s, %3$s</string>
-    <string name="history_empty">Ходов пока нет</string>
-    <string name="history_continue">Продолжить с этого хода</string>
-    <string name="history_no_rollback"> · партия проиграна по времени, откат недоступен</string>
-    <string name="history_close">Закрыть</string>
+    <string name="history_title">Move history</string>
+    <string name="history_moves_count">Moves: %1$d</string>
+    <string name="history_selected">Move %1$d: %2$s, %3$s</string>
+    <string name="history_empty">No moves yet</string>
+    <string name="history_continue">Continue from this move</string>
+    <string name="history_no_rollback"> · game lost on time, no rollback</string>
     <string name="move_index">%1$d.</string>
-    <string name="side_black">чёрные</string>
-    <string name="side_white">белые</string>
+    <string name="side_black">black</string>
+    <string name="side_white">white</string>
 
     <!-- Status -->
-    <string name="your_turn">Ваш ход</string>
-    <string name="computer_turn">Ход компьютера…</string>
-    <string name="computer_thinking">Компьютер думает…</string>
-    <string name="black_wins">Победили чёрные</string>
-    <string name="white_wins">Победили белые</string>
-    <string name="draw">Ничья</string>
-    <string name="forbidden_loss">Чёрные нарушили правило — победили белые</string>
-    <string name="time_loss">Время вышло — победил компьютер</string>
+    <string name="your_turn">Your turn</string>
+    <string name="computer_turn">Computer\'s turn…</string>
+    <string name="computer_thinking">Computer is thinking…</string>
+    <string name="black_wins">Black wins</string>
+    <string name="white_wins">White wins</string>
+    <string name="draw">Draw</string>
+    <string name="forbidden_loss">Black broke the rule — white wins</string>
+    <string name="time_loss">Out of time — the computer wins</string>
     <!-- The player's clock, mm:ss; the seconds always take two digits. -->
     <string name="clock_format">%1$d:%2$02d</string>
 
@@ -85,6 +92,20 @@
         difficulty already implies which engine plays. The fallback suffix is
         appended only when the hard level cannot use Rapfi.
     -->
-    <string name="difficulty_label">Сложность: %1$s</string>
-    <string name="engine_fallback_suffix"> · встроенный</string>
+    <string name="difficulty_label">Difficulty: %1$s</string>
+    <string name="engine_fallback_suffix"> · built-in</string>
+
+    <!--
+        Crash journal: reports are written to the app's private storage and leave the
+        device only when the player shares them by hand.
+    -->
+    <string name="crash_log">Crash journal</string>
+    <string name="crash_log_with_count">%1$s (%2$d)</string>
+    <string name="crash_log_summary">Reports: %1$d</string>
+    <string name="crash_log_empty">No crashes yet</string>
+    <string name="crash_log_hint">When the app crashes it saves the stack trace to its own folder on this device. Nothing is sent anywhere by itself — share a report with the button below.</string>
+    <string name="crash_log_send">Send</string>
+    <string name="crash_log_subject">Gomoku: crash journal</string>
+    <string name="crash_log_clear_title">Clear the journal?</string>
+    <string name="crash_log_clear_message">All saved crash reports will be deleted.</string>
 </resources>

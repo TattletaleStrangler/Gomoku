@@ -315,6 +315,14 @@
                 android:layout_marginTop="8dp"
                 android:text="@string/reset_stats" />
 
+            <!-- The journal is local; its button carries the number of reports. -->
+            <Button
+                android:id="@+id/btnCrashLog"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@string/crash_log" />
+
         </LinearLayout>
     </ScrollView>
 

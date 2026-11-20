@@ -13,8 +13,8 @@ android {
         applicationId = "com.oldmermaidman.gomoku"
         minSdk = 26
         targetSdk = 36
-        versionCode = 12
-        versionName = "1.11"
+        versionCode = 13
+        versionName = "1.12"
 
         // The native Rapfi engine is provided only for arm64-v8a (see TZ §7).
         ndk {
@@ -39,6 +39,8 @@ android {
 
     buildFeatures {
         viewBinding = true
+        // Crash reports carry the version of the build they came from.
+        buildConfig = true
     }
 
     // Force native libs (incl. the shipped Rapfi binary, renamed to librapfi.so)
