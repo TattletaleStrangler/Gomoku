@@ -41,6 +41,10 @@ class GomokuGame(
     var forbiddenLoss: Boolean = false
         private set
 
+    /** True when the game ended because the player's clock ran out (see [GameClock]). */
+    var timeLoss: Boolean = false
+        private set
+
     var lastMove: Move? = null
         private set
 
@@ -65,6 +69,7 @@ class GomokuGame(
         if (board[y][x] != Stone.EMPTY) return PlaceOutcome.OCCUPIED
 
         forbiddenLoss = false
+        timeLoss = false
         board[y][x] = color
         val move = Move(x, y, color)
         history.add(move)
@@ -119,20 +124,68 @@ class GomokuGame(
     fun undo(): Boolean {
         if (history.isEmpty()) return false
 
+        // A full round is the AI's stone plus the player's stone before it. The
+        // rollback below clears the finished state, so a game that ended on the
+        // removed stone becomes playable again.
         val last = history.last()
-        removeLastStone()
-
-        // If the removed stone belonged to the AI, also remove the player's preceding stone.
-        if (last.color == aiColor && history.isNotEmpty() && history.last().color == playerColor) {
-            removeLastStone()
+        var keep = history.size - 1
+        if (last.color == aiColor && keep > 0 && history[keep - 1].color == playerColor) {
+            keep--
         }
+        return rollbackTo(keep)
+    }
+
+    /**
+     * Rolls the game back to the position after the first [moveCount] moves, so
+     * play continues from there. Returns false unless [moveCount] is a strictly
+     * shorter prefix, i.e. when there is nothing to take back.
+     *
+     * The kept position is never finished: a game always stops on its last move,
+     * so keeping fewer moves than that always leaves a game in progress — a win
+     * (with its line), a forbidden loss, a draw or a resignation is cleared with
+     * the moves that produced it.
+     */
+    fun rollbackTo(moveCount: Int): Boolean {
+        if (moveCount < 0 || moveCount >= history.size) return false
+
+        while (history.size > moveCount) removeLastStone()
 
         winner = null
         gameOver = false
         forbiddenLoss = false
+        timeLoss = false
         winningLine = emptyList()
         currentTurn = if (history.isEmpty()) Stone.BLACK else history.last().color.opponent()
         return true
+    }
+
+    /**
+     * A stand-alone copy of the position after the first [moveCount] moves, for the
+     * history screen. [moveCount] is clamped to the range actually available.
+     *
+     * A prefix shorter than the whole history is never finished, because the real
+     * game continued past it. The full history *is* the game, so its result — a win
+     * with its line, a forbidden loss, a draw or a resignation — is carried over
+     * instead of being recomputed, which also keeps a restored game consistent.
+     */
+    fun positionAfter(moveCount: Int): GomokuGame {
+        val count = moveCount.coerceIn(0, history.size)
+
+        val copy = GomokuGame(size, playerColor, forbiddenMoves)
+        for (i in 0 until count) {
+            val m = history[i]
+            copy.replay(m.x, m.y, m.color)
+        }
+
+        if (count == history.size) {
+            copy.winner = winner
+            copy.gameOver = gameOver
+            copy.forbiddenLoss = forbiddenLoss
+            copy.timeLoss = timeLoss
+            copy.winningLine = winningLine
+            if (gameOver) copy.currentTurn = currentTurn
+        }
+        return copy
     }
 
     /** The human resigns: the computer wins. */
@@ -140,6 +193,18 @@ class GomokuGame(
         if (gameOver) return
         winner = aiColor
         gameOver = true
+        winningLine = emptyList()
+    }
+
+    /**
+     * The player's clock ran out: the computer wins, exactly as in chess. This is
+     * not a forbidden move, so [forbiddenLoss] stays false.
+     */
+    fun timeExpired() {
+        if (gameOver) return
+        winner = aiColor
+        gameOver = true
+        timeLoss = true
         winningLine = emptyList()
     }
 
@@ -181,7 +246,14 @@ class GomokuGame(
         return null
     }
 
-    /** Compact persistence format (see README.md, "State persistence"). */
+    /**
+     * Compact persistence format (see README.md, "State persistence").
+     *
+     * Fields: size, player colour, forbidden moves, winner, finished, forbidden
+     * loss, format marker, timeout flag, then the moves. The marker keeps a game
+     * saved by an earlier build readable — without it the moves start immediately
+     * after the forbidden-loss field.
+     */
     fun encode(): String {
         val sb = StringBuilder()
         sb.append(size).append(';')
@@ -190,6 +262,8 @@ class GomokuGame(
         sb.append(winner?.name ?: "NONE").append(';')
         sb.append(if (gameOver) 1 else 0).append(';')
         sb.append(if (forbiddenLoss) 1 else 0).append(';')
+        sb.append(MARKER_V2).append(';')
+        sb.append(if (timeLoss) 1 else 0).append(';')
         sb.append(history.joinToString(";") { "${it.x},${it.y},${it.color.name}" })
         return sb.toString()
     }
@@ -200,6 +274,9 @@ class GomokuGame(
          * AI is offered as an alternative opponent on the same board.
          */
         const val BOARD_SIZE = 15
+
+        /** Marks the persistence format that carries the timeout flag. */
+        private const val MARKER_V2 = "V2"
 
         private val LINE_DIRS = arrayOf(
             intArrayOf(1, 0),
@@ -224,8 +301,17 @@ class GomokuGame(
                 val over = parts[4] == "1"
                 val forbiddenLoss = parts[5] == "1"
 
+                // A game saved before the clock existed has no marker; its moves
+                // start right after the forbidden-loss field.
+                var firstMove = 6
+                var timeLoss = false
+                if (parts.size > 6 && parts[6] == MARKER_V2) {
+                    timeLoss = parts.size > 7 && parts[7] == "1"
+                    firstMove = 8
+                }
+
                 val game = GomokuGame(size, playerColor, forbidden)
-                for (i in 6 until parts.size) {
+                for (i in firstMove until parts.size) {
                     if (parts[i].isEmpty()) continue
                     val t = parts[i].split(',')
                     if (t.size != 3) continue
@@ -234,6 +320,7 @@ class GomokuGame(
                 game.winner = winner
                 game.gameOver = over
                 game.forbiddenLoss = forbiddenLoss
+                game.timeLoss = timeLoss
                 // The line is recomputed instead of stored: saved games written by
                 // an older build keep working, and the highlight survives a restart.
                 if (over && winner != null) {

@@ -73,6 +73,20 @@ class GomokuGameTest {
     }
 
     @Test
+    fun rollbackAfterDrawMakesTheGamePlayableAgain() {
+        val game = newGame()
+        fillWithoutFive(game)
+        val lastCell = GomokuGame.BOARD_SIZE * GomokuGame.BOARD_SIZE - 1
+
+        assertTrue(game.rollbackTo(lastCell))
+
+        assertFalse("rollback must clear the finished state", game.gameOver)
+        assertNull(game.winner)
+        assertTrue("the last cell must be free again", game.isEmpty(14, 14))
+        assertEquals(lastCell, game.history.size)
+    }
+
+    @Test
     fun fiveInARowWins() {
         val game = newGame()
         game.place(3, 7, Stone.BLACK)
@@ -117,6 +131,65 @@ class GomokuGameTest {
         assertEquals(PlaceOutcome.FORBIDDEN, outcome)
         assertEquals(Stone.WHITE, game.winner)
         assertTrue(game.forbiddenLoss)
+    }
+
+    // ---- clock -------------------------------------------------------------
+
+    @Test
+    fun timeExpiredGivesTheGameToTheComputer() {
+        val game = newGame()
+        game.place(7, 7, Stone.BLACK)
+
+        game.timeExpired()
+
+        assertTrue(game.gameOver)
+        assertEquals(Stone.WHITE, game.winner)
+        assertTrue(game.timeLoss)
+        assertFalse("a timeout is not a forbidden move", game.forbiddenLoss)
+        assertTrue("there is no line to highlight", game.winningLine.isEmpty())
+    }
+
+    @Test
+    fun timeLossSurvivesEncodeDecode() {
+        val game = newGame()
+        game.place(7, 7, Stone.BLACK)
+        game.timeExpired()
+
+        val restored = GomokuGame.decode(game.encode())
+
+        assertTrue(restored != null)
+        assertTrue(restored!!.gameOver)
+        assertTrue(restored.timeLoss)
+        assertEquals(Stone.WHITE, restored.winner)
+    }
+
+    @Test
+    fun aGameSavedBeforeTheClockExistedStillDecodes() {
+        // The old format carries no marker, so its moves start right after the
+        // forbidden-loss field.
+        val legacy = "15;BLACK;0;NONE;0;0;7,7,BLACK;8,8,WHITE"
+
+        val game = GomokuGame.decode(legacy)
+
+        assertTrue(game != null)
+        assertEquals(2, game!!.history.size)
+        assertEquals(Move(7, 7, Stone.BLACK), game.history[0])
+        assertFalse(game.timeLoss)
+        assertFalse(game.gameOver)
+    }
+
+    @Test
+    fun rollbackClearsTheTimeout() {
+        val game = newGame()
+        game.place(7, 7, Stone.BLACK)
+        game.place(8, 8, Stone.WHITE)
+        game.timeExpired()
+
+        assertTrue(game.rollbackTo(1))
+
+        assertFalse(game.timeLoss)
+        assertFalse(game.gameOver)
+        assertNull(game.winner)
     }
 
     // ---- winning line ------------------------------------------------------

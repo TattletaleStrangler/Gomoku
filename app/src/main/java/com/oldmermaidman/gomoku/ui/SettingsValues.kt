@@ -13,5 +13,7 @@ data class SettingsValues(
     val aiLevel: Int,
     val theme: Int,
     val soundEnabled: Boolean,
-    val soundVolumeStep: Int
+    val soundVolumeStep: Int,
+    /** Game mode: the ordinal of a [com.oldmermaidman.gomoku.model.TimeControl]. */
+    val gameMode: Int
 )

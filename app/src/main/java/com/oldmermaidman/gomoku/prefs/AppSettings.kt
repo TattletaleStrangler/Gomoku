@@ -7,6 +7,7 @@ import com.oldmermaidman.gomoku.model.GomokuGame
 import com.oldmermaidman.gomoku.model.ScoreBoard
 import com.oldmermaidman.gomoku.model.SoundVolume
 import com.oldmermaidman.gomoku.model.Stone
+import com.oldmermaidman.gomoku.model.TimeControl
 
 /**
  * SharedPreferences-backed settings, cumulative statistics and the current game
@@ -55,6 +56,23 @@ class AppSettings(context: Context) {
         get() = prefs.getInt(KEY_THEME, THEME_LIGHT)
         set(value) = prefs.edit { putInt(KEY_THEME, value) }
 
+    /**
+     * Game mode: the [TimeControl] ordinal — no clock, classical, rapid or blitz.
+     * It belongs to the settings, so the chosen mode survives a restart.
+     */
+    var gameMode: Int
+        get() = prefs.getInt(KEY_MODE, TimeControl.NONE.ordinal)
+        set(value) = prefs.edit { putInt(KEY_MODE, value) }
+
+    /**
+     * Time left on the player's clock, in milliseconds, or [NO_CLOCK_SAVED] when
+     * nothing is stored yet. It belongs to the running game: a new game starts from
+     * the main time of its control again.
+     */
+    var clockRemainingMs: Long
+        get() = prefs.getLong(KEY_CLOCK_LEFT, NO_CLOCK_SAVED)
+        set(value) = prefs.edit { putLong(KEY_CLOCK_LEFT, value) }
+
     fun saveGame(game: GomokuGame) {
         prefs.edit { putString(KEY_GAME, game.encode()) }
     }
@@ -91,6 +109,9 @@ class AppSettings(context: Context) {
         const val THEME_DARK = 1
         const val THEME_WARM = 2
 
+        /** [clockRemainingMs] before anything was stored. */
+        const val NO_CLOCK_SAVED = -1L
+
         private const val PREFS_NAME = "gomoku_prefs"
         private const val KEY_COLOR = "player_color"
         private const val KEY_FORBIDDEN = "forbidden_moves"
@@ -99,6 +120,8 @@ class AppSettings(context: Context) {
         private const val KEY_VOLUME = "sound_volume_step"
         private const val KEY_LEVEL = "ai_level"
         private const val KEY_THEME = "theme"
+        private const val KEY_MODE = "game_mode"
+        private const val KEY_CLOCK_LEFT = "clock_remaining_ms"
         private const val KEY_GAME = "game_state"
         private const val KEY_STATS = "stats_by_level"
     }

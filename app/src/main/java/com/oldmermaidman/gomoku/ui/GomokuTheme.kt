@@ -21,6 +21,8 @@ data class GomokuTheme(
     @param:ColorInt val numberOnBlackStone: Int,
     @param:ColorInt val numberOnWhiteStone: Int,
     @param:ColorInt val lastMoveRing: Int,
+    /** Used for the player's clock in its last seconds. */
+    @param:ColorInt val timeLow: Int,
     val isDark: Boolean
 )
 
@@ -40,6 +42,7 @@ object Themes {
         numberOnBlackStone = "#FFFFFF".toColorInt(),
         numberOnWhiteStone = "#1A1A1A".toColorInt(),
         lastMoveRing = "#4A90D9".toColorInt(),
+        timeLow = "#D32F2F".toColorInt(),
         isDark = false
     )
 
@@ -57,6 +60,7 @@ object Themes {
         numberOnBlackStone = "#1C1C1E".toColorInt(),
         numberOnWhiteStone = "#E5E5E5".toColorInt(),
         lastMoveRing = "#5AC8FA".toColorInt(),
+        timeLow = "#FF6B6B".toColorInt(),
         isDark = true
     )
 
@@ -74,6 +78,7 @@ object Themes {
         numberOnBlackStone = "#FDFBF7".toColorInt(),
         numberOnWhiteStone = "#2B2118".toColorInt(),
         lastMoveRing = "#C0693E".toColorInt(),
+        timeLow = "#C0392B".toColorInt(),
         isDark = false
     )
 

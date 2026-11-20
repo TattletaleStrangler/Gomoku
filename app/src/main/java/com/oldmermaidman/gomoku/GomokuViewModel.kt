@@ -1,6 +1,7 @@
 package com.oldmermaidman.gomoku
 
 import android.app.Application
+import android.os.SystemClock
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -8,17 +9,21 @@ import androidx.lifecycle.viewModelScope
 import com.oldmermaidman.gomoku.engine.BuiltInAI
 import com.oldmermaidman.gomoku.engine.NativeExe
 import com.oldmermaidman.gomoku.engine.RapfiGomokuEngine
+import com.oldmermaidman.gomoku.model.GameClock
 import com.oldmermaidman.gomoku.model.GameResult
 import com.oldmermaidman.gomoku.model.GomokuGame
 import com.oldmermaidman.gomoku.model.Move
 import com.oldmermaidman.gomoku.model.PlaceOutcome
 import com.oldmermaidman.gomoku.model.Stone
+import com.oldmermaidman.gomoku.model.TimeControl
 import com.oldmermaidman.gomoku.model.resultOf
 import com.oldmermaidman.gomoku.prefs.AppSettings
 import com.oldmermaidman.gomoku.rules.ForbiddenMoves
 import com.oldmermaidman.gomoku.ui.SettingsValues
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -32,6 +37,17 @@ data class GameUiState(
      * plays, so the engine is not named separately in the header.
      */
     val difficultyLabel: String
+)
+
+/**
+ * The player's clock as shown next to the status line. [timed] is false for the
+ * "no clock" mode, when nothing is shown at all; [low] marks the last stretch,
+ * which the header highlights as a warning.
+ */
+data class ClockUi(
+    val timed: Boolean,
+    val remainingMs: Long,
+    val low: Boolean
 )
 
 /** Immutable snapshot of the position passed to the AI on a background thread. */
@@ -84,6 +100,25 @@ class GomokuViewModel(app: Application) : AndroidViewModel(app) {
     private val _uiState = MutableLiveData<GameUiState>()
     val uiState: LiveData<GameUiState> = _uiState
 
+    /** The player's clock, redrawn several times a second while it runs. */
+    private val _clockUi = MutableLiveData<ClockUi>()
+    val clockUi: LiveData<ClockUi> = _clockUi
+
+    /**
+     * The player's clock. Only the human is timed — the engine has its own per-move
+     * budget and cannot flag — and the clock runs only while the human is to move.
+     */
+    private var clock = GameClock(TimeControl.NONE)
+
+    /** Ticker that keeps the clock display and the timeout check alive. */
+    private var clockJob: Job? = null
+
+    /**
+     * True while the screen is away. Time spent outside the game is not thinking
+     * time, so the clock is frozen then and the remaining time is stored.
+     */
+    private var clockPaused = true
+
     private var revision = 0
     private var thinking = false
     private var generation = 0
@@ -109,6 +144,10 @@ class GomokuViewModel(app: Application) : AndroidViewModel(app) {
         countedLevel = settings.aiLevel
         countedByThisSession = false
 
+        // The clock continues where the previous session left it; a new game
+        // starts from the full main time of its control.
+        clock = GameClock(TimeControl.byId(settings.gameMode), restoredClockMs())
+
         checkEngineInBackground()
         if (!game.gameOver && game.currentTurn == game.aiColor) {
             requestAiMove()
@@ -121,6 +160,7 @@ class GomokuViewModel(app: Application) : AndroidViewModel(app) {
 
     fun applySettings(r: SettingsValues) {
         val colorChanged = r.playerColor != settings.playerColor
+        val modeChanged = r.gameMode != settings.gameMode
 
         settings.playerColor = r.playerColor
         settings.forbiddenMoves = r.forbidden
@@ -129,6 +169,7 @@ class GomokuViewModel(app: Application) : AndroidViewModel(app) {
         settings.soundVolumeStep = r.soundVolumeStep
         settings.aiLevel = r.aiLevel
         settings.theme = r.theme
+        settings.gameMode = r.gameMode
 
         // The forbidden-move rule applies to future moves immediately.
         game.forbiddenMoves = r.forbidden
@@ -136,6 +177,9 @@ class GomokuViewModel(app: Application) : AndroidViewModel(app) {
         // Changing colour restarts the game. The engine follows the difficulty
         // and is chosen per move, so switching difficulty needs no restart.
         if (colorChanged) startNewGame()
+
+        // A new mode gives the running game a fresh clock on the new control.
+        if (modeChanged) resetClock()
 
         settings.saveGame(game)
         publish()
@@ -165,10 +209,13 @@ class GomokuViewModel(app: Application) : AndroidViewModel(app) {
     fun onBoardTapped(x: Int, y: Int) {
         if (thinking || game.gameOver) return
         if (game.currentTurn != game.playerColor) return
+        // Insurance against a tap in the very moment the flag falls.
+        if (flagFell()) return
 
         val outcome = game.place(x, y, game.playerColor)
         if (outcome == PlaceOutcome.INVALID || outcome == PlaceOutcome.OCCUPIED) return
 
+        onPlayerMovePlayed()
         settings.saveGame(game)
         publish()
         if (!game.gameOver) requestAiMove()
@@ -183,7 +230,14 @@ class GomokuViewModel(app: Application) : AndroidViewModel(app) {
      */
     fun undo() {
         if (thinking) return
+        // A game lost on time stays lost: the clock cannot be wound back, so there
+        // is nothing to take back. Everything else, a finished game included, can.
+        if (game.timeLoss) return
+        if (flagFell()) return
+
+        val historyBefore = game.history.toList()
         if (game.undo()) {
+            takeBackIncrements(historyBefore)
             countedResult?.let {
                 if (countedByThisSession) {
                     scores.rollback(countedLevel, it)
@@ -198,6 +252,45 @@ class GomokuViewModel(app: Application) : AndroidViewModel(app) {
             // Undoing the AI's first move (human plays white) puts black back to move.
             if (!game.gameOver && game.currentTurn == game.aiColor) requestAiMove()
         }
+    }
+
+    /**
+     * Rolls the game back to the position after the first [moveCount] moves — the
+     * "continue from this move" action of the history screen.
+     *
+     * A move the AI is still computing was computed for the position being
+     * discarded, so it is dropped. A result that was already counted is taken back
+     * with the moves, exactly as in [undo].
+     */
+    fun rollbackTo(moveCount: Int) {
+        // Mirrors the model's own rule, so an in-flight AI move is not cancelled
+        // when there is nothing to roll back to.
+        if (moveCount < 0 || moveCount >= game.history.size) return
+        // Like undo: a game lost on time cannot be continued from an earlier move.
+        if (game.timeLoss) return
+        if (flagFell()) return
+
+        generation++
+        aiJob?.cancel()
+        thinking = false
+
+        val historyBefore = game.history.toList()
+        game.rollbackTo(moveCount)
+        takeBackIncrements(historyBefore)
+
+        countedResult?.let {
+            if (countedByThisSession) {
+                scores.rollback(countedLevel, it)
+                settings.saveScores(scores)
+            }
+        }
+        countedResult = null
+        countedByThisSession = false
+
+        settings.saveGame(game)
+        publish()
+        // Continuing from a move that leaves the AI to play starts its turn at once.
+        if (!game.gameOver && game.currentTurn == game.aiColor) requestAiMove()
     }
 
     fun resign() {
@@ -216,6 +309,7 @@ class GomokuViewModel(app: Application) : AndroidViewModel(app) {
         countedByThisSession = false
 
         game = settings.newGame()
+        resetClock()
         settings.saveGame(game)
         publish()
         if (game.currentTurn == game.aiColor) requestAiMove()
@@ -223,8 +317,144 @@ class GomokuViewModel(app: Application) : AndroidViewModel(app) {
 
     override fun onCleared() {
         aiJob?.cancel()
+        clockJob?.cancel()
         engine.stop()   // sends END and force-kills if needed (TZ §4.3)
         // No super.onCleared() call: ViewModel.onCleared() is empty.
+    }
+
+    // ---- clock ------------------------------------------------------------
+
+    /**
+     * The clock runs exactly while the player is to move in a live game and the
+     * screen is visible. Called from every published state, so starting a game,
+     * taking a move back and the engine's reply all end up here.
+     */
+    private fun syncClock() {
+        val playerToMove = !clockPaused && !game.gameOver && !thinking &&
+            game.currentTurn == game.playerColor
+        if (clock.control.timed && playerToMove) startClock() else stopClock()
+    }
+
+    private fun startClock() {
+        if (clock.running) return
+        clock.start(SystemClock.elapsedRealtime())
+
+        clockJob?.cancel()
+        clockJob = viewModelScope.launch {
+            while (isActive) {
+                if (clock.isFlagged(SystemClock.elapsedRealtime())) {
+                    timeOut()
+                    return@launch
+                }
+                publishClock()
+                delay(CLOCK_TICK_MS)
+            }
+        }
+    }
+
+    /** Freezes the clock and keeps what is left of it. */
+    private fun stopClock() {
+        clockJob?.cancel()
+        clockJob = null
+        if (clock.running) {
+            clock.stop(SystemClock.elapsedRealtime())
+            saveClock()
+        }
+        publishClock()
+    }
+
+    /** The player's move ends their turn: the clock stops and the increment is paid. */
+    private fun onPlayerMovePlayed() {
+        if (!clock.control.timed) return
+        clock.stop(SystemClock.elapsedRealtime())
+        if (!game.gameOver) clock.addIncrement()
+        saveClock()
+        publishClock()
+    }
+
+    /**
+     * Takes back the increments of the moves that were just undone. The time spent
+     * thinking stays spent, but playing a move and taking it back again cannot buy
+     * extra time in a timed game.
+     */
+    private fun takeBackIncrements(historyBefore: List<Move>) {
+        if (!clock.control.timed) return
+        val removed = historyBefore.drop(game.history.size)
+        val playerMoves = removed.count { it.color == game.playerColor }
+        if (playerMoves == 0) return
+
+        clock.removeIncrements(playerMoves)
+        saveClock()
+        publishClock()
+    }
+
+    /**
+     * Ends the game when the flag has already fallen but the ticker has not caught
+     * up yet. True when it did — the caller then has nothing left to do.
+     */
+    private fun flagFell(): Boolean {
+        if (!clock.isFlagged(SystemClock.elapsedRealtime())) return false
+        timeOut()
+        return true
+    }
+
+    /** The player ran out of time: the game is lost, as in chess. */
+    private fun timeOut() {
+        if (game.gameOver) return
+
+        clockJob?.cancel()
+        clockJob = null
+        clock.stop(SystemClock.elapsedRealtime())
+        saveClock()
+
+        game.timeExpired()
+        settings.saveGame(game)
+        publish()       // counts the loss in the statistics
+        publishClock()
+    }
+
+    /** Drops the running clock and starts it over from the control's main time. */
+    private fun resetClock() {
+        clockJob?.cancel()
+        clockJob = null
+        clock = GameClock(TimeControl.byId(settings.gameMode))
+        saveClock()
+        publishClock()
+    }
+
+    /**
+     * Time the player had left when the app was last closed. A game that never had
+     * a clock, or one that has none now, starts from the full main time.
+     */
+    private fun restoredClockMs(): Long {
+        val control = TimeControl.byId(settings.gameMode)
+        val saved = settings.clockRemainingMs
+        return if (control.timed && saved >= 0L) saved else control.mainTimeMs
+    }
+
+    private fun publishClock() {
+        val now = SystemClock.elapsedRealtime()
+        _clockUi.value = ClockUi(
+            timed = clock.control.timed,
+            remainingMs = clock.remainingAt(now),
+            low = clock.isLow(now)
+        )
+    }
+
+    private fun saveClock() {
+        settings.clockRemainingMs = clock.remainingMs
+    }
+
+    /** The screen is visible again: the clock may run. */
+    fun onScreenStarted() {
+        clockPaused = false
+        syncClock()
+    }
+
+    /** The screen went away: freeze the clock and store what is left. */
+    fun onScreenStopped() {
+        clockPaused = true
+        syncClock()
     }
 
     // ---- AI ---------------------------------------------------------------
@@ -339,6 +569,7 @@ class GomokuViewModel(app: Application) : AndroidViewModel(app) {
 
     private fun publish() {
         syncScore()
+        syncClock()
         revision++
         _uiState.value = GameUiState(
             game = game,
@@ -352,6 +583,7 @@ class GomokuViewModel(app: Application) : AndroidViewModel(app) {
     /** Also carries the result of a finished game — that is the only report shown. */
     private fun buildStatus(): String = when {
         game.gameOver -> when {
+            game.timeLoss -> context.getString(R.string.time_loss)
             game.forbiddenLoss -> context.getString(R.string.forbidden_loss)
             game.winner == Stone.BLACK -> context.getString(R.string.black_wins)
             game.winner == Stone.WHITE -> context.getString(R.string.white_wins)
@@ -383,5 +615,13 @@ class GomokuViewModel(app: Application) : AndroidViewModel(app) {
         } else {
             base
         }
+    }
+
+    private companion object {
+        /**
+         * How often the running clock is redrawn. The display shows whole seconds,
+         * so this only has to be fine enough for the flag to fall on time.
+         */
+        const val CLOCK_TICK_MS = 250L
     }
 }

@@ -6,6 +6,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
+import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.SeekBar
 import android.widget.TextView
@@ -16,6 +17,7 @@ import com.oldmermaidman.gomoku.R
 import com.oldmermaidman.gomoku.model.ScoreBoard
 import com.oldmermaidman.gomoku.model.SoundVolume
 import com.oldmermaidman.gomoku.model.Stone
+import com.oldmermaidman.gomoku.model.TimeControl
 import com.oldmermaidman.gomoku.prefs.AppSettings
 
 /**
@@ -36,6 +38,7 @@ class SettingsActivity : AppCompatActivity() {
         private const val EXTRA_THEME = "theme"
         private const val EXTRA_SOUND_ENABLED = "sound_enabled"
         private const val EXTRA_SOUND_VOLUME = "sound_volume"
+        private const val EXTRA_GAME_MODE = "game_mode"
 
         /** Set when the statistics were cleared on this screen. */
         const val EXTRA_STATS_RESET = "stats_reset"
@@ -56,7 +59,8 @@ class SettingsActivity : AppCompatActivity() {
                 aiLevel = data.getIntExtra(EXTRA_AI_LEVEL, AppSettings.LEVEL_NORMAL),
                 theme = data.getIntExtra(EXTRA_THEME, AppSettings.THEME_LIGHT),
                 soundEnabled = data.getBooleanExtra(EXTRA_SOUND_ENABLED, true),
-                soundVolumeStep = data.getIntExtra(EXTRA_SOUND_VOLUME, SoundVolume.DEFAULT_STEP)
+                soundVolumeStep = data.getIntExtra(EXTRA_SOUND_VOLUME, SoundVolume.DEFAULT_STEP),
+                gameMode = data.getIntExtra(EXTRA_GAME_MODE, TimeControl.NONE.ordinal)
             )
         }
     }
@@ -77,6 +81,11 @@ class SettingsActivity : AppCompatActivity() {
         val rgColor = findViewById<RadioGroup>(R.id.rgColor)
         val rgLevel = findViewById<RadioGroup>(R.id.rgLevel)
         val rgTheme = findViewById<RadioGroup>(R.id.rgTheme)
+        val rgMode = findViewById<RadioGroup>(R.id.rgMode)
+        val rbModeNone = findViewById<RadioButton>(R.id.rbModeNone)
+        val rbModeClassic = findViewById<RadioButton>(R.id.rbModeClassic)
+        val rbModeRapid = findViewById<RadioButton>(R.id.rbModeRapid)
+        val rbModeBlitz = findViewById<RadioButton>(R.id.rbModeBlitz)
         val swForbidden = findViewById<SwitchCompat>(R.id.swForbidden)
         val swNumbers = findViewById<SwitchCompat>(R.id.swNumbers)
         val swSound = findViewById<SwitchCompat>(R.id.swSound)
@@ -116,6 +125,32 @@ class SettingsActivity : AppCompatActivity() {
             }
         )
 
+        fun controlName(control: TimeControl): Int = when (control) {
+            TimeControl.CLASSIC -> R.string.mode_classic
+            TimeControl.RAPID -> R.string.mode_rapid
+            TimeControl.BLITZ -> R.string.mode_blitz
+            TimeControl.NONE -> R.string.mode_none
+        }
+
+        /** «Классика — 30 мин + 30 с»: the numbers come from the control itself. */
+        fun modeLabel(control: TimeControl): String = if (!control.timed) {
+            getString(R.string.mode_none)
+        } else {
+            getString(
+                R.string.mode_timing,
+                getString(controlName(control)),
+                (control.mainTimeMs / TimeControl.MINUTE_MS).toInt(),
+                (control.incrementMs / TimeControl.SECOND_MS).toInt()
+            )
+        }
+
+        fun checkedMode(): Int = when (rgMode.checkedRadioButtonId) {
+            R.id.rbModeClassic -> TimeControl.CLASSIC.ordinal
+            R.id.rbModeRapid -> TimeControl.RAPID.ordinal
+            R.id.rbModeBlitz -> TimeControl.BLITZ.ordinal
+            else -> TimeControl.NONE.ordinal
+        }
+
         // The theme is previewed as soon as it is picked, but only saved on Apply.
         fun previewTheme() {
             val theme = selectedTheme()
@@ -147,6 +182,7 @@ class SettingsActivity : AppCompatActivity() {
                 )
                 putExtra(EXTRA_SOUND_ENABLED, swSound.isChecked)
                 putExtra(EXTRA_SOUND_VOLUME, sbVolume.progress)
+                putExtra(EXTRA_GAME_MODE, checkedMode())
                 putExtra(EXTRA_STATS_RESET, statsReset)
             }
             setResult(Activity.RESULT_OK, data)
@@ -165,6 +201,18 @@ class SettingsActivity : AppCompatActivity() {
                 AppSettings.THEME_DARK -> R.id.rbThemeDark
                 AppSettings.THEME_WARM -> R.id.rbThemeWarm
                 else -> R.id.rbThemeLight
+            }
+        )
+        rbModeNone.text = modeLabel(TimeControl.NONE)
+        rbModeClassic.text = modeLabel(TimeControl.CLASSIC)
+        rbModeRapid.text = modeLabel(TimeControl.RAPID)
+        rbModeBlitz.text = modeLabel(TimeControl.BLITZ)
+        rgMode.check(
+            when (TimeControl.byId(settings.gameMode)) {
+                TimeControl.CLASSIC -> R.id.rbModeClassic
+                TimeControl.RAPID -> R.id.rbModeRapid
+                TimeControl.BLITZ -> R.id.rbModeBlitz
+                TimeControl.NONE -> R.id.rbModeNone
             }
         )
         swForbidden.isChecked = settings.forbiddenMoves
