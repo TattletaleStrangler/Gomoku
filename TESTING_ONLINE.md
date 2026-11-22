@@ -39,38 +39,51 @@ curl.exe http://localhost:8080/actuator/health
 
 ## 2. Собрать и установить клиент
 
-Адрес сервера вшивается в сборку через `BuildConfig.API_BASE_URL`.
+Адрес сервера вшивается в сборку через `BuildConfig.API_BASE_URL`, поэтому для
+разных устройств может понадобиться разная сборка.
 
-**Эмулятор (по умолчанию).** Debug-сборка ходит на `http://10.0.2.2:8080` —
-это хост-машина с точки зрения эмулятора:
+**Вариант 1 — два эмулятора (проще всего).** Debug-сборка по умолчанию ходит на
+`http://10.0.2.2:8080` — это хост-машина с точки зрения эмулятора:
 
 ```powershell
 cd Gomoku
 .\gradlew.bat installDebug
 ```
 
-`installDebug` ставит APK на все подключённые устройства. Список — `adb devices`.
+`installDebug` ставит APK на все подключённые устройства (`adb devices`), так что
+второй AVD достаточно запустить и повторить команду. Оба эмулятора видят
+`10.0.2.2` — отдельная настройка не нужна.
 
-**Два эмулятора.** Запустите второй AVD и повторите `installDebug` (или
-`adb -s emulator-5556 install -r app\build\outputs\apk\debug\app-debug.apk`).
-Оба эмулятора видят `10.0.2.2` — отдельная настройка не нужна.
+**Вариант 2 — эмулятор + телефон, общий адрес.** Соберите APK с адресом
+компьютера в локальной сети и поставьте его на оба устройства:
 
-**Телефон по USB.** Пробросьте порт и пересоберите с `127.0.0.1`:
+```powershell
+ipconfig                     # найдите IPv4, например 192.168.1.42
+.\gradlew.bat assembleDebug -Pgomoku.apiBaseUrl=http://192.168.1.42:8080
+adb -s emulator-5554 install -r app\build\outputs\apk\debug\app-debug.apk
+adb -s <серийный-номер-телефона> install -r app\build\outputs\apk\debug\app-debug.apk
+```
+
+Порт 8080 должен быть разрешён в брандмауэре Windows, телефон — в той же сети.
+Если эмулятор не достаёт до LAN-адреса, соберите два APK: вариант 1 для
+эмулятора и вариант 3 для телефона.
+
+**Вариант 3 — телефон по USB.** `adb reverse` пробрасывает порт телефона на
+компьютер, но только для этого телефона; эмулятору нужен свой APK:
 
 ```powershell
 adb reverse tcp:8080 tcp:8080
-.\gradlew.bat installDebug -Pgomoku.apiBaseUrl=http://127.0.0.1:8080
+.\gradlew.bat assembleDebug -Pgomoku.apiBaseUrl=http://127.0.0.1:8080
+adb -s <серийный-номер-телефона> install -r app\build\outputs\apk\debug\app-debug.apk
 ```
 
-**Телефон по Wi-Fi.** Узнайте IP компьютера (`ipconfig`), разрешите порт 8080 в
-брандмауэре Windows и соберите с адресом компьютера:
+Не ставьте эту сборку на эмулятор: `127.0.0.1` внутри эмулятора — это он сам.
 
-```powershell
-.\gradlew.bat installDebug -Pgomoku.apiBaseUrl=http://192.168.1.42:8080
-```
+**Вариант 4 — два телефона по Wi-Fi.** Как вариант 2: адрес компьютера в
+`-Pgomoku.apiBaseUrl`, APK — на оба телефона.
 
-Телефон и компьютер должны быть в одной сети. Release-сборка ходит на
-`https://api.gomoku.invalid` — для локальной проверки используйте debug.
+Release-сборка ходит на `https://api.gomoku.invalid` — для локальной проверки
+используйте debug.
 
 ## 3. Сыграть партию
 
