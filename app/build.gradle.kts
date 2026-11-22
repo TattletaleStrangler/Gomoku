@@ -1,6 +1,7 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+    id("org.jetbrains.kotlin.plugin.serialization")
 }
 
 android {
@@ -13,8 +14,8 @@ android {
         applicationId = "com.oldmermaidman.gomoku"
         minSdk = 26
         targetSdk = 36
-        versionCode = 13
-        versionName = "1.12"
+        versionCode = 14
+        versionName = "1.13"
 
         // The native Rapfi engine is provided only for arm64-v8a (see TZ §7).
         ndk {
@@ -23,7 +24,20 @@ android {
     }
 
     buildTypes {
+        debug {
+            // 10.0.2.2 is the host machine as seen from the Android emulator. A phone
+            // on USB reaches the host through `adb reverse tcp:8080 tcp:8080` and then
+            // needs 127.0.0.1; override without touching the source:
+            //   ./gradlew assembleDebug -Pgomoku.apiBaseUrl=http://127.0.0.1:8080
+            val debugApi = (project.findProperty("gomoku.apiBaseUrl") as String?)
+                ?: "http://10.0.2.2:8080"
+            buildConfigField("String", "API_BASE_URL", "\"$debugApi\"")
+        }
         release {
+            // Placeholder until the deployment domain exists (see USER_ACTION.md and
+            // README.md, "Online play"). Release builds only speak HTTPS: cleartext is
+            // allowed in src/debug/AndroidManifest.xml and nowhere else.
+            buildConfigField("String", "API_BASE_URL", "\"https://api.gomoku.invalid\"")
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
@@ -41,6 +55,21 @@ android {
         viewBinding = true
         // Crash reports carry the version of the build they came from.
         buildConfig = true
+    }
+
+    testOptions {
+        unitTests {
+            // The network layer logs through android.util.Log. On the JVM that class is
+            // a stub, so without this flag every logged failure would throw instead of
+            // reaching the assertion the test is about.
+            isReturnDefaultValues = true
+        }
+    }
+
+    lint {
+        // "A newer version is available" is not a defect: the pinned versions are the
+        // ones this project was built and tested against (see README.md, §16).
+        disable += "NewerVersionAvailable"
     }
 
     // Force native libs (incl. the shipped Rapfi binary, renamed to librapfi.so)
@@ -70,6 +99,14 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.11.1")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.11.0")
 
+    // Network layer (TZ §11.2): one OkHttp client for REST and the WebSocket, and
+    // kotlinx.serialization for the DTOs — no reflection, so the DTOs stay testable.
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
+
     // JVM unit tests for the built-in engine (it has no Android dependencies).
     testImplementation("junit:junit:4.13.2")
+    // MockWebServer drives the REST client and the socket against a local server.
+    testImplementation("com.squareup.okhttp3:mockwebserver:4.12.0")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.11.0")
 }

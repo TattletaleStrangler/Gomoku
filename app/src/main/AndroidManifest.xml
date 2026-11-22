@@ -3,13 +3,20 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <!--
-        No network and no storage permissions are requested: the app is fully offline
-        (TZ §7). localeConfig feeds the Android 13+ per-app language picker; older
-        versions ignore the attribute, which is what tools:targetApi records for lint.
+        The offline game needs no permission at all; online play adds exactly one:
+        INTERNET (TZ §11.1). The refresh token lives in its own preferences file and
+        is excluded from backup, so it never leaves the device through the cloud
+        (see res/xml/data_extraction_rules.xml and res/xml/backup_rules.xml).
+        localeConfig feeds the Android 13+ per-app language picker; older versions
+        ignore the attribute, which is what tools:targetApi records for lint.
     -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:name=".GomokuApp"
         android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
         android:localeConfig="@xml/locales_config"
         android:roundIcon="@mipmap/ic_launcher_round"
@@ -47,6 +54,26 @@
             android:exported="false"
             android:label="@string/crash_log"
             android:parentActivityName=".MainActivity" />
+
+        <!-- Online play (TZ §11.4). The account screen is the entry point; the room
+             screen and the game screen hang off it. -->
+        <activity
+            android:name=".ui.AccountActivity"
+            android:exported="false"
+            android:label="@string/account_title"
+            android:parentActivityName=".MainActivity" />
+
+        <activity
+            android:name=".ui.OnlineActivity"
+            android:exported="false"
+            android:label="@string/online_title"
+            android:parentActivityName=".ui.AccountActivity" />
+
+        <activity
+            android:name=".ui.OnlineGameActivity"
+            android:exported="false"
+            android:label="@string/online_game_title"
+            android:parentActivityName=".ui.OnlineActivity" />
     </application>
 
 </manifest>

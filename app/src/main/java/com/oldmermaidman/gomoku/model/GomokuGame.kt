@@ -224,6 +224,16 @@ class GomokuGame(
     }
 
     /**
+     * The winning line of [color] on the current board, or an empty list when that
+     * colour has no five in a row.
+     *
+     * The online screen builds its board with [replay], which does not judge the
+     * position — the server does. This exposes the same scan the offline game uses,
+     * so the online board can still highlight the five that won.
+     */
+    fun winningLineOf(color: Stone): List<Move> = findWinningLine(color) ?: emptyList()
+
+    /**
      * Finds the stones that won the game: the first run of five or more of
      * [color] on the board. Returns null when that colour has no such run.
      */

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Debug builds talk to a local backend over plain HTTP (TZ §11.1). Release builds
+    never do: this file is merged into debug variants only, so the release manifest
+    keeps the platform default, which forbids cleartext.
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <application android:usesCleartextTraffic="true" />
+
+</manifest>

@@ -28,6 +28,9 @@ class BoardView @JvmOverloads constructor(
 
         /** Star points of the 15×15 board, stored flat as x,y pairs. */
         private val HOSHI = intArrayOf(3, 3, 3, 11, 11, 3, 11, 11, 7, 7)
+
+        /** Opacity of the ghost of an undone stone; clearly fainter than a real stone. */
+        private const val GHOST_ALPHA = 80
     }
 
     var game: GomokuGame? = null
@@ -37,6 +40,13 @@ class BoardView @JvmOverloads constructor(
 
     /** Cells of the winning line; empty unless the game was won. */
     var winningLine: List<Move> = emptyList()
+
+    /**
+     * A stone an accepted online undo took back, drawn semi-transparent so its owner
+     * can see which move was canceled (FEATURES.md, "the ghost of the undone stone").
+     * Null for the opponent — the server does not even send it to them.
+     */
+    var ghost: Move? = null
 
     private val stonePaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val linePaint = Paint(Paint.ANTI_ALIAS_FLAG)
@@ -116,6 +126,14 @@ class BoardView @JvmOverloads constructor(
             canvas.drawCircle(cx, cy, stoneRadius * 0.68f, ringPaint)
         }
 
+        // Ghost of a move an accepted online undo took back. It is drawn only on an
+        // empty cell: once the player places a new stone, the server clears the ghost.
+        ghost?.let { m ->
+            if (m.x in 0 until size && m.y in 0 until size && g.board[m.y][m.x] == Stone.EMPTY) {
+                drawGhost(canvas, m)
+            }
+        }
+
         // Winning line, drawn over the stones so it reads on every theme.
         if (winningLine.size >= 2) {
             val first = winningLine.first()
@@ -152,6 +170,20 @@ class BoardView @JvmOverloads constructor(
             val baseline = cy - (textPaint.ascent() + textPaint.descent()) / 2f
             canvas.drawText(number.toString(), cx, baseline, textPaint)
         }
+    }
+
+    /**
+     * The stone an undone move left behind: the same shape as a real one, at roughly
+     * a third of the opacity, so it is clearly not in play.
+     */
+    private fun drawGhost(canvas: Canvas, move: Move) {
+        val cx = originX + move.x * cellSize
+        val cy = originY + move.y * cellSize
+        stonePaint.style = Paint.Style.FILL
+        stonePaint.alpha = GHOST_ALPHA
+        stonePaint.color = if (move.color == Stone.BLACK) theme.blackStone else theme.whiteStone
+        canvas.drawCircle(cx, cy, stoneRadius, stonePaint)
+        stonePaint.alpha = 255
     }
 
     private fun drawHoshi(canvas: Canvas, size: Int) {

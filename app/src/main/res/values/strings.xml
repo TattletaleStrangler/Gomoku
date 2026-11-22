@@ -108,4 +108,105 @@
     <string name="crash_log_subject">Gomoku: crash journal</string>
     <string name="crash_log_clear_title">Clear the journal?</string>
     <string name="crash_log_clear_message">All saved crash reports will be deleted.</string>
+
+    <!--
+        Online play (TZ_BACKEND.md §11). The whole section is optional: the offline
+        game never touches it, and nothing here is shown until the player opens it.
+    -->
+    <string name="online">Online</string>
+    <string name="account_title">Account</string>
+    <string name="account_nickname">Nickname</string>
+    <string name="account_password">Password</string>
+    <string name="account_sign_in">Sign in</string>
+    <string name="account_register">Create account</string>
+    <string name="account_sign_out">Sign out</string>
+    <string name="account_delete">Delete account</string>
+    <string name="account_delete_title">Delete the account?</string>
+    <string name="account_delete_message">The account and its games will be deleted. This cannot be undone.</string>
+    <string name="account_delete_confirm">Delete</string>
+    <string name="account_delete_password">Password to confirm</string>
+    <string name="account_signed_in_as">Signed in as %1$s</string>
+    <string name="account_stats">Wins %1$d · losses %2$d · draws %3$d</string>
+    <string name="account_play">Play online</string>
+    <string name="account_hint">A nickname of 3–24 letters, digits, underscore or hyphen; a password of 8–72 characters.</string>
+    <string name="account_working">Please wait…</string>
+
+    <string name="online_title">Online play</string>
+    <string name="online_create">Create a room</string>
+    <string name="online_rule">Rule</string>
+    <string name="online_rule_freestyle">Freestyle</string>
+    <string name="online_rule_renju">Renju</string>
+    <string name="online_time_control">Time control</string>
+    <string name="online_create_action">Create</string>
+    <string name="online_join">Join by code</string>
+    <string name="online_code">Room code</string>
+    <string name="online_join_action">Join</string>
+    <string name="online_waiting">Waiting for an opponent</string>
+    <string name="online_waiting_hint">Give this code to your opponent.</string>
+    <string name="online_cancel_room">Close the room</string>
+    <string name="online_return_to_game">Return to the game</string>
+    <string name="online_signed_out">Sign in to play online.</string>
+    <string name="online_time_untimed">No clock</string>
+    <string name="online_time_classic">Classical 30 + 30</string>
+    <string name="online_time_rapid">Rapid 15 + 10</string>
+    <string name="online_time_blitz">Blitz 3 + 2</string>
+
+    <string name="online_game_title">Online game</string>
+    <string name="online_you_black">You play black</string>
+    <string name="online_you_white">You play white</string>
+    <string name="online_opponent">Opponent: %1$s</string>
+    <string name="online_turn_you">Your turn</string>
+    <string name="online_turn_opponent">Opponent\'s turn</string>
+    <string name="online_waiting_opponent">Waiting for an opponent</string>
+    <string name="online_result_you_win">You win</string>
+    <string name="online_result_you_lose">You lose</string>
+    <string name="online_result_draw">Draw</string>
+    <string name="online_finish_five">Five in a row</string>
+    <string name="online_finish_forbidden">Forbidden move</string>
+    <string name="online_finish_timeout">Time out</string>
+    <string name="online_finish_resign">Resignation</string>
+    <string name="online_finish_abandon">Opponent left</string>
+    <string name="online_undo">Undo (%1$d)</string>
+    <string name="online_undo_request_text">Your opponent asks to take the move back</string>
+    <string name="online_game_over">Game over</string>
+    <string name="online_undo_accept">Accept</string>
+    <string name="online_undo_decline">Decline</string>
+    <string name="online_undo_accepted">The move was taken back</string>
+    <string name="online_undo_declined">The request was declined</string>
+    <string name="online_undo_seconds">%1$d s</string>
+    <string name="online_connection_lost">Connection lost, reconnecting…</string>
+    <string name="online_clock_you">You</string>
+    <string name="online_clock_opponent">Opponent</string>
+    <string name="online_back">Back</string>
+
+    <!-- Error codes of the API, translated (TZ_BACKEND.md §7). -->
+    <string name="error_network">The server is unreachable. Check the connection.</string>
+    <string name="error_timeout">The server did not answer in time.</string>
+    <string name="error_malformed">The server sent an unexpected answer.</string>
+    <string name="error_validation">Check the entered data.</string>
+    <string name="error_nickname_taken">This nickname is already taken.</string>
+    <string name="error_bad_credentials">Wrong nickname or password.</string>
+    <string name="error_session_expired">The session has expired. Sign in again.</string>
+    <string name="error_not_participant">You are not a player in this game.</string>
+    <string name="error_not_found">Not found.</string>
+    <string name="error_game_not_found">The game no longer exists.</string>
+    <string name="error_room_not_found">No room with that code.</string>
+    <string name="error_room_closed">The room was closed.</string>
+    <string name="error_room_full">The room is already full.</string>
+    <string name="error_self_join">You cannot join your own room.</string>
+    <string name="error_active_game_exists">You already have a game in progress.</string>
+    <string name="error_game_finished">The game is already over.</string>
+    <string name="error_not_your_turn">It is not your turn.</string>
+    <string name="error_wrong_ply">The position changed. Try again.</string>
+    <string name="error_cell_occupied">That cell is taken.</string>
+    <string name="error_out_of_board">The cell is outside the board.</string>
+    <string name="error_forbidden_move">That move is forbidden under renju rules.</string>
+    <string name="error_undo_not_allowed">You have no move to take back.</string>
+    <string name="error_undo_too_late">Too late to take the move back.</string>
+    <string name="error_undo_limit">No undo requests left.</string>
+    <string name="error_undo_already">The request is already pending.</string>
+    <string name="error_undo_not_requested">There is no undo request.</string>
+    <string name="error_rate_limited">Too many requests. Wait a minute.</string>
+    <string name="error_internal">Server error. Try again later.</string>
+    <string name="error_unknown">Something went wrong.</string>
 </resources>

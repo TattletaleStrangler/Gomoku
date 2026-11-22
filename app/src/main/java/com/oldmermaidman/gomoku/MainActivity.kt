@@ -9,8 +9,10 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.oldmermaidman.gomoku.databinding.ActivityMainBinding
 import com.oldmermaidman.gomoku.model.SoundVolume
+import com.oldmermaidman.gomoku.ui.AccountActivity
 import com.oldmermaidman.gomoku.ui.GomokuTheme
 import com.oldmermaidman.gomoku.ui.HistoryActivity
+import com.oldmermaidman.gomoku.ui.OnlineActivity
 import com.oldmermaidman.gomoku.ui.SettingsActivity
 import com.oldmermaidman.gomoku.ui.SoundPlayer
 import com.oldmermaidman.gomoku.ui.ThemeSupport
@@ -28,6 +30,17 @@ class MainActivity : AppCompatActivity() {
 
     /** True while the player's clock is in its last seconds. */
     private var clockLow = false
+
+    /**
+     * Online play needs an account: a signed-in player goes straight to the rooms,
+     * everyone else lands on the sign-in screen first (TZ §11.4).
+     */
+    private fun openOnline() {
+        val signedIn = (application as GomokuApp).net.tokens.hasSession()
+        startActivity(
+            if (signedIn) OnlineActivity.intent(this) else AccountActivity.intent(this)
+        )
+    }
 
     private val settingsLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -67,6 +80,7 @@ class MainActivity : AppCompatActivity() {
         binding.btnUndo.setOnClickListener { viewModel.undo() }
         binding.btnResign.setOnClickListener { viewModel.resign() }
         binding.btnTheme.setOnClickListener { viewModel.cycleTheme() }
+        binding.btnOnline.setOnClickListener { openOnline() }
         binding.btnHistory.setOnClickListener {
             historyLauncher.launch(HistoryActivity.intent(this, viewModel.game))
         }
@@ -160,6 +174,7 @@ class MainActivity : AppCompatActivity() {
         binding.tvDifficulty.setTextColor(theme.accent)
 
         val tint = ColorStateList.valueOf(theme.statusText)
+        binding.btnOnline.imageTintList = tint
         binding.btnHistory.imageTintList = tint
         binding.btnTheme.imageTintList = tint
         binding.btnSettings.imageTintList = tint

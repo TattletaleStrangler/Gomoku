@@ -108,4 +108,105 @@
     <string name="crash_log_subject">Гомоку: журнал сбоев</string>
     <string name="crash_log_clear_title">Очистить журнал?</string>
     <string name="crash_log_clear_message">Все сохранённые отчёты о сбоях будут удалены.</string>
+
+    <!--
+        Онлайн-игра (TZ_BACKEND.md §11). Раздел необязательный: офлайн-игра его не
+        касается, и ничего отсюда не показывается, пока игрок сам его не откроет.
+    -->
+    <string name="online">Онлайн</string>
+    <string name="account_title">Аккаунт</string>
+    <string name="account_nickname">Никнейм</string>
+    <string name="account_password">Пароль</string>
+    <string name="account_sign_in">Войти</string>
+    <string name="account_register">Зарегистрироваться</string>
+    <string name="account_sign_out">Выйти</string>
+    <string name="account_delete">Удалить аккаунт</string>
+    <string name="account_delete_title">Удалить аккаунт?</string>
+    <string name="account_delete_message">Аккаунт и его партии будут удалены. Это нельзя отменить.</string>
+    <string name="account_delete_confirm">Удалить</string>
+    <string name="account_delete_password">Пароль для подтверждения</string>
+    <string name="account_signed_in_as">Вы вошли как %1$s</string>
+    <string name="account_stats">Победы %1$d · поражения %2$d · ничьи %3$d</string>
+    <string name="account_play">Играть онлайн</string>
+    <string name="account_hint">Никнейм: 3–24 буквы, цифры, «_» или «-»; пароль: 8–72 символа.</string>
+    <string name="account_working">Подождите…</string>
+
+    <string name="online_title">Онлайн-игра</string>
+    <string name="online_create">Создать комнату</string>
+    <string name="online_rule">Правило</string>
+    <string name="online_rule_freestyle">Фристайл</string>
+    <string name="online_rule_renju">Рендзю</string>
+    <string name="online_time_control">Контроль времени</string>
+    <string name="online_create_action">Создать</string>
+    <string name="online_join">Войти по коду</string>
+    <string name="online_code">Код комнаты</string>
+    <string name="online_join_action">Войти</string>
+    <string name="online_waiting">Ожидание соперника</string>
+    <string name="online_waiting_hint">Передайте этот код сопернику.</string>
+    <string name="online_cancel_room">Закрыть комнату</string>
+    <string name="online_return_to_game">Вернуться в партию</string>
+    <string name="online_signed_out">Войдите, чтобы играть онлайн.</string>
+    <string name="online_time_untimed">Без таймера</string>
+    <string name="online_time_classic">Классика 30 + 30</string>
+    <string name="online_time_rapid">Рапид 15 + 10</string>
+    <string name="online_time_blitz">Блиц 3 + 2</string>
+
+    <string name="online_game_title">Онлайн-партия</string>
+    <string name="online_you_black">Вы играете чёрными</string>
+    <string name="online_you_white">Вы играете белыми</string>
+    <string name="online_opponent">Соперник: %1$s</string>
+    <string name="online_turn_you">Ваш ход</string>
+    <string name="online_turn_opponent">Ход соперника</string>
+    <string name="online_waiting_opponent">Ожидание соперника</string>
+    <string name="online_result_you_win">Вы победили</string>
+    <string name="online_result_you_lose">Вы проиграли</string>
+    <string name="online_result_draw">Ничья</string>
+    <string name="online_finish_five">Пять в ряд</string>
+    <string name="online_finish_forbidden">Запрещённый ход</string>
+    <string name="online_finish_timeout">Время вышло</string>
+    <string name="online_finish_resign">Сдача</string>
+    <string name="online_finish_abandon">Соперник вышел</string>
+    <string name="online_undo">Отмена (%1$d)</string>
+    <string name="online_undo_request_text">Соперник просит отменить ход</string>
+    <string name="online_game_over">Партия завершена</string>
+    <string name="online_undo_accept">Да</string>
+    <string name="online_undo_decline">Нет</string>
+    <string name="online_undo_accepted">Ход отменён</string>
+    <string name="online_undo_declined">Отказано</string>
+    <string name="online_undo_seconds">%1$d с</string>
+    <string name="online_connection_lost">Соединение потеряно, переподключение…</string>
+    <string name="online_clock_you">Вы</string>
+    <string name="online_clock_opponent">Соперник</string>
+    <string name="online_back">Назад</string>
+
+    <!-- Переводы кодов ошибок API (TZ_BACKEND.md §7). -->
+    <string name="error_network">Сервер недоступен. Проверьте соединение.</string>
+    <string name="error_timeout">Сервер не ответил вовремя.</string>
+    <string name="error_malformed">Сервер прислал неожиданный ответ.</string>
+    <string name="error_validation">Проверьте введённые данные.</string>
+    <string name="error_nickname_taken">Этот никнейм уже занят.</string>
+    <string name="error_bad_credentials">Неверный никнейм или пароль.</string>
+    <string name="error_session_expired">Сессия истекла. Войдите снова.</string>
+    <string name="error_not_participant">Вы не участвуете в этой партии.</string>
+    <string name="error_not_found">Не найдено.</string>
+    <string name="error_game_not_found">Партия больше не существует.</string>
+    <string name="error_room_not_found">Комнаты с таким кодом нет.</string>
+    <string name="error_room_closed">Комната закрыта.</string>
+    <string name="error_room_full">Комната уже заполнена.</string>
+    <string name="error_self_join">Нельзя войти в свою комнату.</string>
+    <string name="error_active_game_exists">У вас уже есть незавершённая партия.</string>
+    <string name="error_game_finished">Партия уже завершена.</string>
+    <string name="error_not_your_turn">Сейчас не ваш ход.</string>
+    <string name="error_wrong_ply">Позиция изменилась. Попробуйте снова.</string>
+    <string name="error_cell_occupied">Клетка занята.</string>
+    <string name="error_out_of_board">Клетка вне доски.</string>
+    <string name="error_forbidden_move">Этот ход запрещён правилами рендзю.</string>
+    <string name="error_undo_not_allowed">Вам нечего отменять.</string>
+    <string name="error_undo_too_late">Слишком поздно отменять ход.</string>
+    <string name="error_undo_limit">Попытки отмены закончились.</string>
+    <string name="error_undo_already">Запрос уже отправлен.</string>
+    <string name="error_undo_not_requested">Запроса на отмену нет.</string>
+    <string name="error_rate_limited">Слишком много запросов. Подождите минуту.</string>
+    <string name="error_internal">Ошибка сервера. Попробуйте позже.</string>
+    <string name="error_unknown">Что-то пошло не так.</string>
 </resources>

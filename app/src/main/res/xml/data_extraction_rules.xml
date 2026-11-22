@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Android 12+ (API 31+) backup rules. The auth preferences file holds the refresh
+    token and must not travel to the cloud or to another device (TZ §11.1); the
+    local settings, the running game and the crash journal are backed up as before.
+-->
+<data-extraction-rules>
+    <cloud-backup>
+        <exclude domain="sharedpref" path="gomoku_auth.xml" />
+    </cloud-backup>
+    <device-transfer>
+        <exclude domain="sharedpref" path="gomoku_auth.xml" />
+    </device-transfer>
+</data-extraction-rules>

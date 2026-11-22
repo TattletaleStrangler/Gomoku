@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Backup rules for Android 11 and older (API 30-), where dataExtractionRules is
+    ignored. Same intent as ../xml/data_extraction_rules.xml: the refresh token stays
+    on the device, everything else may be backed up.
+-->
+<full-backup-content>
+    <exclude domain="sharedpref" path="gomoku_auth.xml" />
+</full-backup-content>
