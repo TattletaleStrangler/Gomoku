@@ -174,14 +174,15 @@ class OnlineGameViewModel(
 
     /**
      * Replaces the local copy with [next] unless it is older than what is already shown:
-     * a slow REST answer must not overwrite a newer socket event.
+     * a slow REST answer must not overwrite a newer socket event. Returns false when the
+     * snapshot was ignored, so the caller can still publish the command's own change.
      */
-    private fun applySnapshot(next: GameSnapshotDto) {
+    private fun applySnapshot(next: GameSnapshotDto): Boolean {
         val previous = snapshot
         if (previous != null) {
             val oldTime = instantOf(previous.serverTime)?.toEpochMilli()
             val newTime = instantOf(next.serverTime)?.toEpochMilli()
-            if (oldTime != null && newTime != null && newTime < oldTime) return
+            if (oldTime != null && newTime != null && newTime < oldTime) return false
         }
 
         snapshot = next
@@ -200,28 +201,10 @@ class OnlineGameViewModel(
             flash(if (next.moves.size < previous.moves.size) R.string.online_undo_accepted else R.string.online_undo_declined)
         }
 
-        updateUndoWindow(previous, next)
+        undoWindowUntilMs = nextUndoWindow(previous, next, receivedAtMs, undoWindowUntilMs)
         publishUi()
         publishClock()
-    }
-
-    /**
-     * The server allows an undo request only in the two seconds after the move. The
-     * snapshot does not carry the move's timestamp, so the arrival of a snapshot in which
-     * our stone is the latest and the opponent is to answer starts the local window; the
-     * server remains the judge of whether it is still open.
-     */
-    private fun updateUndoWindow(previous: GameSnapshotDto?, next: GameSnapshotDto) {
-        val you = stoneOf(next.you)
-        val last = next.moves.lastOrNull()
-        val ownMoveIsLast = you != Stone.EMPTY && last != null && stoneOf(last.color) == you
-        val opponentToMove = you != Stone.EMPTY && stoneOf(next.turn) != you
-        if (next.status != "ACTIVE" || !ownMoveIsLast || !opponentToMove) {
-            undoWindowUntilMs = 0L
-            return
-        }
-        val sameMoves = previous != null && previous.moves.size == next.moves.size
-        if (!sameMoves) undoWindowUntilMs = receivedAtMs + UNDO_WINDOW_MS
+        return true
     }
 
     private fun remoteClockOf(game: GameSnapshotDto, receivedAt: Long): RemoteClock {
@@ -305,7 +288,14 @@ class OnlineGameViewModel(
             try {
                 val next = withContext(Dispatchers.IO) { action() }
                 busy = false
-                applySnapshot(next)
+                if (!applySnapshot(next)) {
+                    // The socket event for this move arrived first and is already on
+                    // screen; the older REST answer is ignored, but `busy` still has to
+                    // leave the UI state — otherwise the board and the undo button would
+                    // stay locked until the next event.
+                    publishUi()
+                    publishClock()
+                }
             } catch (e: ApiException) {
                 busy = false
                 publishUi()
@@ -350,9 +340,6 @@ class OnlineGameViewModel(
     private companion object {
         /** How often the clocks and the undo countdown are redrawn. */
         const val TICK_MS = 250L
-
-        /** FEATURES.md: an undo may be asked for only in the first two seconds. */
-        const val UNDO_WINDOW_MS = 2_000L
 
         /** How long "accepted" / "declined" stays on screen. */
         const val FLASH_MS = 1_200L

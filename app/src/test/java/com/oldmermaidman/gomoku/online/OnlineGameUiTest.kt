@@ -147,6 +147,34 @@ class OnlineGameUiTest {
         assertFalse(canRequestUndo(black, nowMs = 10_001L, undoWindowUntilMs = windowUntil))
     }
 
+    /**
+     * The regression this test guards: the window used to open only for the first move,
+     * so after the second move of the same player the button never came back.
+     */
+    @Test
+    fun theUndoWindowOpensAfterEveryOwnMoveAndClosesWhenTheOpponentMoves() {
+        val blackMove1 = MoveDto(ply = 1, x = 7, y = 7, color = "BLACK")
+        val whiteMove = MoveDto(ply = 2, x = 8, y = 8, color = "WHITE")
+        val blackMove2 = MoveDto(ply = 3, x = 9, y = 9, color = "BLACK")
+
+        val start = snapshot(you = "BLACK", turn = "BLACK", moves = emptyList())
+        val afterBlack1 = snapshot(you = "BLACK", turn = "WHITE", moves = listOf(blackMove1))
+        val afterWhite = snapshot(you = "BLACK", turn = "BLACK", moves = listOf(blackMove1, whiteMove))
+        val afterBlack2 = snapshot(
+            you = "BLACK",
+            turn = "WHITE",
+            moves = listOf(blackMove1, whiteMove, blackMove2),
+        )
+
+        assertEquals(0L, nextUndoWindow(null, start, 1_000L, 0L))
+        assertEquals(3_000L, nextUndoWindow(start, afterBlack1, 1_000L, 0L))
+        assertEquals(0L, nextUndoWindow(afterBlack1, afterWhite, 5_000L, 3_000L))
+        assertEquals(7_000L, nextUndoWindow(afterWhite, afterBlack2, 5_000L, 0L))
+
+        // The socket echo of the same move does not restart the two seconds.
+        assertEquals(7_000L, nextUndoWindow(afterBlack2, afterBlack2, 9_000L, 7_000L))
+    }
+
     @Test
     fun anUndoRequestNeedsAttemptsAndNoPendingOne() {
         val blackMoved = listOf(MoveDto(ply = 1, x = 7, y = 7, color = "BLACK"))

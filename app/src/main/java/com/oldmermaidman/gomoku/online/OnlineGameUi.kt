@@ -46,11 +46,45 @@ data class OnlineGameUi(
     val busy: Boolean,
 )
 
+/**
+ * How long an undo request stays possible after a move (FEATURES.md). The server owns
+ * the real deadline; this only decides when the button greys out.
+ */
+const val UNDO_WINDOW_MS = 2_000L
+
 /** The colour a server wire value names; [Stone.EMPTY] for anything else. */
 fun stoneOf(wire: String?): Stone = when (wire) {
     "BLACK" -> Stone.BLACK
     "WHITE" -> Stone.WHITE
     else -> Stone.EMPTY
+}
+
+/**
+ * When the local undo window closes after [next].
+ *
+ * The window opens only when the snapshot shows **our own** stone as the last move and
+ * the opponent is to answer — never for the player who still has to move. It closes as
+ * soon as the opponent plays, and opens again after our next move, which is why this is
+ * recomputed on every snapshot rather than once per game.
+ *
+ * [currentWindowUntilMs] is kept when the snapshot carries no new move (for example the
+ * socket echo of the move we have just applied), so a duplicate does not restart the
+ * two seconds.
+ */
+fun nextUndoWindow(
+    previous: GameSnapshotDto?,
+    next: GameSnapshotDto,
+    receivedAtMs: Long,
+    currentWindowUntilMs: Long,
+    windowMs: Long = UNDO_WINDOW_MS,
+): Long {
+    val you = stoneOf(next.you)
+    val last = next.moves.lastOrNull()
+    val ownMoveIsLast = you != Stone.EMPTY && last != null && stoneOf(last.color) == you
+    val opponentToMove = you != Stone.EMPTY && stoneOf(next.turn) != you
+    if (next.status != "ACTIVE" || !ownMoveIsLast || !opponentToMove) return 0L
+    val sameMoves = previous != null && previous.moves.size == next.moves.size
+    return if (sameMoves) currentWindowUntilMs else receivedAtMs + windowMs
 }
 
 /**
