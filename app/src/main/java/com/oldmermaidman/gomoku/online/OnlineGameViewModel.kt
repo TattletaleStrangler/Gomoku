@@ -127,7 +127,9 @@ class OnlineGameViewModel(
 
     fun requestUndo() {
         val screen = ui ?: return
-        if (busy || screen.finished || screen.pendingUndo != null) return
+        // The button is only a hint: the same rule guards the call, so a stale tap after
+        // the two-second window (or by the player who still has to move) sends nothing.
+        if (!canRequestUndo(screen, SystemClock.elapsedRealtime(), undoWindowUntilMs)) return
         // A refusal is shown as "declined", never as its actual reason (FEATURES.md).
         command(quietUndoFailure = true) { net.api.requestUndo(gameId) }
     }
@@ -257,19 +259,9 @@ class OnlineGameViewModel(
             opponentRemainingMs = clock.remainingMs(screen.you.opponent(), now),
             running = clock.running,
             undoSeconds = undoSeconds,
-            canUndo = canRequestUndo(screen, now),
+            canUndo = canRequestUndo(screen, now, undoWindowUntilMs),
         )
     }
-
-    private fun canRequestUndo(screen: OnlineGameUi, now: Long): Boolean =
-        !busy &&
-            !screen.finished &&
-            screen.snapshot.status == "ACTIVE" &&
-            screen.pendingUndo == null &&
-            screen.undoRemaining > 0 &&
-            !screen.yourTurn &&
-            screen.snapshot.moves.isNotEmpty() &&
-            now <= undoWindowUntilMs
 
     private fun startTicker() {
         ticker?.cancel()

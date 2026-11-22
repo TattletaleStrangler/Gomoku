@@ -118,4 +118,57 @@ class OnlineGameUiTest {
         val ui = buildOnlineGameUi(snapshot(rule = "RENJU"), SocketState.OPEN)!!
         assertTrue(ui.board.forbiddenMoves)
     }
+
+    /**
+     * The regression this test guards: the button used to be enabled for everyone with
+     * attempts left, so the player who still had to move could tap it and only got a
+     * refusal from the server. It belongs to the player whose move is the last one.
+     */
+    @Test
+    fun onlyThePlayerWhoJustMovedMayAskForAnUndo() {
+        val blackMoved = listOf(MoveDto(ply = 1, x = 7, y = 7, color = "BLACK"))
+        val windowUntil = 10_000L
+
+        // Black has just moved and White is to answer: the button is live for Black.
+        val black = buildOnlineGameUi(
+            snapshot(you = "BLACK", turn = "WHITE", moves = blackMoved),
+            SocketState.OPEN,
+        )!!
+        assertTrue(canRequestUndo(black, nowMs = 5_000L, undoWindowUntilMs = windowUntil))
+
+        // White is the one to move, so White never sees it live.
+        val white = buildOnlineGameUi(
+            snapshot(you = "WHITE", turn = "WHITE", moves = blackMoved),
+            SocketState.OPEN,
+        )!!
+        assertFalse(canRequestUndo(white, nowMs = 5_000L, undoWindowUntilMs = windowUntil))
+
+        // After the two seconds the request is too late for Black as well.
+        assertFalse(canRequestUndo(black, nowMs = 10_001L, undoWindowUntilMs = windowUntil))
+    }
+
+    @Test
+    fun anUndoRequestNeedsAttemptsAndNoPendingOne() {
+        val blackMoved = listOf(MoveDto(ply = 1, x = 7, y = 7, color = "BLACK"))
+        val undo = UndoDto(requestedBy = "BLACK", deadline = "2026-11-21T03:20:14.482Z", ply = 1)
+
+        val spent = buildOnlineGameUi(
+            snapshot(you = "BLACK", turn = "WHITE", moves = blackMoved, undoRemaining = 0),
+            SocketState.OPEN,
+        )!!
+        assertFalse(canRequestUndo(spent, 5_000L, 10_000L))
+
+        val pending = buildOnlineGameUi(
+            snapshot(you = "BLACK", turn = "WHITE", moves = blackMoved, undo = undo),
+            SocketState.OPEN,
+        )!!
+        assertFalse(canRequestUndo(pending, 5_000L, 10_000L))
+
+        val busy = buildOnlineGameUi(
+            snapshot(you = "BLACK", turn = "WHITE", moves = blackMoved),
+            SocketState.OPEN,
+            busy = true,
+        )!!
+        assertFalse(canRequestUndo(busy, 5_000L, 10_000L))
+    }
 }

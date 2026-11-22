@@ -53,6 +53,31 @@ fun stoneOf(wire: String?): Stone = when (wire) {
     else -> Stone.EMPTY
 }
 
+/**
+ * Whether the local player may ask the opponent to take the last move back at [nowMs].
+ *
+ * FEATURES.md: the request is possible only in the two seconds after **our own** move,
+ * when the opponent is the one to answer, once per move and at most three times per
+ * game. The server re-checks every one of these; the client uses the same rule to decide
+ * when the button is live, so the player who still has to move never sees it enabled.
+ *
+ * [undoWindowUntilMs] is the monotonic moment the local window closes, derived in
+ * [com.oldmermaidman.gomoku.online.OnlineGameViewModel] from the snapshot's arrival.
+ */
+fun canRequestUndo(
+    screen: OnlineGameUi,
+    nowMs: Long,
+    undoWindowUntilMs: Long,
+): Boolean =
+    !screen.busy &&
+        !screen.finished &&
+        screen.snapshot.status == "ACTIVE" &&
+        screen.pendingUndo == null &&
+        screen.undoRemaining > 0 &&
+        !screen.yourTurn &&
+        screen.snapshot.moves.isNotEmpty() &&
+        nowMs <= undoWindowUntilMs
+
 /** Parses an ISO-8601 instant; null when the server sent something unexpected. */
 fun instantOf(wire: String?): Instant? =
     wire?.let { runCatching { Instant.parse(it) }.getOrNull() }

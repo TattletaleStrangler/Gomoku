@@ -63,6 +63,10 @@ class OnlineGameActivity : AppCompatActivity() {
         setContentView(binding.root)
         applyTheme()
 
+        // Until the first snapshot arrives the clocks are unknown: the button must not
+        // look live just because the layout enables it by default.
+        binding.btnUndo.isEnabled = false
+
         binding.btnGameBack.setOnClickListener { finish() }
         binding.boardView.onCellTapped = { x, y -> viewModel.move(x, y) }
         binding.btnUndo.setOnClickListener { viewModel.requestUndo() }
@@ -122,7 +126,7 @@ class OnlineGameActivity : AppCompatActivity() {
         binding.tvGameStatus.text = statusText(state)
 
         binding.btnUndo.text = getString(R.string.online_undo, state.undoRemaining)
-        binding.btnUndo.isEnabled = !state.busy && !state.finished && state.undoRemaining > 0
+        renderUndoButton()
         binding.btnResign.isEnabled = !state.busy && !state.finished
 
         val connected = state.socket == SocketState.OPEN
@@ -131,6 +135,9 @@ class OnlineGameActivity : AppCompatActivity() {
     }
 
     private fun renderClock() {
+        // The undo window is measured in time, so the button follows the clock even when
+        // the game itself has no clock.
+        renderUndoButton()
         binding.clockRow.visibility = if (clock.timed) View.VISIBLE else View.GONE
         if (!clock.timed) return
 
@@ -142,6 +149,14 @@ class OnlineGameActivity : AppCompatActivity() {
         binding.tvClockOpponent.setTextColor(
             clockColor(clock.opponentRemainingMs, clock.running == me.opponent())
         )
+    }
+
+    /**
+     * The undo button follows the clock: it is live only in the two seconds after our own
+     * move (FEATURES.md), never for the player who still has to make one.
+     */
+    private fun renderUndoButton() {
+        binding.btnUndo.isEnabled = clock.canUndo
     }
 
     /** Accent while running, warning colour in the last seconds, plain otherwise. */
