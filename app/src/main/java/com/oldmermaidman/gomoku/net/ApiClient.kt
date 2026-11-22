@@ -113,11 +113,15 @@ class ApiClient(
 
     // ------------------------------------------------------------------- games
 
-    suspend fun createGame(rule: String, timeControl: String): GameSnapshotDto =
-        decode(call("POST", url("games"), json.encodeToString(CreateGameRequest(rule, timeControl))))
+    suspend fun createGame(
+        rule: String,
+        timeControl: String,
+        color: String? = null,
+    ): GameSnapshotDto =
+        decode(call("POST", url("games"), json.encodeToString(CreateGameRequest(rule, timeControl, color))))
 
-    suspend fun joinGame(code: String): GameSnapshotDto =
-        decode(call("POST", url("games/join"), json.encodeToString(JoinGameRequest(code))))
+    suspend fun joinGame(code: String, color: String? = null): GameSnapshotDto =
+        decode(call("POST", url("games/join"), json.encodeToString(JoinGameRequest(code, color))))
 
     suspend fun game(id: String): GameSnapshotDto = decode(call("GET", url("games/$id")))
 

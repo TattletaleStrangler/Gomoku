@@ -136,6 +136,9 @@
     <string name="online_rule">Rule</string>
     <string name="online_rule_freestyle">Freestyle</string>
     <string name="online_rule_renju">Renju</string>
+    <string name="online_play_as">Your colour</string>
+    <string name="online_color_any">Any (the opponent chooses)</string>
+    <string name="online_join_color">Your colour, if the room leaves it open</string>
     <string name="online_time_control">Time control</string>
     <string name="online_create_action">Create</string>
     <string name="online_join">Join by code</string>

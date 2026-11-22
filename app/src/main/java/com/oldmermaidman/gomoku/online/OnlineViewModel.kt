@@ -70,13 +70,13 @@ class OnlineViewModel(app: Application) : AndroidViewModel(app) {
         if (ui.waiting == null) resumeOpenGame()
     }
 
-    fun createRoom(rule: String, timeControl: String) {
+    fun createRoom(rule: String, timeControl: String, color: String) {
         if (ui.busy || ui.waiting != null) return
         ui = ui.copy(busy = true, error = null)
         publish()
         viewModelScope.launch {
             try {
-                val game = withContext(Dispatchers.IO) { net.api.createGame(rule, timeControl) }
+                val game = withContext(Dispatchers.IO) { net.api.createGame(rule, timeControl, color) }
                 if (game.status == "WAITING") startWaiting(game) else open(game)
             } catch (e: ApiException) {
                 handleCommandFailure(e)
@@ -84,7 +84,7 @@ class OnlineViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
-    fun joinRoom(rawCode: String) {
+    fun joinRoom(rawCode: String, color: String? = null) {
         if (ui.busy || ui.waiting != null) return
         val code = rawCode.trim().uppercase()
         if (!code.matches(Regex("^[A-Z0-9]{6}$"))) {
@@ -96,7 +96,7 @@ class OnlineViewModel(app: Application) : AndroidViewModel(app) {
         publish()
         viewModelScope.launch {
             try {
-                val game = withContext(Dispatchers.IO) { net.api.joinGame(code) }
+                val game = withContext(Dispatchers.IO) { net.api.joinGame(code, color) }
                 open(game)
             } catch (e: ApiException) {
                 handleCommandFailure(e)

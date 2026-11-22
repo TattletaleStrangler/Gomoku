@@ -136,6 +136,9 @@
     <string name="online_rule">Правило</string>
     <string name="online_rule_freestyle">Фристайл</string>
     <string name="online_rule_renju">Рендзю</string>
+    <string name="online_play_as">Ваш цвет</string>
+    <string name="online_color_any">Любой (выберет соперник)</string>
+    <string name="online_join_color">Ваш цвет, если комната оставляет выбор</string>
     <string name="online_time_control">Контроль времени</string>
     <string name="online_create_action">Создать</string>
     <string name="online_join">Войти по коду</string>

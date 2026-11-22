@@ -1,7 +1,9 @@
 package com.oldmermaidman.gomoku.net
 
+import com.oldmermaidman.gomoku.net.dto.CreateGameRequest
 import com.oldmermaidman.gomoku.net.dto.GameEventDto
 import com.oldmermaidman.gomoku.net.dto.GameSnapshotDto
+import com.oldmermaidman.gomoku.net.dto.JoinGameRequest
 import com.oldmermaidman.gomoku.net.dto.MoveRequest
 import com.oldmermaidman.gomoku.net.dto.UndoDecisionRequest
 import org.junit.Assert.assertEquals
@@ -91,6 +93,26 @@ class DtoSerializationTest {
     fun requestBodiesCarryEveryField() {
         assertEquals("""{"ply":1,"x":7,"y":7}""", json.encodeToString(MoveRequest(1, 7, 7)))
         assertEquals("""{"accept":false}""", json.encodeToString(UndoDecisionRequest(false)))
+    }
+
+    @Test
+    fun theColourIsSentOnlyWhenThePlayerChoseOne() {
+        assertEquals(
+            """{"rule":"FREESTYLE","timeControl":"UNTIMED","color":"ANY"}""",
+            json.encodeToString(CreateGameRequest("FREESTYLE", "UNTIMED", "ANY")),
+        )
+        assertEquals(
+            """{"rule":"FREESTYLE","timeControl":"UNTIMED"}""",
+            json.encodeToString(CreateGameRequest("FREESTYLE", "UNTIMED")),
+        )
+        assertEquals(
+            """{"code":"ABC123","color":"WHITE"}""",
+            json.encodeToString(JoinGameRequest("ABC123", "WHITE")),
+        )
+        assertEquals(
+            """{"code":"ABC123"}""",
+            json.encodeToString(JoinGameRequest("ABC123")),
+        )
     }
 
     @Test

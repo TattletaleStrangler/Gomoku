@@ -10,17 +10,29 @@ import kotlinx.serialization.Serializable
  * are omitted by the server, so every optional field has a default here.
  */
 
-/** What the creator of a room chooses. */
+/**
+ * What the creator of a room chooses.
+ *
+ * [color] is `BLACK`, `WHITE`, or `ANY` (the opponent chooses when joining). A null is
+ * omitted from the body and the server defaults the creator to black.
+ */
 @Serializable
 data class CreateGameRequest(
     val rule: String,
     val timeControl: String,
+    val color: String? = null,
 )
 
-/** Joining a room by the code shown to its creator. */
+/**
+ * Joining a room by the code shown to its creator.
+ *
+ * [color] is a wish that the server honours only when the creator left the colour open;
+ * otherwise the room's own choice wins.
+ */
 @Serializable
 data class JoinGameRequest(
     val code: String,
+    val color: String? = null,
 )
 
 /**

@@ -170,6 +170,41 @@
                 </RadioGroup>
 
                 <TextView
+                    android:id="@+id/tvColorTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/online_play_as"
+                    android:textSize="14sp" />
+
+                <!-- Black by default; ANY leaves the choice to the opponent. -->
+                <RadioGroup
+                    android:id="@+id/rgColor"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <RadioButton
+                        android:id="@+id/rbColorBlack"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:checked="true"
+                        android:text="@string/play_black" />
+
+                    <RadioButton
+                        android:id="@+id/rbColorWhite"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/play_white" />
+
+                    <RadioButton
+                        android:id="@+id/rbColorAny"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/online_color_any" />
+                </RadioGroup>
+
+                <TextView
                     android:id="@+id/tvTimeTitle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -234,6 +269,42 @@
                     android:importantForAutofill="no"
                     android:inputType="textCapCharacters"
                     android:maxLength="6" />
+
+                <TextView
+                    android:id="@+id/tvJoinColorTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/online_join_color"
+                    android:textSize="14sp" />
+
+                <!-- Honoured only when the room left the colour open; no preference by
+                     default. -->
+                <RadioGroup
+                    android:id="@+id/rgJoinColor"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <RadioButton
+                        android:id="@+id/rbJoinAny"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:checked="true"
+                        android:text="@string/online_color_any" />
+
+                    <RadioButton
+                        android:id="@+id/rbJoinBlack"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/play_black" />
+
+                    <RadioButton
+                        android:id="@+id/rbJoinWhite"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/play_white" />
+                </RadioGroup>
 
                 <Button
                     android:id="@+id/btnJoin"

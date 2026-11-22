@@ -42,10 +42,10 @@ class OnlineActivity : AppCompatActivity() {
             startActivity(AccountActivity.intent(this))
         }
         binding.btnCreate.setOnClickListener {
-            viewModel.createRoom(selectedRule(), selectedTimeControl())
+            viewModel.createRoom(selectedRule(), selectedTimeControl(), selectedColor())
         }
         binding.btnJoin.setOnClickListener {
-            viewModel.joinRoom(binding.etCode.text.toString())
+            viewModel.joinRoom(binding.etCode.text.toString(), selectedJoinColor())
         }
         binding.btnCloseRoom.setOnClickListener { viewModel.leaveWaitingRoom() }
         binding.btnResume.setOnClickListener { viewModel.openResume() }
@@ -65,6 +65,20 @@ class OnlineActivity : AppCompatActivity() {
         R.id.rbRapid -> "RAPID"
         R.id.rbBlitz -> "BLITZ"
         else -> "UNTIMED"
+    }
+
+    /** The creator's colour: black by default, or ANY to let the joiner choose. */
+    private fun selectedColor(): String = when (binding.rgColor.checkedRadioButtonId) {
+        R.id.rbColorWhite -> "WHITE"
+        R.id.rbColorAny -> "ANY"
+        else -> "BLACK"
+    }
+
+    /** The joiner's wish; null means "no preference" and is omitted from the request. */
+    private fun selectedJoinColor(): String? = when (binding.rgJoinColor.checkedRadioButtonId) {
+        R.id.rbJoinBlack -> "BLACK"
+        R.id.rbJoinWhite -> "WHITE"
+        else -> null
     }
 
     private fun render(ui: OnlineUi) {
