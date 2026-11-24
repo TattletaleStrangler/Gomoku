@@ -119,6 +119,23 @@ data class UndoDto(
     val ply: Int = 0,
 )
 
+/** One row of the player's finished games (`GET /games/history`). */
+@Serializable
+data class GameHistoryDto(
+    val gameId: String = "",
+    val rule: String = "FREESTYLE",
+    val timeControl: String = "UNTIMED",
+    val ranked: Boolean = false,
+    val result: String = "NONE",
+    val finishReason: String = "NONE",
+    val you: String? = null,
+    val opponentNickname: String = "",
+    val opponentRating: Int? = null,
+    val ratingDelta: Int? = null,
+    val finishedAt: String? = null,
+    val moveCount: Int = 0,
+)
+
 /**
  * The whole state of a game, as every game endpoint returns it.
  *

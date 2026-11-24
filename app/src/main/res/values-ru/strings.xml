@@ -149,6 +149,10 @@
     <string name="online_lobby_empty">Открытых игр нет — создайте комнату или найдите соперника</string>
     <string name="online_lobby_loading">Загрузка…</string>
     <string name="online_rating_delta">рейтинг %1$s%2$d</string>
+    <string name="online_history">История партий</string>
+    <string name="online_history_empty">Завершённых партий пока нет</string>
+    <string name="online_replay_title">Повтор партии</string>
+    <string name="online_replay_vs">против %1$s</string>
     <string name="online_code">Код комнаты</string>
     <string name="online_join_action">Войти</string>
     <string name="online_waiting">Ожидание соперника</string>

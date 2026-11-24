@@ -74,6 +74,18 @@
             android:exported="false"
             android:label="@string/online_game_title"
             android:parentActivityName=".ui.OnlineActivity" />
+
+        <activity
+            android:name=".ui.OnlineHistoryActivity"
+            android:exported="false"
+            android:label="@string/online_history"
+            android:parentActivityName=".ui.OnlineActivity" />
+
+        <activity
+            android:name=".ui.OnlineReplayActivity"
+            android:exported="false"
+            android:label="@string/online_replay_title"
+            android:parentActivityName=".ui.OnlineHistoryActivity" />
     </application>
 
 </manifest>

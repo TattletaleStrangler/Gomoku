@@ -130,6 +130,13 @@
                     android:text="@string/online_return_to_game"
                     android:visibility="gone" />
 
+                <Button
+                    android:id="@+id/btnHistory"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/online_history" />
+
                 <TextView
                     android:id="@+id/tvCreateTitle"
                     android:layout_width="match_parent"

@@ -71,6 +71,9 @@ class OnlineActivity : AppCompatActivity() {
         }
         binding.btnCloseRoom.setOnClickListener { viewModel.leaveWaitingRoom() }
         binding.btnResume.setOnClickListener { viewModel.openResume() }
+        binding.btnHistory.setOnClickListener {
+            startActivity(OnlineHistoryActivity.intent(this))
+        }
 
         viewModel.state.observe(this) { render(it) }
     }
@@ -139,24 +142,6 @@ class OnlineActivity : AppCompatActivity() {
         }
     }
 
-    private fun ruleName(rule: String): Int = when (rule) {
-        "RENJU" -> R.string.online_rule_renju
-        else -> R.string.online_rule_freestyle
-    }
-
-    private fun timeName(timeControl: String): Int = when (timeControl) {
-        "CLASSIC" -> R.string.online_time_classic
-        "RAPID" -> R.string.online_time_rapid
-        "BLITZ" -> R.string.online_time_blitz
-        else -> R.string.online_time_untimed
-    }
-
-    private fun colorName(color: String): Int = when (color) {
-        "BLACK" -> R.string.play_black
-        "WHITE" -> R.string.play_white
-        else -> R.string.online_color_any
-    }
-
     private fun render(ui: OnlineUi) {
         binding.tvOnlineNickname.text = ui.nickname
 
@@ -172,6 +157,8 @@ class OnlineActivity : AppCompatActivity() {
         binding.btnCreate.isEnabled = !busy && ui.signedIn
         binding.btnQuick.isEnabled = !busy && ui.signedIn
         binding.btnRefreshLobby.isEnabled = !ui.lobbyLoading
+        binding.btnHistory.isEnabled = !busy && ui.signedIn
+        binding.btnHistory.visibility = if (ui.signedIn) View.VISIBLE else View.GONE
         binding.btnJoin.isEnabled = !busy && ui.signedIn
         binding.btnCloseRoom.isEnabled = !busy
         renderLobby(ui)

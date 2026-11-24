@@ -2,6 +2,7 @@ package com.oldmermaidman.gomoku.net
 
 import com.oldmermaidman.gomoku.net.dto.CreateGameRequest
 import com.oldmermaidman.gomoku.net.dto.GameEventDto
+import com.oldmermaidman.gomoku.net.dto.GameHistoryDto
 import com.oldmermaidman.gomoku.net.dto.GameSnapshotDto
 import com.oldmermaidman.gomoku.net.dto.JoinGameRequest
 import com.oldmermaidman.gomoku.net.dto.LobbyGameDto
@@ -139,6 +140,22 @@ class DtoSerializationTest {
         assertEquals("ABC123", lobby[0].code)
         assertEquals("ann", lobby[0].creatorNickname)
         assertEquals("ANY", lobby[0].creatorColor)
+    }
+
+    @Test
+    fun theHistoryRowReadsFromTheWire() {
+        val rows = json.decodeFromString<List<GameHistoryDto>>(
+            """[{"gameId":"g","rule":"RENJU","timeControl":"BLITZ","ranked":true,""" +
+                """"result":"WHITE_WIN","finishReason":"RESIGN","you":"WHITE",""" +
+                """"opponentNickname":"ann","opponentRating":1184,"ratingDelta":16,""" +
+                """"moveCount":24}]""",
+        )
+
+        assertEquals(1, rows.size)
+        assertEquals("WHITE", rows[0].you)
+        assertEquals(16, rows[0].ratingDelta)
+        assertEquals(1184, rows[0].opponentRating)
+        assertEquals(24, rows[0].moveCount)
     }
 
     @Test

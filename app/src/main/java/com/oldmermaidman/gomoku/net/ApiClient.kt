@@ -5,6 +5,7 @@ import com.oldmermaidman.gomoku.net.dto.CreateGameRequest
 import com.oldmermaidman.gomoku.net.dto.CredentialsRequest
 import com.oldmermaidman.gomoku.net.dto.DeleteAccountRequest
 import com.oldmermaidman.gomoku.net.dto.ErrorDto
+import com.oldmermaidman.gomoku.net.dto.GameHistoryDto
 import com.oldmermaidman.gomoku.net.dto.GameSnapshotDto
 import com.oldmermaidman.gomoku.net.dto.JoinGameRequest
 import com.oldmermaidman.gomoku.net.dto.LobbyGameDto
@@ -145,6 +146,16 @@ class ApiClient(
 
     /** The open-games list, oldest first. */
     suspend fun lobby(): List<LobbyGameDto> = decode(call("GET", url("games/lobby")))
+
+    /** The caller's finished games, newest first; the moves come from [game]. */
+    suspend fun history(limit: Int = 20): List<GameHistoryDto> = decode(
+        call(
+            "GET",
+            url("games/history").newBuilder()
+                .addQueryParameter("limit", limit.toString())
+                .build(),
+        ),
+    )
 
     suspend fun joinGame(code: String, color: String? = null): GameSnapshotDto =
         decode(call("POST", url("games/join"), json.encodeToString(JoinGameRequest(code, color))))

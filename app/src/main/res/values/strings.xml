@@ -149,6 +149,10 @@
     <string name="online_lobby_empty">No open games — create a room or find an opponent</string>
     <string name="online_lobby_loading">Loading…</string>
     <string name="online_rating_delta">rating %1$s%2$d</string>
+    <string name="online_history">Game history</string>
+    <string name="online_history_empty">No finished games yet</string>
+    <string name="online_replay_title">Replay</string>
+    <string name="online_replay_vs">vs %1$s</string>
     <string name="online_code">Room code</string>
     <string name="online_join_action">Join</string>
     <string name="online_waiting">Waiting for an opponent</string>
