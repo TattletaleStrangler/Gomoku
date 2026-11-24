@@ -38,8 +38,7 @@ data class QuickGameRequest(
     val color: String? = null,
 )
 
-/** One row of the open-games list. */
-@Serializable
+/** One row of the open-games list. */@Serializable
 data class LobbyGameDto(
     val gameId: String,
     val code: String,
@@ -118,6 +117,10 @@ data class UndoDto(
     val deadline: String? = null,
     val ply: Int = 0,
 )
+
+/** A complaint about the opponent of a game (FUTURE.md). */
+@Serializable
+data class ReportRequest(val reason: String)
 
 /** One row of the player's finished games (`GET /games/history`). */
 @Serializable

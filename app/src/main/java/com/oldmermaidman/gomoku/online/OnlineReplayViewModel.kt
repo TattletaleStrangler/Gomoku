@@ -1,6 +1,7 @@
 package com.oldmermaidman.gomoku.online
 
 import android.app.Application
+import androidx.annotation.StringRes
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -9,6 +10,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
 import com.oldmermaidman.gomoku.GomokuApp
+import com.oldmermaidman.gomoku.R
 import com.oldmermaidman.gomoku.model.GomokuGame
 import com.oldmermaidman.gomoku.model.Stone
 import com.oldmermaidman.gomoku.net.ApiException
@@ -48,6 +50,10 @@ class OnlineReplayViewModel(
     private val _state = MutableLiveData(ui)
     val state: LiveData<OnlineReplayUi> = _state
 
+    /** A one-shot message for a completed block or report. */
+    private val _message = MutableLiveData<String?>()
+    val message: LiveData<String?> = _message
+
     fun load() {
         if (ui.loading || ui.snapshot != null) return
         ui = ui.copy(loading = true, error = null)
@@ -68,8 +74,34 @@ class OnlineReplayViewModel(
         }
     }
 
-    /** The final position, rebuilt move by move the same way the live board is. */
-    private fun boardOf(game: GameSnapshotDto): GomokuGame {
+    /**
+     * Stops being paired with this opponent again (FUTURE.md). The screen of a replayed
+     * game is the place to decide that: the game is over and the opponent is known.
+     */
+    fun blockOpponent() = moderate(R.string.online_block_done) { net.api.block(gameId) }
+
+    /** Reports the opponent; [reason] is `NICKNAME`, `STALLING`, `CHEATING` or `OTHER`. */
+    fun report(reason: String) =
+        moderate(R.string.online_report_done) { net.api.report(gameId, reason) }
+
+    /** The screen has shown the message; forget it. */
+    fun consumeMessage() {
+        if (_message.value == null) return
+        _message.value = null
+    }
+
+    private fun moderate(@StringRes success: Int, action: suspend () -> Unit) {
+        viewModelScope.launch {
+            _message.value = try {
+                withContext(Dispatchers.IO) { action() }
+                context.getString(success)
+            } catch (e: ApiException) {
+                context.getString(e.error.messageRes)
+            }
+        }
+    }
+
+    /** The final position, rebuilt move by move the same way the live board is. */    private fun boardOf(game: GameSnapshotDto): GomokuGame {
         val you = stoneOf(game.you)
         val board = GomokuGame(
             GomokuGame.BOARD_SIZE,

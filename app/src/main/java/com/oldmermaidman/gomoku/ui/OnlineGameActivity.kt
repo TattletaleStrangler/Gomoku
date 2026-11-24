@@ -72,6 +72,7 @@ class OnlineGameActivity : AppCompatActivity() {
         binding.btnUndo.setOnClickListener { viewModel.requestUndo() }
         binding.btnResign.setOnClickListener { viewModel.resign() }
         binding.btnRematch.setOnClickListener { viewModel.rematch() }
+        binding.btnBlock.setOnClickListener { viewModel.blockOpponent() }
         binding.btnUndoAccept.setOnClickListener { viewModel.decideUndo(true) }
         binding.btnUndoDecline.setOnClickListener { viewModel.decideUndo(false) }
 
@@ -144,10 +145,14 @@ class OnlineGameActivity : AppCompatActivity() {
         renderUndoButton()
         binding.btnResign.isEnabled = !state.busy && !state.finished && state.snapshot.status == "ACTIVE"
 
-        // The rematch button exists only once the game is over; its label changes when
-        // the opponent has already offered a room.
+        // The bottom bar changes over: while the game runs it is undo and resign, and
+        // once it is over the same space offers a rematch and a block.
+        binding.btnUndo.visibility = if (state.finished) View.GONE else View.VISIBLE
+        binding.btnResign.visibility = if (state.finished) View.GONE else View.VISIBLE
         binding.btnRematch.visibility = if (state.finished) View.VISIBLE else View.GONE
+        binding.btnBlock.visibility = if (state.finished) View.VISIBLE else View.GONE
         binding.btnRematch.isEnabled = !state.busy
+        binding.btnBlock.isEnabled = !state.busy
         binding.btnRematch.text = getString(
             if (state.rematchOffered) R.string.online_rematch_accept else R.string.online_rematch,
         )

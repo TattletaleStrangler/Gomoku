@@ -5,7 +5,9 @@ import android.content.Intent
 import android.content.res.ColorStateList
 import android.os.Bundle
 import android.widget.SeekBar
+import android.widget.Toast
 import androidx.activity.viewModels
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.oldmermaidman.gomoku.R
 import com.oldmermaidman.gomoku.databinding.ActivityOnlineReplayBinding
@@ -40,6 +42,14 @@ class OnlineReplayActivity : AppCompatActivity() {
     private var theme: GomokuTheme = Themes.LIGHT
     private var current: OnlineReplayUi = OnlineReplayUi()
 
+    /** Wire values and labels of the report reasons (FUTURE.md). */
+    private val reportReasons = listOf(
+        "NICKNAME" to R.string.report_reason_nickname,
+        "STALLING" to R.string.report_reason_stalling,
+        "CHEATING" to R.string.report_reason_cheating,
+        "OTHER" to R.string.report_reason_other,
+    )
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityOnlineReplayBinding.inflate(layoutInflater)
@@ -48,6 +58,8 @@ class OnlineReplayActivity : AppCompatActivity() {
         applyTheme()
 
         binding.btnReplayBack.setOnClickListener { finish() }
+        binding.btnBlock.setOnClickListener { viewModel.blockOpponent() }
+        binding.btnReport.setOnClickListener { askReportReason() }
         binding.seekMove.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(bar: SeekBar?, progress: Int, fromUser: Boolean) {
                 renderPosition(progress)
@@ -58,6 +70,11 @@ class OnlineReplayActivity : AppCompatActivity() {
             override fun onStopTrackingTouch(bar: SeekBar?) = Unit
         })
         viewModel.state.observe(this) { render(it) }
+        viewModel.message.observe(this) { text ->
+            if (text == null) return@observe
+            viewModel.consumeMessage()
+            Toast.makeText(this, text, Toast.LENGTH_SHORT).show()
+        }
     }
 
     override fun onStart() {
@@ -78,6 +95,19 @@ class OnlineReplayActivity : AppCompatActivity() {
         binding.seekMove.progress = ui.moves.size
         renderPosition(ui.moves.size)
         binding.tvReplayResult.text = resultText(ui)
+    }
+
+    /**
+     * A short list of reasons, with no free text: it is enough to act on and cannot say
+     * more than the reporter meant (FUTURE.md). The replay screen is not the game, so a
+     * dialog is allowed here — the game screen itself still has none.
+     */
+    private fun askReportReason() {
+        val labels = reportReasons.map { getString(it.second) }.toTypedArray()
+        AlertDialog.Builder(this)
+            .setTitle(R.string.online_report_title)
+            .setItems(labels) { _, which -> viewModel.report(reportReasons[which].first) }
+            .show()
     }
 
     /** Shows the position after [count] moves; zero is the empty board. */

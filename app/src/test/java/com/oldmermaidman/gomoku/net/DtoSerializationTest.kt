@@ -9,6 +9,7 @@ import com.oldmermaidman.gomoku.net.dto.LeaderboardRowDto
 import com.oldmermaidman.gomoku.net.dto.LobbyGameDto
 import com.oldmermaidman.gomoku.net.dto.MoveRequest
 import com.oldmermaidman.gomoku.net.dto.QuickGameRequest
+import com.oldmermaidman.gomoku.net.dto.ReportRequest
 import com.oldmermaidman.gomoku.net.dto.UndoDecisionRequest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -179,6 +180,11 @@ class DtoSerializationTest {
         )
 
         assertEquals("r", dto.rematchGameId)
+    }
+
+    @Test
+    fun theReportRequestCarriesTheReason() {
+        assertEquals("""{"reason":"CHEATING"}""", json.encodeToString(ReportRequest("CHEATING")))
     }
 
     @Test

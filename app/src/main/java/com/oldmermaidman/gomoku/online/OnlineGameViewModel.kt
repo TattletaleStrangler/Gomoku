@@ -164,6 +164,29 @@ class OnlineGameViewModel(
         _rematch.value = null
     }
 
+    /**
+     * Stops being paired with this opponent again (FUTURE.md). Offered on the finished
+     * screen, where the game definitely had two players.
+     */
+    fun blockOpponent() {
+        val screen = ui ?: return
+        if (busy || !screen.finished) return
+        busy = true
+        publishUi()
+        viewModelScope.launch {
+            try {
+                withContext(Dispatchers.IO) { net.api.block(gameId) }
+                busy = false
+                publishUi()
+                flash(context.getString(R.string.online_block_done))
+            } catch (e: ApiException) {
+                busy = false
+                publishUi()
+                flash(e)
+            }
+        }
+    }
+
     fun requestUndo() {
         val screen = ui ?: return
         // The button is only a hint: the same rule guards the call, so a stale tap after

@@ -159,6 +159,15 @@
     <string name="leaderboard_record">W/L/D: %1$d/%2$d/%3$d</string>
     <string name="online_rematch">Play again</string>
     <string name="online_rematch_accept">Accept rematch</string>
+    <string name="online_block">Not this opponent</string>
+    <string name="online_block_done">You will not be paired with this opponent</string>
+    <string name="online_report">Report</string>
+    <string name="online_report_title">Report the opponent</string>
+    <string name="online_report_done">Report sent</string>
+    <string name="report_reason_nickname">Nickname</string>
+    <string name="report_reason_stalling">Stalling</string>
+    <string name="report_reason_cheating">Cheating</string>
+    <string name="report_reason_other">Other</string>
     <string name="online_code">Room code</string>
     <string name="online_join_action">Join</string>
     <string name="online_waiting">Waiting for an opponent</string>

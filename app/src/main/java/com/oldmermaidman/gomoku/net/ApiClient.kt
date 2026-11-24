@@ -13,6 +13,7 @@ import com.oldmermaidman.gomoku.net.dto.LobbyGameDto
 import com.oldmermaidman.gomoku.net.dto.MoveRequest
 import com.oldmermaidman.gomoku.net.dto.ProfileDto
 import com.oldmermaidman.gomoku.net.dto.QuickGameRequest
+import com.oldmermaidman.gomoku.net.dto.ReportRequest
 import com.oldmermaidman.gomoku.net.dto.RefreshTokenRequest
 import com.oldmermaidman.gomoku.net.dto.TokenDto
 import com.oldmermaidman.gomoku.net.dto.UndoDecisionRequest
@@ -182,6 +183,16 @@ class ApiClient(
     suspend fun rematch(id: String): GameSnapshotDto = decode(call("POST", url("games/$id/rematch")))
 
     suspend fun leave(id: String): GameSnapshotDto = decode(call("POST", url("games/$id/leave")))
+
+    /** Stops being paired with the opponent of this game. */
+    suspend fun block(id: String) {
+        call("POST", url("games/$id/block"))
+    }
+
+    /** Reports the opponent of this game; [reason] is one of `NICKNAME`, `STALLING`, `CHEATING`, `OTHER`. */
+    suspend fun report(id: String, reason: String) {
+        call("POST", url("games/$id/report"), json.encodeToString(ReportRequest(reason)))
+    }
 
     /** Asks the opponent to take the last move back (FEATURES.md, online undo). */
     suspend fun requestUndo(id: String): GameSnapshotDto =
