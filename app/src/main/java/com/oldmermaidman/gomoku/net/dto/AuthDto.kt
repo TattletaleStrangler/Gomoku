@@ -49,6 +49,8 @@ data class StatsDto(
 data class ProfileDto(
     val id: String = "",
     val nickname: String = "",
+    /** Elo of ranked (quick-play) games. */
+    val rating: Int = 1200,
     val createdAt: String? = null,
     val stats: StatsDto = StatsDto(),
 )

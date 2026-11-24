@@ -126,6 +126,7 @@
     <string name="account_delete_confirm">Удалить</string>
     <string name="account_delete_password">Пароль для подтверждения</string>
     <string name="account_signed_in_as">Вы вошли как %1$s</string>
+    <string name="account_rating">Рейтинг: %1$d</string>
     <string name="account_stats">Победы %1$d · поражения %2$d · ничьи %3$d</string>
     <string name="account_play">Играть онлайн</string>
     <string name="account_hint">Никнейм: 3–24 буквы, цифры, «_» или «-»; пароль: 8–72 символа.</string>
@@ -147,6 +148,7 @@
     <string name="online_lobby_refresh">Обновить</string>
     <string name="online_lobby_empty">Открытых игр нет — создайте комнату или найдите соперника</string>
     <string name="online_lobby_loading">Загрузка…</string>
+    <string name="online_rating_delta">рейтинг %1$s%2$d</string>
     <string name="online_code">Код комнаты</string>
     <string name="online_join_action">Войти</string>
     <string name="online_waiting">Ожидание соперника</string>

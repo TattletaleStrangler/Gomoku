@@ -17,6 +17,8 @@ import kotlinx.coroutines.withContext
 data class AccountUi(
     val signedIn: Boolean = false,
     val nickname: String = "",
+    /** Elo of ranked (quick-play) games. */
+    val rating: Int = 1200,
     val stats: StatsDto = StatsDto(),
     val busy: Boolean = false,
     val error: String? = null,
@@ -139,6 +141,7 @@ class AccountViewModel(app: Application) : AndroidViewModel(app) {
             ui = ui.copy(
                 signedIn = true,
                 nickname = profile.nickname,
+                rating = profile.rating,
                 stats = profile.stats,
                 busy = false,
                 error = null,

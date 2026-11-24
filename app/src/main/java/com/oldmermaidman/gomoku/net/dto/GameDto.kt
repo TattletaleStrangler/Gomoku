@@ -47,6 +47,8 @@ data class LobbyGameDto(
     val timeControl: String,
     val creatorColor: String = "ANY",
     val creatorNickname: String = "",
+    val creatorRating: Int? = null,
+    val ranked: Boolean = false,
     val createdAt: String? = null,
 )
 
@@ -84,6 +86,9 @@ data class UndoDecisionRequest(
 data class PlayerDto(
     val userId: String? = null,
     val nickname: String = "",
+    /** Current Elo, and the change a just-finished ranked game produced. */
+    val rating: Int? = null,
+    val ratingDelta: Int? = null,
 )
 
 /** One stone on the board. `color` is `BLACK` or `WHITE`. */
@@ -132,6 +137,8 @@ data class GameSnapshotDto(
     val rule: String = "FREESTYLE",
     val timeControl: String = "UNTIMED",
     val status: String = "WAITING",
+    /** True for quick-play games, whose result settles the Elo rating. */
+    val ranked: Boolean = false,
     val black: PlayerDto? = null,
     val white: PlayerDto? = null,
     val you: String? = null,

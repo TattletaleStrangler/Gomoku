@@ -39,6 +39,8 @@ data class OnlineGameUi(
     val finished: Boolean,
     val outcome: OnlineOutcome,
     val finish: OnlineFinish,
+    /** The viewer's Elo change, set only after a ranked game has finished. */
+    val ratingDelta: Int?,
     val undoRemaining: Int,
     val pendingUndo: PendingUndo?,
     val socket: SocketState,
@@ -174,6 +176,11 @@ fun buildOnlineGameUi(
         finished = finished,
         outcome = outcome,
         finish = finish,
+        ratingDelta = when (you) {
+            Stone.BLACK -> snapshot.black?.ratingDelta
+            Stone.WHITE -> snapshot.white?.ratingDelta
+            else -> null
+        },
         undoRemaining = snapshot.undoRemaining.coerceAtLeast(0),
         pendingUndo = pending,
         socket = socket,

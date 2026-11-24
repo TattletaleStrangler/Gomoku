@@ -126,8 +126,9 @@ class OnlineActivity : AppCompatActivity() {
 
         for (row in ui.lobby) {
             val item = ItemLobbyGameBinding.inflate(layoutInflater, binding.lobbyList, false)
-            item.tvLobbyRow.text = listOf(
-                row.creatorNickname,
+            item.tvLobbyRow.text = listOfNotNull(
+                row.creatorNickname.ifEmpty { null },
+                row.creatorRating?.toString(),
                 getString(ruleName(row.rule)),
                 getString(timeName(row.timeControl)),
                 getString(colorName(row.creatorColor)),

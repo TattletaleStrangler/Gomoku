@@ -126,6 +126,7 @@
     <string name="account_delete_confirm">Delete</string>
     <string name="account_delete_password">Password to confirm</string>
     <string name="account_signed_in_as">Signed in as %1$s</string>
+    <string name="account_rating">Rating: %1$d</string>
     <string name="account_stats">Wins %1$d · losses %2$d · draws %3$d</string>
     <string name="account_play">Play online</string>
     <string name="account_hint">A nickname of 3–24 letters, digits, underscore or hyphen; a password of 8–72 characters.</string>
@@ -147,6 +148,7 @@
     <string name="online_lobby_refresh">Refresh</string>
     <string name="online_lobby_empty">No open games — create a room or find an opponent</string>
     <string name="online_lobby_loading">Loading…</string>
+    <string name="online_rating_delta">rating %1$s%2$d</string>
     <string name="online_code">Room code</string>
     <string name="online_join_action">Join</string>
     <string name="online_waiting">Waiting for an opponent</string>

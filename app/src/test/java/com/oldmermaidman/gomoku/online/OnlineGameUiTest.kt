@@ -6,6 +6,7 @@ import com.oldmermaidman.gomoku.net.SocketState
 import com.oldmermaidman.gomoku.net.dto.ClockDto
 import com.oldmermaidman.gomoku.net.dto.GameSnapshotDto
 import com.oldmermaidman.gomoku.net.dto.MoveDto
+import com.oldmermaidman.gomoku.net.dto.PlayerDto
 import com.oldmermaidman.gomoku.net.dto.UndoDto
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -31,6 +32,8 @@ class OnlineGameUiTest {
         undo: UndoDto? = null,
         lastUndoneMove: MoveDto? = null,
         rule: String = "FREESTYLE",
+        black: PlayerDto? = null,
+        white: PlayerDto? = null,
     ) = GameSnapshotDto(
         gameId = "g",
         code = "ABC123",
@@ -41,6 +44,8 @@ class OnlineGameUiTest {
         ply = moves.size + 1,
         turn = turn,
         moves = moves,
+        black = black,
+        white = white,
         clocks = ClockDto(60_000L, 60_000L, turn),
         serverTime = "2026-11-21T03:20:11.482Z",
         result = result,
@@ -117,6 +122,32 @@ class OnlineGameUiTest {
     fun renjuTurnsOnForbiddenChecks() {
         val ui = buildOnlineGameUi(snapshot(rule = "RENJU"), SocketState.OPEN)!!
         assertTrue(ui.board.forbiddenMoves)
+    }
+
+    @Test
+    fun theRatingDeltaBelongsToTheViewer() {
+        val black = PlayerDto(nickname = "ann", rating = 1184, ratingDelta = -16)
+        val white = PlayerDto(nickname = "bob", rating = 1216, ratingDelta = 16)
+
+        val winner = buildOnlineGameUi(
+            snapshot(
+                you = "WHITE",
+                status = "FINISHED",
+                turn = null,
+                result = "WHITE_WIN",
+                finishReason = "RESIGN",
+                black = black,
+                white = white,
+            ),
+            SocketState.OPEN,
+        )!!
+        assertEquals(16, winner.ratingDelta)
+
+        val casual = buildOnlineGameUi(
+            snapshot(you = "WHITE", status = "FINISHED", turn = null, result = "WHITE_WIN"),
+            SocketState.OPEN,
+        )!!
+        assertNull(casual.ratingDelta)
     }
 
     /**

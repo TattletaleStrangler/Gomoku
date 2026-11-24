@@ -122,6 +122,13 @@
                     android:textStyle="bold" />
 
                 <TextView
+                    android:id="@+id/tvAccountRating"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:textSize="15sp" />
+
+                <TextView
                     android:id="@+id/tvAccountStats"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

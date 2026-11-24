@@ -213,11 +213,16 @@ class OnlineGameActivity : AppCompatActivity() {
             OnlineFinish.ABANDON -> R.string.online_finish_abandon
             OnlineFinish.NONE -> null
         }
-        return if (reason == null) {
+        val result = if (reason == null) {
             getString(outcome)
         } else {
             getString(outcome) + " · " + getString(reason)
         }
+        // A ranked game also moved the rating; showing the change here is the whole
+        // point of playing quick games.
+        val delta = state.ratingDelta ?: return result
+        val sign = if (delta >= 0) "+" else "−"
+        return result + " · " + getString(R.string.online_rating_delta, sign, kotlin.math.abs(delta))
     }
 
     /** mm:ss, rounded up, so a second is still on the display while any part of it is left. */

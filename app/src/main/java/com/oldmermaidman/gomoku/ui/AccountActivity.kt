@@ -74,6 +74,7 @@ class AccountActivity : AppCompatActivity() {
         binding.tvAccountError.visibility = if (ui.error == null) View.GONE else View.VISIBLE
 
         binding.tvSignedInAs.text = getString(R.string.account_signed_in_as, ui.nickname)
+        binding.tvAccountRating.text = getString(R.string.account_rating, ui.rating)
         binding.tvAccountStats.text = getString(
             R.string.account_stats,
             ui.stats.wins,
