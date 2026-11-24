@@ -29,8 +29,15 @@ class BoardView @JvmOverloads constructor(
         /** Star points of the 15×15 board, stored flat as x,y pairs. */
         private val HOSHI = intArrayOf(3, 3, 3, 11, 11, 3, 11, 11, 7, 7)
 
-        /** Opacity of the ghost of an undone stone; clearly fainter than a real stone. */
-        private const val GHOST_ALPHA = 80
+        /**
+         * Every ghost is the same light blue and semi-transparent. It is deliberately not
+         * the colour of the stone that was taken back: on a light theme a white ghost and
+         * on a dark one a black ghost would be lost against the board.
+         */
+        private val GHOST_COLOR = 0xFF4FC3F7.toInt()
+
+        /** Opacity of the ghost; clearly fainter than a real stone, still easy to see. */
+        private const val GHOST_ALPHA = 150
     }
 
     var game: GomokuGame? = null
@@ -173,15 +180,15 @@ class BoardView @JvmOverloads constructor(
     }
 
     /**
-     * The stone an undone move left behind: the same shape as a real one, at roughly
-     * a third of the opacity, so it is clearly not in play.
+     * The stone an undone move left behind: the same shape as a real one, but always the
+     * same light blue and semi-transparent, so it reads as "not a stone" on every theme.
      */
     private fun drawGhost(canvas: Canvas, move: Move) {
         val cx = originX + move.x * cellSize
         val cy = originY + move.y * cellSize
         stonePaint.style = Paint.Style.FILL
         stonePaint.alpha = GHOST_ALPHA
-        stonePaint.color = if (move.color == Stone.BLACK) theme.blackStone else theme.whiteStone
+        stonePaint.color = GHOST_COLOR
         canvas.drawCircle(cx, cy, stoneRadius, stonePaint)
         stonePaint.alpha = 255
     }
