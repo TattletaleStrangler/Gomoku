@@ -74,6 +74,9 @@ class OnlineActivity : AppCompatActivity() {
         binding.btnHistory.setOnClickListener {
             startActivity(OnlineHistoryActivity.intent(this))
         }
+        binding.btnLeaders.setOnClickListener {
+            startActivity(LeaderboardActivity.intent(this))
+        }
 
         viewModel.state.observe(this) { render(it) }
     }
@@ -159,6 +162,8 @@ class OnlineActivity : AppCompatActivity() {
         binding.btnRefreshLobby.isEnabled = !ui.lobbyLoading
         binding.btnHistory.isEnabled = !busy && ui.signedIn
         binding.btnHistory.visibility = if (ui.signedIn) View.VISIBLE else View.GONE
+        binding.btnLeaders.isEnabled = !busy && ui.signedIn
+        binding.btnLeaders.visibility = if (ui.signedIn) View.VISIBLE else View.GONE
         binding.btnJoin.isEnabled = !busy && ui.signedIn
         binding.btnCloseRoom.isEnabled = !busy
         renderLobby(ui)

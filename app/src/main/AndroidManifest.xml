@@ -86,6 +86,12 @@
             android:exported="false"
             android:label="@string/online_replay_title"
             android:parentActivityName=".ui.OnlineHistoryActivity" />
+
+        <activity
+            android:name=".ui.LeaderboardActivity"
+            android:exported="false"
+            android:label="@string/online_leaders"
+            android:parentActivityName=".ui.OnlineActivity" />
     </application>
 
 </manifest>

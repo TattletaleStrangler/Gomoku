@@ -137,6 +137,13 @@
                     android:layout_marginTop="8dp"
                     android:text="@string/online_history" />
 
+                <Button
+                    android:id="@+id/btnLeaders"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/online_leaders" />
+
                 <TextView
                     android:id="@+id/tvCreateTitle"
                     android:layout_width="match_parent"

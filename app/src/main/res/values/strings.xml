@@ -153,6 +153,10 @@
     <string name="online_history_empty">No finished games yet</string>
     <string name="online_replay_title">Replay</string>
     <string name="online_replay_vs">vs %1$s</string>
+    <string name="online_leaders">Leaderboard</string>
+    <string name="online_leaders_empty">Nobody has finished a game yet</string>
+    <string name="leaderboard_rank">#%1$d %2$s</string>
+    <string name="leaderboard_record">W/L/D: %1$d/%2$d/%3$d</string>
     <string name="online_code">Room code</string>
     <string name="online_join_action">Join</string>
     <string name="online_waiting">Waiting for an opponent</string>

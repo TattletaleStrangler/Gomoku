@@ -55,6 +55,18 @@ data class ProfileDto(
     val stats: StatsDto = StatsDto(),
 )
 
+/** One row of `GET /leaderboard`: a player with at least one finished game. */
+@Serializable
+data class LeaderboardRowDto(
+    val rank: Int = 0,
+    val userId: String? = null,
+    val nickname: String = "",
+    val rating: Int = 1200,
+    val wins: Long = 0,
+    val losses: Long = 0,
+    val draws: Long = 0,
+)
+
 /**
  * What registration, login and refresh return. `expiresIn` is the access token's
  * lifetime in seconds, so the client knows when to refresh without parsing the JWT.

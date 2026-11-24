@@ -8,6 +8,7 @@ import com.oldmermaidman.gomoku.net.dto.ErrorDto
 import com.oldmermaidman.gomoku.net.dto.GameHistoryDto
 import com.oldmermaidman.gomoku.net.dto.GameSnapshotDto
 import com.oldmermaidman.gomoku.net.dto.JoinGameRequest
+import com.oldmermaidman.gomoku.net.dto.LeaderboardRowDto
 import com.oldmermaidman.gomoku.net.dto.LobbyGameDto
 import com.oldmermaidman.gomoku.net.dto.MoveRequest
 import com.oldmermaidman.gomoku.net.dto.ProfileDto
@@ -113,6 +114,16 @@ class ApiClient(
 
     /** The signed-in player's profile and record. */
     suspend fun profile(): ProfileDto = decode(call("GET", url("me")))
+
+    /** The top players by rating. */
+    suspend fun leaderboard(limit: Int = 50): List<LeaderboardRowDto> = decode(
+        call(
+            "GET",
+            url("leaderboard").newBuilder()
+                .addQueryParameter("limit", limit.toString())
+                .build(),
+        ),
+    )
 
     // ------------------------------------------------------------------- games
 

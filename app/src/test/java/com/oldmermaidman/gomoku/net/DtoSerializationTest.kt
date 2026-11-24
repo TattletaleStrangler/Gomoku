@@ -5,6 +5,7 @@ import com.oldmermaidman.gomoku.net.dto.GameEventDto
 import com.oldmermaidman.gomoku.net.dto.GameHistoryDto
 import com.oldmermaidman.gomoku.net.dto.GameSnapshotDto
 import com.oldmermaidman.gomoku.net.dto.JoinGameRequest
+import com.oldmermaidman.gomoku.net.dto.LeaderboardRowDto
 import com.oldmermaidman.gomoku.net.dto.LobbyGameDto
 import com.oldmermaidman.gomoku.net.dto.MoveRequest
 import com.oldmermaidman.gomoku.net.dto.QuickGameRequest
@@ -156,6 +157,19 @@ class DtoSerializationTest {
         assertEquals(16, rows[0].ratingDelta)
         assertEquals(1184, rows[0].opponentRating)
         assertEquals(24, rows[0].moveCount)
+    }
+
+    @Test
+    fun theLeaderboardRowReadsFromTheWire() {
+        val rows = json.decodeFromString<List<LeaderboardRowDto>>(
+            """[{"rank":1,"userId":"u","nickname":"ann","rating":2032,"wins":7,"losses":2,"draws":1}]""",
+        )
+
+        assertEquals(1, rows.size)
+        assertEquals(1, rows[0].rank)
+        assertEquals("ann", rows[0].nickname)
+        assertEquals(2032, rows[0].rating)
+        assertEquals(7L, rows[0].wins)
     }
 
     @Test
