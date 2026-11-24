@@ -195,6 +195,15 @@
         android:padding="8dp">
 
         <Button
+            android:id="@+id/btnRematch"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="6dp"
+            android:layout_weight="1"
+            android:text="@string/online_rematch"
+            android:visibility="gone" />
+
+        <Button
             android:id="@+id/btnUndo"
             android:layout_width="0dp"
             android:layout_height="wrap_content"

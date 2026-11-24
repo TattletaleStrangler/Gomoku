@@ -71,6 +71,7 @@ class OnlineGameActivity : AppCompatActivity() {
         binding.boardView.onCellTapped = { x, y -> viewModel.move(x, y) }
         binding.btnUndo.setOnClickListener { viewModel.requestUndo() }
         binding.btnResign.setOnClickListener { viewModel.resign() }
+        binding.btnRematch.setOnClickListener { viewModel.rematch() }
         binding.btnUndoAccept.setOnClickListener { viewModel.decideUndo(true) }
         binding.btnUndoDecline.setOnClickListener { viewModel.decideUndo(false) }
 
@@ -90,6 +91,20 @@ class OnlineGameActivity : AppCompatActivity() {
         }
         viewModel.gone.observe(this) { gone ->
             if (gone) finish()
+        }
+        // The rematch answer belongs to another game: open it instead of applying it here.
+        viewModel.rematchGame.observe(this) { game ->
+            if (game == null) return@observe
+            viewModel.consumeRematch()
+            startActivity(
+                if (game.status == "ACTIVE") {
+                    OnlineGameActivity.intent(this, game.gameId)
+                } else {
+                    // The room is waiting: its screen shows the code and polls for the opponent.
+                    OnlineActivity.intent(this)
+                },
+            )
+            finish()
         }
     }
 
@@ -127,7 +142,15 @@ class OnlineGameActivity : AppCompatActivity() {
 
         binding.btnUndo.text = getString(R.string.online_undo, state.undoRemaining)
         renderUndoButton()
-        binding.btnResign.isEnabled = !state.busy && !state.finished
+        binding.btnResign.isEnabled = !state.busy && !state.finished && state.snapshot.status == "ACTIVE"
+
+        // The rematch button exists only once the game is over; its label changes when
+        // the opponent has already offered a room.
+        binding.btnRematch.visibility = if (state.finished) View.VISIBLE else View.GONE
+        binding.btnRematch.isEnabled = !state.busy
+        binding.btnRematch.text = getString(
+            if (state.rematchOffered) R.string.online_rematch_accept else R.string.online_rematch,
+        )
 
         val connected = state.socket == SocketState.OPEN
         binding.tvConnection.visibility = if (connected) View.GONE else View.VISIBLE

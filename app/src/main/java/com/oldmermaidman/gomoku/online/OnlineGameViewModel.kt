@@ -86,6 +86,13 @@ class OnlineGameViewModel(
     private val _gone = MutableLiveData(false)
     val gone: LiveData<Boolean> = _gone
 
+    /**
+     * The answer to [rematch]: a snapshot of another game, which the screen opens
+     * instead of applying it here. Cleared with [consumeRematch] once it has.
+     */
+    private val _rematch = MutableLiveData<GameSnapshotDto?>()
+    val rematchGame: LiveData<GameSnapshotDto?> = _rematch
+
     init {
         viewModelScope.launch {
             socket.events.collect { onSocketEvent(it) }
@@ -123,6 +130,38 @@ class OnlineGameViewModel(
         val screen = ui ?: return
         if (busy || screen.finished) return
         command { net.api.resign(gameId) }
+    }
+
+    /**
+     * Offers a rematch of this finished game, or accepts the one already offered
+     * (FUTURE.md). The room belongs to another game, so the snapshot is not applied
+     * here: the screen opens it and closes this one.
+     */
+    fun rematch() {
+        val screen = ui ?: return
+        if (busy || !screen.finished) return
+        busy = true
+        publishUi()
+        viewModelScope.launch {
+            try {
+                val next = withContext(Dispatchers.IO) { net.api.rematch(gameId) }
+                busy = false
+                publishUi()
+                // Remember the new game, so the room screen can resume into it.
+                store.save(next.gameId, next.code)
+                _rematch.value = next
+            } catch (e: ApiException) {
+                busy = false
+                publishUi()
+                flash(e)
+            }
+        }
+    }
+
+    /** The screen has opened the game the rematch produced; forget the request. */
+    fun consumeRematch() {
+        if (_rematch.value == null) return
+        _rematch.value = null
     }
 
     fun requestUndo() {

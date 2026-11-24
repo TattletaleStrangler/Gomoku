@@ -41,6 +41,8 @@ data class OnlineGameUi(
     val finish: OnlineFinish,
     /** The viewer's Elo change, set only after a ranked game has finished. */
     val ratingDelta: Int?,
+    /** True when a rematch of this finished game has already been offered. */
+    val rematchOffered: Boolean,
     val undoRemaining: Int,
     val pendingUndo: PendingUndo?,
     val socket: SocketState,
@@ -181,6 +183,7 @@ fun buildOnlineGameUi(
             Stone.WHITE -> snapshot.white?.ratingDelta
             else -> null
         },
+        rematchOffered = snapshot.rematchGameId != null,
         undoRemaining = snapshot.undoRemaining.coerceAtLeast(0),
         pendingUndo = pending,
         socket = socket,

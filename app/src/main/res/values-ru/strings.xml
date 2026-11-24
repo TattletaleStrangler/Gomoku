@@ -157,6 +157,8 @@
     <string name="online_leaders_empty">Пока никто не завершил партию</string>
     <string name="leaderboard_rank">#%1$d %2$s</string>
     <string name="leaderboard_record">В/П/Н: %1$d/%2$d/%3$d</string>
+    <string name="online_rematch">Сыграть ещё</string>
+    <string name="online_rematch_accept">Принять реванш</string>
     <string name="online_code">Код комнаты</string>
     <string name="online_join_action">Войти</string>
     <string name="online_waiting">Ожидание соперника</string>
@@ -214,6 +216,7 @@
     <string name="error_self_join">Нельзя войти в свою комнату.</string>
     <string name="error_active_game_exists">У вас уже есть незавершённая партия.</string>
     <string name="error_game_finished">Партия уже завершена.</string>
+    <string name="error_rematch_not_allowed">Реванш возможен только после завершённой партии.</string>
     <string name="error_not_your_turn">Сейчас не ваш ход.</string>
     <string name="error_wrong_ply">Позиция изменилась. Попробуйте снова.</string>
     <string name="error_cell_occupied">Клетка занята.</string>

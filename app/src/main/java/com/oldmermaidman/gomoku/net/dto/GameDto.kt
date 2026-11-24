@@ -169,4 +169,6 @@ data class GameSnapshotDto(
     val undoRemaining: Int = 0,
     val undo: UndoDto? = null,
     val lastUndoneMove: MoveDto? = null,
+    /** The room offered for a rematch of this finished game, or null. */
+    val rematchGameId: String? = null,
 )

@@ -173,6 +173,15 @@ class DtoSerializationTest {
     }
 
     @Test
+    fun theRematchOfferComesFromTheSnapshot() {
+        val dto = json.decodeFromString<GameSnapshotDto>(
+            """{"gameId":"g","status":"FINISHED","rematchGameId":"r"}""",
+        )
+
+        assertEquals("r", dto.rematchGameId)
+    }
+
+    @Test
     fun anUnknownFieldDoesNotBreakTheClient() {
         val snapshot = json.decodeFromString<GameSnapshotDto>("""{"gameId":"g","newField":42}""")
         assertEquals("g", snapshot.gameId)

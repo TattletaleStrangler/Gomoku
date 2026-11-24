@@ -38,6 +38,7 @@ enum class ApiError(@param:StringRes val messageRes: Int) {
     SELF_JOIN(R.string.error_self_join),
     ACTIVE_GAME_EXISTS(R.string.error_active_game_exists),
     GAME_FINISHED(R.string.error_game_finished),
+    REMATCH_NOT_ALLOWED(R.string.error_rematch_not_allowed),
     NOT_YOUR_TURN(R.string.error_not_your_turn),
     WRONG_PLY(R.string.error_wrong_ply),
     CELL_OCCUPIED(R.string.error_cell_occupied),

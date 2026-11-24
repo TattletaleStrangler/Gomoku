@@ -150,6 +150,22 @@ class OnlineGameUiTest {
         assertNull(casual.ratingDelta)
     }
 
+    @Test
+    fun theRematchOfferIsVisibleOnTheFinishedScreen() {
+        val offered = buildOnlineGameUi(
+            snapshot(you = "BLACK", status = "FINISHED", turn = null, result = "BLACK_WIN")
+                .copy(rematchGameId = "r"),
+            SocketState.OPEN,
+        )!!
+        assertTrue(offered.rematchOffered)
+
+        val none = buildOnlineGameUi(
+            snapshot(you = "BLACK", status = "FINISHED", turn = null, result = "BLACK_WIN"),
+            SocketState.OPEN,
+        )!!
+        assertFalse(none.rematchOffered)
+    }
+
     /**
      * The regression this test guards: the button used to be enabled for everyone with
      * attempts left, so the player who still had to move could tap it and only got a

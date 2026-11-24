@@ -157,6 +157,8 @@
     <string name="online_leaders_empty">Nobody has finished a game yet</string>
     <string name="leaderboard_rank">#%1$d %2$s</string>
     <string name="leaderboard_record">W/L/D: %1$d/%2$d/%3$d</string>
+    <string name="online_rematch">Play again</string>
+    <string name="online_rematch_accept">Accept rematch</string>
     <string name="online_code">Room code</string>
     <string name="online_join_action">Join</string>
     <string name="online_waiting">Waiting for an opponent</string>
@@ -214,6 +216,7 @@
     <string name="error_self_join">You cannot join your own room.</string>
     <string name="error_active_game_exists">You already have a game in progress.</string>
     <string name="error_game_finished">The game is already over.</string>
+    <string name="error_rematch_not_allowed">A rematch is possible only after the game is over.</string>
     <string name="error_not_your_turn">It is not your turn.</string>
     <string name="error_wrong_ply">The position changed. Try again.</string>
     <string name="error_cell_occupied">That cell is taken.</string>

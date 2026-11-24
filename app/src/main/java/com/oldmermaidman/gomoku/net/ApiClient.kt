@@ -178,6 +178,9 @@ class ApiClient(
 
     suspend fun resign(id: String): GameSnapshotDto = decode(call("POST", url("games/$id/resign")))
 
+    /** Offers a rematch of a finished game, or accepts the offer already made. */
+    suspend fun rematch(id: String): GameSnapshotDto = decode(call("POST", url("games/$id/rematch")))
+
     suspend fun leave(id: String): GameSnapshotDto = decode(call("POST", url("games/$id/leave")))
 
     /** Asks the opponent to take the last move back (FEATURES.md, online undo). */
