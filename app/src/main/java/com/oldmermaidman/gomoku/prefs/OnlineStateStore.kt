@@ -43,9 +43,31 @@ class OnlineStateStore(context: Context) {
         }
     }
 
+    /** The settings last used for a room or a quick match, restored on the next visit. */
+    var quickRule: String?
+        get() = prefs.getString(KEY_QUICK_RULE, null)
+        set(value) = prefs.edit {
+            if (value == null) remove(KEY_QUICK_RULE) else putString(KEY_QUICK_RULE, value)
+        }
+
+    var quickTimeControl: String?
+        get() = prefs.getString(KEY_QUICK_TIME, null)
+        set(value) = prefs.edit {
+            if (value == null) remove(KEY_QUICK_TIME) else putString(KEY_QUICK_TIME, value)
+        }
+
+    var quickColor: String?
+        get() = prefs.getString(KEY_QUICK_COLOR, null)
+        set(value) = prefs.edit {
+            if (value == null) remove(KEY_QUICK_COLOR) else putString(KEY_QUICK_COLOR, value)
+        }
+
     companion object {
         private const val PREFS_NAME = "gomoku_online"
         private const val KEY_ID = "game_id"
         private const val KEY_CODE = "game_code"
+        private const val KEY_QUICK_RULE = "quick_rule"
+        private const val KEY_QUICK_TIME = "quick_time"
+        private const val KEY_QUICK_COLOR = "quick_color"
     }
 }

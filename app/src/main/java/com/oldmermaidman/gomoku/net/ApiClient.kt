@@ -7,8 +7,10 @@ import com.oldmermaidman.gomoku.net.dto.DeleteAccountRequest
 import com.oldmermaidman.gomoku.net.dto.ErrorDto
 import com.oldmermaidman.gomoku.net.dto.GameSnapshotDto
 import com.oldmermaidman.gomoku.net.dto.JoinGameRequest
+import com.oldmermaidman.gomoku.net.dto.LobbyGameDto
 import com.oldmermaidman.gomoku.net.dto.MoveRequest
 import com.oldmermaidman.gomoku.net.dto.ProfileDto
+import com.oldmermaidman.gomoku.net.dto.QuickGameRequest
 import com.oldmermaidman.gomoku.net.dto.RefreshTokenRequest
 import com.oldmermaidman.gomoku.net.dto.TokenDto
 import com.oldmermaidman.gomoku.net.dto.UndoDecisionRequest
@@ -117,8 +119,32 @@ class ApiClient(
         rule: String,
         timeControl: String,
         color: String? = null,
+        visibility: String? = null,
     ): GameSnapshotDto =
-        decode(call("POST", url("games"), json.encodeToString(CreateGameRequest(rule, timeControl, color))))
+        decode(
+            call(
+                "POST",
+                url("games"),
+                json.encodeToString(CreateGameRequest(rule, timeControl, color, visibility)),
+            ),
+        )
+
+    /** Quick match: joins the oldest public room with these settings, or opens one. */
+    suspend fun quickGame(
+        rule: String,
+        timeControl: String,
+        color: String? = null,
+    ): GameSnapshotDto =
+        decode(
+            call(
+                "POST",
+                url("games/quick"),
+                json.encodeToString(QuickGameRequest(rule, timeControl, color)),
+            ),
+        )
+
+    /** The open-games list, oldest first. */
+    suspend fun lobby(): List<LobbyGameDto> = decode(call("GET", url("games/lobby")))
 
     suspend fun joinGame(code: String, color: String? = null): GameSnapshotDto =
         decode(call("POST", url("games/join"), json.encodeToString(JoinGameRequest(code, color))))

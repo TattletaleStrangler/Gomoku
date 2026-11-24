@@ -4,7 +4,9 @@ import com.oldmermaidman.gomoku.net.dto.CreateGameRequest
 import com.oldmermaidman.gomoku.net.dto.GameEventDto
 import com.oldmermaidman.gomoku.net.dto.GameSnapshotDto
 import com.oldmermaidman.gomoku.net.dto.JoinGameRequest
+import com.oldmermaidman.gomoku.net.dto.LobbyGameDto
 import com.oldmermaidman.gomoku.net.dto.MoveRequest
+import com.oldmermaidman.gomoku.net.dto.QuickGameRequest
 import com.oldmermaidman.gomoku.net.dto.UndoDecisionRequest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -113,6 +115,30 @@ class DtoSerializationTest {
             """{"code":"ABC123"}""",
             json.encodeToString(JoinGameRequest("ABC123")),
         )
+    }
+
+    @Test
+    fun theQuickMatchAndLobbyDtosMatchTheWire() {
+        assertEquals(
+            """{"rule":"FREESTYLE","timeControl":"RAPID"}""",
+            json.encodeToString(QuickGameRequest("FREESTYLE", "RAPID")),
+        )
+        assertEquals(
+            """{"rule":"FREESTYLE","timeControl":"RAPID","color":"WHITE"}""",
+            json.encodeToString(QuickGameRequest("FREESTYLE", "RAPID", "WHITE")),
+        )
+        assertEquals(
+            """{"rule":"FREESTYLE","timeControl":"RAPID","visibility":"PUBLIC"}""",
+            json.encodeToString(CreateGameRequest("FREESTYLE", "RAPID", visibility = "PUBLIC")),
+        )
+
+        val lobby = json.decodeFromString<List<LobbyGameDto>>(
+            """[{"gameId":"g","code":"ABC123","rule":"RENJU","timeControl":"BLITZ","creatorColor":"ANY","creatorNickname":"ann"}]""",
+        )
+        assertEquals(1, lobby.size)
+        assertEquals("ABC123", lobby[0].code)
+        assertEquals("ann", lobby[0].creatorNickname)
+        assertEquals("ANY", lobby[0].creatorColor)
     }
 
     @Test

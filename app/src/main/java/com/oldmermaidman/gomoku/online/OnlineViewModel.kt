@@ -10,6 +10,7 @@ import com.oldmermaidman.gomoku.R
 import com.oldmermaidman.gomoku.net.ApiError
 import com.oldmermaidman.gomoku.net.ApiException
 import com.oldmermaidman.gomoku.net.dto.GameSnapshotDto
+import com.oldmermaidman.gomoku.net.dto.LobbyGameDto
 import com.oldmermaidman.gomoku.prefs.OnlineStateStore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -35,6 +36,17 @@ data class OnlineUi(
     val waiting: GameSnapshotDto? = null,
     val resume: GameSnapshotDto? = null,
     val openGame: GameSnapshotDto? = null,
+    /** Public rooms waiting for an opponent, oldest first. */
+    val lobby: List<LobbyGameDto> = emptyList(),
+    val lobbyLoading: Boolean = false,
+    val lobbyError: String? = null,
+)
+
+/** The settings the player last used, so the form comes back the way it was left. */
+data class QuickSettings(
+    val rule: String,
+    val timeControl: String,
+    val color: String?,
 )
 
 /**
@@ -68,10 +80,12 @@ class OnlineViewModel(app: Application) : AndroidViewModel(app) {
         ui = ui.copy(signedIn = session != null, nickname = session?.nickname.orEmpty())
         publish()
         if (ui.waiting == null) resumeOpenGame()
+        if (ui.signedIn && ui.waiting == null) refreshLobby()
     }
 
     fun createRoom(rule: String, timeControl: String, color: String) {
         if (ui.busy || ui.waiting != null) return
+        rememberQuick(rule, timeControl, color)
         ui = ui.copy(busy = true, error = null)
         publish()
         viewModelScope.launch {
@@ -82,6 +96,56 @@ class OnlineViewModel(app: Application) : AndroidViewModel(app) {
                 handleCommandFailure(e)
             }
         }
+    }
+
+    /**
+     * Quick match (FEATURES.md, B1): the server joins the oldest public room with these
+     * settings, or opens one and we wait in it. A null [color] means "no preference".
+     */
+    fun quickMatch(rule: String, timeControl: String, color: String?) {
+        if (ui.busy || ui.waiting != null) return
+        rememberQuick(rule, timeControl, color)
+        ui = ui.copy(busy = true, error = null)
+        publish()
+        viewModelScope.launch {
+            try {
+                val game = withContext(Dispatchers.IO) { net.api.quickGame(rule, timeControl, color) }
+                if (game.status == "WAITING") startWaiting(game) else open(game)
+            } catch (e: ApiException) {
+                handleCommandFailure(e)
+            }
+        }
+    }
+
+    /** Reloads the open-games list; a failure keeps the previous rows on screen. */
+    fun refreshLobby() {
+        if (!ui.signedIn) return
+        ui = ui.copy(lobbyLoading = true)
+        publish()
+        viewModelScope.launch {
+            try {
+                val rows = withContext(Dispatchers.IO) { net.api.lobby() }
+                ui = ui.copy(lobby = rows, lobbyLoading = false, lobbyError = null)
+            } catch (e: ApiException) {
+                ui = ui.copy(
+                    lobbyLoading = false,
+                    lobbyError = context.getString(e.error.messageRes),
+                )
+            }
+            publish()
+        }
+    }
+
+    /** The settings last used; null on the first visit, when the form keeps its defaults. */
+    fun savedQuickSettings(): QuickSettings? {
+        val rule = store.quickRule ?: return null
+        return QuickSettings(rule, store.quickTimeControl ?: "UNTIMED", store.quickColor)
+    }
+
+    private fun rememberQuick(rule: String, timeControl: String, color: String?) {
+        store.quickRule = rule
+        store.quickTimeControl = timeControl
+        store.quickColor = color
     }
 
     fun joinRoom(rawCode: String, color: String? = null) {

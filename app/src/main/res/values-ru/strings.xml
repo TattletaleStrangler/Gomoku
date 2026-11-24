@@ -142,6 +142,11 @@
     <string name="online_time_control">Контроль времени</string>
     <string name="online_create_action">Создать</string>
     <string name="online_join">Войти по коду</string>
+    <string name="online_quick">Найти соперника</string>
+    <string name="online_lobby">Открытые игры</string>
+    <string name="online_lobby_refresh">Обновить</string>
+    <string name="online_lobby_empty">Открытых игр нет — создайте комнату или найдите соперника</string>
+    <string name="online_lobby_loading">Загрузка…</string>
     <string name="online_code">Код комнаты</string>
     <string name="online_join_action">Войти</string>
     <string name="online_waiting">Ожидание соперника</string>

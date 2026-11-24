@@ -14,13 +14,40 @@ import kotlinx.serialization.Serializable
  * What the creator of a room chooses.
  *
  * [color] is `BLACK`, `WHITE`, or `ANY` (the opponent chooses when joining). A null is
- * omitted from the body and the server defaults the creator to black.
+ * omitted from the body and the server defaults the creator to black. [visibility] is
+ * `PRIVATE` (by code, the default) or `PUBLIC` (listed in the lobby).
  */
 @Serializable
 data class CreateGameRequest(
     val rule: String,
     val timeControl: String,
     val color: String? = null,
+    val visibility: String? = null,
+)
+
+/**
+ * Quick match: the settings the player wants (FEATURES.md, B1).
+ *
+ * [color] is optional; with no preference the server opens the room as `ANY` and the
+ * opponent decides when they join.
+ */
+@Serializable
+data class QuickGameRequest(
+    val rule: String,
+    val timeControl: String,
+    val color: String? = null,
+)
+
+/** One row of the open-games list. */
+@Serializable
+data class LobbyGameDto(
+    val gameId: String,
+    val code: String,
+    val rule: String,
+    val timeControl: String,
+    val creatorColor: String = "ANY",
+    val creatorNickname: String = "",
+    val createdAt: String? = null,
 )
 
 /**

@@ -142,6 +142,11 @@
     <string name="online_time_control">Time control</string>
     <string name="online_create_action">Create</string>
     <string name="online_join">Join by code</string>
+    <string name="online_quick">Find an opponent</string>
+    <string name="online_lobby">Open games</string>
+    <string name="online_lobby_refresh">Refresh</string>
+    <string name="online_lobby_empty">No open games — create a room or find an opponent</string>
+    <string name="online_lobby_loading">Loading…</string>
     <string name="online_code">Room code</string>
     <string name="online_join_action">Join</string>
     <string name="online_waiting">Waiting for an opponent</string>
