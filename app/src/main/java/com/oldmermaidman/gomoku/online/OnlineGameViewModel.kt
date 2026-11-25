@@ -34,6 +34,8 @@ data class OnlineClockUi(
     val running: Stone? = null,
     /** Seconds left for the opponent to answer a pending request, or null. */
     val undoSeconds: Int? = null,
+    /** Seconds left for the opponent to answer a draw offer, or null. */
+    val drawSeconds: Int? = null,
     /** True during the two seconds after our own move when an undo may be asked for. */
     val canUndo: Boolean = false,
 )
@@ -203,6 +205,27 @@ class OnlineGameViewModel(
         command { net.api.decideUndo(gameId, accept) }
     }
 
+    /**
+     * Offers a draw (FUTURE.md). Unlike an undo it is possible at any moment of a
+     * running game; the server gives the opponent ten seconds and the attempt is spent
+     * whether they agree, refuse or say nothing.
+     */
+    fun offerDraw() {
+        val screen = ui ?: return
+        if (busy || screen.finished) return
+        if (screen.pendingUndo != null || screen.pendingDraw != null) return
+        if (screen.drawRemaining <= 0) return
+        command { net.api.drawOffer(gameId) }
+    }
+
+    /** The opponent's answer to a draw offer; only the asked side may send it. */
+    fun decideDraw(accept: Boolean) {
+        val screen = ui ?: return
+        val pending = screen.pendingDraw ?: return
+        if (busy || pending.requestedByMe) return
+        command { net.api.drawDecision(gameId, accept) }
+    }
+
     override fun onCleared() {
         socket.stop()
         ticker?.cancel()
@@ -262,6 +285,11 @@ class OnlineGameViewModel(
         if (previous?.undo != null && next.undo == null) {
             flash(if (next.moves.size < previous.moves.size) R.string.online_undo_accepted else R.string.online_undo_declined)
         }
+        // A draw offer that disappeared was either agreed to (the game is a draw now)
+        // or refused; the panel itself stays silent about which.
+        if (previous?.draw != null && next.draw == null) {
+            flash(if (next.result == "DRAW") R.string.online_draw_accepted else R.string.online_draw_declined)
+        }
 
         undoWindowUntilMs = nextUndoWindow(previous, next, receivedAtMs, undoWindowUntilMs)
         publishUi()
@@ -297,6 +325,12 @@ class OnlineGameViewModel(
         } else {
             null
         }
+        val drawDeadline = instantOf(game.draw?.deadline)?.toEpochMilli()
+        val drawSeconds = if (drawDeadline != null) {
+            ((drawDeadline - clock.serverNowMs(now) + 999) / 1_000).coerceAtLeast(0).toInt()
+        } else {
+            null
+        }
 
         _clock.value = OnlineClockUi(
             timed = clock.timed,
@@ -304,6 +338,7 @@ class OnlineGameViewModel(
             opponentRemainingMs = clock.remainingMs(screen.you.opponent(), now),
             running = clock.running,
             undoSeconds = undoSeconds,
+            drawSeconds = drawSeconds,
             canUndo = canRequestUndo(screen, now, undoWindowUntilMs),
         )
     }

@@ -70,11 +70,13 @@ class OnlineGameActivity : AppCompatActivity() {
         binding.btnGameBack.setOnClickListener { finish() }
         binding.boardView.onCellTapped = { x, y -> viewModel.move(x, y) }
         binding.btnUndo.setOnClickListener { viewModel.requestUndo() }
+        binding.btnDraw.setOnClickListener { viewModel.offerDraw() }
         binding.btnResign.setOnClickListener { viewModel.resign() }
         binding.btnRematch.setOnClickListener { viewModel.rematch() }
         binding.btnBlock.setOnClickListener { viewModel.blockOpponent() }
-        binding.btnUndoAccept.setOnClickListener { viewModel.decideUndo(true) }
-        binding.btnUndoDecline.setOnClickListener { viewModel.decideUndo(false) }
+        // The same panel answers whichever request is waiting.
+        binding.btnUndoAccept.setOnClickListener { decide(true) }
+        binding.btnUndoDecline.setOnClickListener { decide(false) }
 
         viewModel.state.observe(this) { state ->
             current = state
@@ -147,12 +149,19 @@ class OnlineGameActivity : AppCompatActivity() {
 
         // The bottom bar changes over: while the game runs it is undo and resign, and
         // once it is over the same space offers a rematch and a block.
-        binding.btnUndo.visibility = if (state.finished) View.GONE else View.VISIBLE
-        binding.btnResign.visibility = if (state.finished) View.GONE else View.VISIBLE
-        binding.btnRematch.visibility = if (state.finished) View.VISIBLE else View.GONE
-        binding.btnBlock.visibility = if (state.finished) View.VISIBLE else View.GONE
+        val finished = state.finished
+        binding.btnUndo.visibility = if (finished) View.GONE else View.VISIBLE
+        binding.btnDraw.visibility = if (finished) View.GONE else View.VISIBLE
+        binding.btnResign.visibility = if (finished) View.GONE else View.VISIBLE
+        binding.btnRematch.visibility = if (finished) View.VISIBLE else View.GONE
+        binding.btnBlock.visibility = if (finished) View.VISIBLE else View.GONE
         binding.btnRematch.isEnabled = !state.busy
         binding.btnBlock.isEnabled = !state.busy
+        binding.btnDraw.isEnabled = !state.busy &&
+            state.snapshot.status == "ACTIVE" &&
+            state.pendingUndo == null &&
+            state.pendingDraw == null &&
+            state.drawRemaining > 0
         binding.btnRematch.text = getString(
             if (state.rematchOffered) R.string.online_rematch_accept else R.string.online_rematch,
         )
@@ -215,7 +224,26 @@ class OnlineGameActivity : AppCompatActivity() {
                 binding.undoButtons.visibility =
                     if (state.pendingUndo.requestedByMe) View.GONE else View.VISIBLE
             }
+            state?.pendingDraw != null -> {
+                binding.undoOverlay.visibility = View.VISIBLE
+                binding.tvUndoText.text = getString(R.string.online_draw_offered)
+                binding.tvUndoCountdown.text = clock.drawSeconds
+                    ?.let { getString(R.string.online_undo_seconds, it) }
+                    .orEmpty()
+                binding.undoButtons.visibility =
+                    if (state.pendingDraw.requestedByMe) View.GONE else View.VISIBLE
+            }
             else -> binding.undoOverlay.visibility = View.GONE
+        }
+    }
+
+    /** The panel's "yes" and "no" answer whichever request is on it. */
+    private fun decide(accept: Boolean) {
+        val state = current ?: return
+        if (state.pendingDraw != null) {
+            viewModel.decideDraw(accept)
+        } else {
+            viewModel.decideUndo(accept)
         }
     }
 
@@ -239,6 +267,7 @@ class OnlineGameActivity : AppCompatActivity() {
             OnlineFinish.TIMEOUT -> R.string.online_finish_timeout
             OnlineFinish.RESIGN -> R.string.online_finish_resign
             OnlineFinish.ABANDON -> R.string.online_finish_abandon
+            OnlineFinish.AGREE -> R.string.online_finish_agree
             OnlineFinish.NONE -> null
         }
         val result = if (reason == null) {

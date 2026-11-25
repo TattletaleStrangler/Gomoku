@@ -221,6 +221,14 @@
             android:text="@string/undo" />
 
         <Button
+            android:id="@+id/btnDraw"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="6dp"
+            android:layout_weight="1"
+            android:text="@string/online_draw" />
+
+        <Button
             android:id="@+id/btnResign"
             android:layout_width="0dp"
             android:layout_height="wrap_content"

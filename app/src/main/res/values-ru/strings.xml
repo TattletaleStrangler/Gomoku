@@ -168,6 +168,15 @@
     <string name="report_reason_stalling">Затягивает игру</string>
     <string name="report_reason_cheating">Читерство</string>
     <string name="report_reason_other">Другое</string>
+    <string name="online_draw">Ничья</string>
+    <string name="online_draw_offered">Соперник предлагает ничью</string>
+    <string name="online_draw_accepted">Ничья</string>
+    <string name="online_draw_declined">Ничья отклонена</string>
+    <string name="online_finish_agree">по согласию</string>
+    <string name="error_draw_already">Предложение ничьей уже отправлено</string>
+    <string name="error_draw_not_requested">Предложения ничьей нет</string>
+    <string name="error_draw_limit">Попытки предложить ничью кончились</string>
+    <string name="error_request_pending">Сначала дождитесь ответа на другой запрос</string>
     <string name="online_code">Код комнаты</string>
     <string name="online_join_action">Войти</string>
     <string name="online_waiting">Ожидание соперника</string>

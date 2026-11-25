@@ -11,12 +11,18 @@ import java.time.Instant
 enum class OnlineOutcome { NONE, YOU_WIN, YOU_LOSE, DRAW }
 
 /** Why the game ended, as far as the screen cares. */
-enum class OnlineFinish { NONE, FIVE, FORBIDDEN, TIMEOUT, RESIGN, ABANDON }
+enum class OnlineFinish { NONE, FIVE, FORBIDDEN, TIMEOUT, RESIGN, ABANDON, AGREE }
 
 /** A pending undo request, with the server deadline converted to epoch milliseconds. */
 data class PendingUndo(
     val requestedByMe: Boolean,
     val ply: Int,
+    val deadlineMs: Long,
+)
+
+/** A pending draw offer, with the server deadline converted to epoch milliseconds. */
+data class PendingDraw(
+    val requestedByMe: Boolean,
     val deadlineMs: Long,
 )
 
@@ -45,6 +51,10 @@ data class OnlineGameUi(
     val rematchOffered: Boolean,
     val undoRemaining: Int,
     val pendingUndo: PendingUndo?,
+    /** The pending draw offer, or null; the panel shows it the same way as an undo. */
+    val pendingDraw: PendingDraw?,
+    /** How many draw offers the viewer still has. */
+    val drawRemaining: Int,
     val socket: SocketState,
     /** True while a command is on its way; the board ignores taps then. */
     val busy: Boolean,
@@ -167,6 +177,14 @@ fun buildOnlineGameUi(
         )
     }
 
+    val pendingDraw = snapshot.draw?.let { draw ->
+        val deadline = instantOf(draw.deadline)?.toEpochMilli() ?: return@let null
+        PendingDraw(
+            requestedByMe = stoneOf(draw.requestedBy) == you,
+            deadlineMs = deadline,
+        )
+    }
+
     return OnlineGameUi(
         snapshot = snapshot,
         board = board,
@@ -186,6 +204,8 @@ fun buildOnlineGameUi(
         rematchOffered = snapshot.rematchGameId != null,
         undoRemaining = snapshot.undoRemaining.coerceAtLeast(0),
         pendingUndo = pending,
+        pendingDraw = pendingDraw,
+        drawRemaining = snapshot.drawRemaining.coerceAtLeast(0),
         socket = socket,
         busy = busy,
     )
@@ -204,5 +224,6 @@ private fun finishOf(reason: String?): OnlineFinish = when (reason) {
     "TIMEOUT" -> OnlineFinish.TIMEOUT
     "RESIGN" -> OnlineFinish.RESIGN
     "ABANDON" -> OnlineFinish.ABANDON
+    "AGREE" -> OnlineFinish.AGREE
     else -> OnlineFinish.NONE
 }

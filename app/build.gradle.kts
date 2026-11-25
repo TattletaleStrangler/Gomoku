@@ -14,8 +14,8 @@ android {
         applicationId = "com.oldmermaidman.gomoku"
         minSdk = 26
         targetSdk = 36
-        versionCode = 20
-        versionName = "1.19"
+        versionCode = 21
+        versionName = "1.20"
 
         // The native Rapfi engine is provided only for arm64-v8a (see TZ §7).
         ndk {

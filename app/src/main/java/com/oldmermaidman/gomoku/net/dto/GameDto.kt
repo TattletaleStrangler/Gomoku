@@ -77,8 +77,7 @@ data class MoveRequest(
 /** The opponent's answer to an undo request. */
 @Serializable
 data class UndoDecisionRequest(
-    val accept: Boolean,
-)
+    val accept: Boolean,)
 
 /** A player as the snapshot shows them. */
 @Serializable
@@ -121,6 +120,20 @@ data class UndoDto(
 /** A complaint about the opponent of a game (FUTURE.md). */
 @Serializable
 data class ReportRequest(val reason: String)
+
+/** The opponent's answer to a draw offer. */
+@Serializable
+data class DrawDecisionRequest(val accept: Boolean)
+
+/**
+ * A pending draw offer: who asked (as a colour) and until when the opponent must answer
+ * (server time). Unlike an undo there is no move at stake.
+ */
+@Serializable
+data class DrawDto(
+    val requestedBy: String? = null,
+    val deadline: String? = null,
+)
 
 /** One row of the player's finished games (`GET /games/history`). */
 @Serializable
@@ -174,4 +187,8 @@ data class GameSnapshotDto(
     val lastUndoneMove: MoveDto? = null,
     /** The room offered for a rematch of this finished game, or null. */
     val rematchGameId: String? = null,
+    /** How many draw offers the viewer still has in this game. */
+    val drawRemaining: Int = 0,
+    /** The pending draw offer, or null when none is pending. */
+    val draw: DrawDto? = null,
 )

@@ -1,6 +1,7 @@
 package com.oldmermaidman.gomoku.net
 
 import com.oldmermaidman.gomoku.net.dto.CreateGameRequest
+import com.oldmermaidman.gomoku.net.dto.DrawDecisionRequest
 import com.oldmermaidman.gomoku.net.dto.GameEventDto
 import com.oldmermaidman.gomoku.net.dto.GameHistoryDto
 import com.oldmermaidman.gomoku.net.dto.GameSnapshotDto
@@ -185,6 +186,22 @@ class DtoSerializationTest {
     @Test
     fun theReportRequestCarriesTheReason() {
         assertEquals("""{"reason":"CHEATING"}""", json.encodeToString(ReportRequest("CHEATING")))
+    }
+
+    @Test
+    fun theDrawOfferComesFromTheSnapshot() {
+        val dto = json.decodeFromString<GameSnapshotDto>(
+            """{"gameId":"g","status":"ACTIVE","drawRemaining":2,""" +
+                """"draw":{"requestedBy":"BLACK","deadline":"2026-11-21T03:20:14.482Z"}}""",
+        )
+
+        assertEquals(2, dto.drawRemaining)
+        assertEquals("BLACK", dto.draw?.requestedBy)
+    }
+
+    @Test
+    fun theDrawDecisionCarriesTheAnswer() {
+        assertEquals("""{"accept":true}""", json.encodeToString(DrawDecisionRequest(true)))
     }
 
     @Test

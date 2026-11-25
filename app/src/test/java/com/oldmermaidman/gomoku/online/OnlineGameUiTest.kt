@@ -4,6 +4,7 @@ import com.oldmermaidman.gomoku.model.Move
 import com.oldmermaidman.gomoku.model.Stone
 import com.oldmermaidman.gomoku.net.SocketState
 import com.oldmermaidman.gomoku.net.dto.ClockDto
+import com.oldmermaidman.gomoku.net.dto.DrawDto
 import com.oldmermaidman.gomoku.net.dto.GameSnapshotDto
 import com.oldmermaidman.gomoku.net.dto.MoveDto
 import com.oldmermaidman.gomoku.net.dto.PlayerDto
@@ -34,6 +35,8 @@ class OnlineGameUiTest {
         rule: String = "FREESTYLE",
         black: PlayerDto? = null,
         white: PlayerDto? = null,
+        draw: DrawDto? = null,
+        drawRemaining: Int = 3,
     ) = GameSnapshotDto(
         gameId = "g",
         code = "ABC123",
@@ -53,6 +56,8 @@ class OnlineGameUiTest {
         undoRemaining = undoRemaining,
         undo = undo,
         lastUndoneMove = lastUndoneMove,
+        draw = draw,
+        drawRemaining = drawRemaining,
     )
 
     @Test
@@ -164,6 +169,33 @@ class OnlineGameUiTest {
             SocketState.OPEN,
         )!!
         assertFalse(none.rematchOffered)
+    }
+
+    @Test
+    fun aPendingDrawBelongsToTheOfferer() {
+        val draw = DrawDto(requestedBy = "BLACK", deadline = "2026-11-21T03:20:14.482Z")
+
+        val offerer = buildOnlineGameUi(
+            snapshot(you = "BLACK", draw = draw, drawRemaining = 2),
+            SocketState.OPEN,
+        )!!
+        assertTrue(offerer.pendingDraw!!.requestedByMe)
+        assertEquals(2, offerer.drawRemaining)
+
+        val asked = buildOnlineGameUi(snapshot(you = "WHITE", draw = draw), SocketState.OPEN)!!
+        assertFalse(asked.pendingDraw!!.requestedByMe)
+    }
+
+    @Test
+    fun anAgreedDrawIsShownAsSuch() {
+        val ui = buildOnlineGameUi(
+            snapshot(status = "FINISHED", turn = null, result = "DRAW", finishReason = "AGREE"),
+            SocketState.OPEN,
+        )!!
+
+        assertEquals(OnlineOutcome.DRAW, ui.outcome)
+        assertEquals(OnlineFinish.AGREE, ui.finish)
+        assertNull(ui.pendingDraw)
     }
 
     /**

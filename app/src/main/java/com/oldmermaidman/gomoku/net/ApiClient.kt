@@ -4,6 +4,7 @@ import android.util.Log
 import com.oldmermaidman.gomoku.net.dto.CreateGameRequest
 import com.oldmermaidman.gomoku.net.dto.CredentialsRequest
 import com.oldmermaidman.gomoku.net.dto.DeleteAccountRequest
+import com.oldmermaidman.gomoku.net.dto.DrawDecisionRequest
 import com.oldmermaidman.gomoku.net.dto.ErrorDto
 import com.oldmermaidman.gomoku.net.dto.GameHistoryDto
 import com.oldmermaidman.gomoku.net.dto.GameSnapshotDto
@@ -201,6 +202,14 @@ class ApiClient(
     /** The opponent's answer to a pending request. */
     suspend fun decideUndo(id: String, accept: Boolean): GameSnapshotDto =
         decode(call("POST", url("games/$id/undo-decision"), json.encodeToString(UndoDecisionRequest(accept))))
+
+    /** Offers a draw; the server gives the opponent ten seconds to answer. */
+    suspend fun drawOffer(id: String): GameSnapshotDto =
+        decode(call("POST", url("games/$id/draw-offer")))
+
+    /** The opponent's answer to a draw offer. */
+    suspend fun drawDecision(id: String, accept: Boolean): GameSnapshotDto =
+        decode(call("POST", url("games/$id/draw-decision"), json.encodeToString(DrawDecisionRequest(accept))))
 
     // ----------------------------------------------------------------- session
 
