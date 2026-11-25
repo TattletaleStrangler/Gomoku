@@ -26,6 +26,15 @@
         android:paddingBottom="4dp"
         android:textSize="12sp" />
 
+    <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/swCrashUpload"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="24dp"
+        android:paddingEnd="24dp"
+        android:paddingBottom="4dp"
+        android:text="@string/crash_log_upload" />
+
     <!-- The reports themselves, monospace and selectable. -->
     <ScrollView
         android:layout_width="match_parent"

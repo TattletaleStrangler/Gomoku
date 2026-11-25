@@ -3,6 +3,7 @@ package com.oldmermaidman.gomoku
 import android.app.Application
 import com.oldmermaidman.gomoku.crash.CrashHandler
 import com.oldmermaidman.gomoku.crash.CrashStore
+import com.oldmermaidman.gomoku.crash.CrashUploader
 import com.oldmermaidman.gomoku.net.NetContainer
 
 /**
@@ -29,5 +30,9 @@ class GomokuApp : Application() {
         Thread.setDefaultUncaughtExceptionHandler(
             CrashHandler(CrashStore.inFilesDir(filesDir), version, previous)
         )
+
+        // A report cannot be sent by the process that died: the journal goes out on the
+        // next launch, and only when the player allowed it (FEATURES.md, B4).
+        CrashUploader.sendPending(this)
     }
 }

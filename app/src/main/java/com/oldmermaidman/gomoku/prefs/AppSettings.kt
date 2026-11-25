@@ -39,6 +39,15 @@ class AppSettings(context: Context) {
         get() = prefs.getBoolean(KEY_SOUND, true)
         set(value) = prefs.edit { putBoolean(KEY_SOUND, value) }
 
+    /**
+     * Whether the crash journal is sent to the server on the next launch. Off by
+     * default: the journal exists to be shared by hand, and sending it is the player's
+     * choice (see README.md, "Crash journal").
+     */
+    var sendCrashReports: Boolean
+        get() = prefs.getBoolean(KEY_SEND_CRASHES, false)
+        set(value) = prefs.edit { putBoolean(KEY_SEND_CRASHES, value) }
+
     /** Volume slider position, `0..SoundVolume.STEPS-1`; see [SoundVolume.percentOf]. */
     var soundVolumeStep: Int
         get() = prefs.getInt(KEY_VOLUME, SoundVolume.DEFAULT_STEP)
@@ -117,6 +126,7 @@ class AppSettings(context: Context) {
         private const val KEY_FORBIDDEN = "forbidden_moves"
         private const val KEY_NUMBERS = "show_move_numbers"
         private const val KEY_SOUND = "sound_enabled"
+        private const val KEY_SEND_CRASHES = "send_crash_reports"
         private const val KEY_VOLUME = "sound_volume_step"
         private const val KEY_LEVEL = "ai_level"
         private const val KEY_THEME = "theme"

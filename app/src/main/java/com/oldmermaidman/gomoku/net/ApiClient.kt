@@ -3,6 +3,7 @@ package com.oldmermaidman.gomoku.net
 import android.util.Log
 import com.oldmermaidman.gomoku.net.dto.CreateGameRequest
 import com.oldmermaidman.gomoku.net.dto.CredentialsRequest
+import com.oldmermaidman.gomoku.net.dto.CrashReportRequest
 import com.oldmermaidman.gomoku.net.dto.DeleteAccountRequest
 import com.oldmermaidman.gomoku.net.dto.DrawDecisionRequest
 import com.oldmermaidman.gomoku.net.dto.ErrorDto
@@ -128,6 +129,15 @@ class ApiClient(
     )
 
     // ------------------------------------------------------------------- games
+
+    /**
+     * Sends one crash report the app kept from an earlier run. Open on the server (a
+     * crash often happens before signing in) and never retried by itself: the journal
+     * keeps the report until the next launch.
+     */
+    suspend fun sendCrash(report: CrashReportRequest) {
+        call("POST", url("crash-reports"), json.encodeToString(report), authorized = false)
+    }
 
     suspend fun createGame(
         rule: String,

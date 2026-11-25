@@ -53,6 +53,7 @@ enum class ApiError(@param:StringRes val messageRes: Int) {
     DRAW_NOT_REQUESTED(R.string.error_draw_not_requested),
     DRAW_LIMIT_REACHED(R.string.error_draw_limit),
     REQUEST_ALREADY_PENDING(R.string.error_request_pending),
+    BANNED(R.string.error_banned),
     RATE_LIMITED(R.string.error_rate_limited),
     INTERNAL_ERROR(R.string.error_internal),
 

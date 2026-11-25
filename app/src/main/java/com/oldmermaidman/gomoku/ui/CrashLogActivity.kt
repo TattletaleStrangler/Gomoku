@@ -7,6 +7,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.oldmermaidman.gomoku.R
 import com.oldmermaidman.gomoku.crash.CrashStore
+import com.oldmermaidman.gomoku.crash.CrashUploader
 import com.oldmermaidman.gomoku.databinding.ActivityCrashLogBinding
 import com.oldmermaidman.gomoku.prefs.AppSettings
 
@@ -45,6 +46,14 @@ class CrashLogActivity : AppCompatActivity() {
         binding.btnCrashSend.setOnClickListener { send() }
         binding.btnCrashClear.setOnClickListener { confirmClear() }
         binding.btnCrashClose.setOnClickListener { finish() }
+
+        val settings = AppSettings(this)
+        binding.swCrashUpload.isChecked = settings.sendCrashReports
+        binding.swCrashUpload.setOnCheckedChangeListener { _, checked ->
+            settings.sendCrashReports = checked
+            // Turning it on sends the reports already on the device right away.
+            if (checked) CrashUploader.sendPending(this) { refresh() }
+        }
 
         refresh()
     }

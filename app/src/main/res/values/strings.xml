@@ -177,6 +177,8 @@
     <string name="error_draw_not_requested">There is no draw offer</string>
     <string name="error_draw_limit">No draw offers left</string>
     <string name="error_request_pending">Answer the pending request first</string>
+    <string name="error_banned">Ranked games are closed for this account</string>
+    <string name="crash_log_upload">Send reports to the server</string>
     <string name="online_code">Room code</string>
     <string name="online_join_action">Join</string>
     <string name="online_waiting">Waiting for an opponent</string>
