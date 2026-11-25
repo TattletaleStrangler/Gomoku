@@ -179,6 +179,7 @@
     <string name="error_request_pending">Сначала дождитесь ответа на другой запрос</string>
     <string name="error_banned">Этому аккаунту закрыты рейтинговые игры</string>
     <string name="crash_log_upload">Отправлять отчёты на сервер</string>
+    <string name="privacy_policy">Политика конфиденциальности</string>
     <string name="online_code">Код комнаты</string>
     <string name="online_join_action">Войти</string>
     <string name="online_waiting">Ожидание соперника</string>

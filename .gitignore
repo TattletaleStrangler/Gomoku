@@ -8,6 +8,13 @@ local.properties
 *.apk
 *.aab
 
+# Release signing: the upload key and its passwords never go to git. Losing them is
+# recoverable (Play App Signing can reset the upload key), leaking them is not.
+keystore.properties
+keystore/
+*.jks
+*.keystore
+
 # IDE
 .idea/
 *.iml

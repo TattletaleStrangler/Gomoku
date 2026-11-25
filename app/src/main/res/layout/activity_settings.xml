@@ -323,6 +323,14 @@
                 android:layout_marginTop="8dp"
                 android:text="@string/crash_log" />
 
+            <!-- Google Play expects the policy to be reachable from the app too. -->
+            <Button
+                android:id="@+id/btnPrivacy"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@string/privacy_policy" />
+
         </LinearLayout>
     </ScrollView>
 

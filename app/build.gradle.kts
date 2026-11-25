@@ -1,8 +1,50 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.plugin.serialization")
 }
+
+// ─── Release configuration that must not live in the source ──────────────────
+//
+// The production address and the signing key are supplied at build time; neither
+// belongs in git. Without keystore.properties the release build is unsigned, which
+// Google Play rejects, so the file has to exist before the first upload
+// (see PLAY_RELEASE.md).
+
+/** Where the release build points. The placeholder is caught before a bundle is built. */
+val releaseApiUrl: String = (project.findProperty("gomoku.apiBaseUrl") as String?)
+    ?: "https://api.gomoku.invalid"
+
+val placeholderHost = "api.gomoku.invalid"
+
+// A bundle is what goes to Play: refuse to build one that cannot work.
+val verifyReleaseApiUrl = tasks.register("verifyReleaseApiUrl") {
+    doLast {
+        if (releaseApiUrl.contains(placeholderHost) && !project.hasProperty("gomoku.allowPlaceholderApi")) {
+            throw GradleException(
+                "gomoku.apiBaseUrl is still the placeholder ($releaseApiUrl).\n" +
+                    "Build the bundle with the real address, for example:\n" +
+                    "  ./gradlew bundleRelease -Pgomoku.apiBaseUrl=https://api.example.com\n" +
+                    "(add -Pgomoku.allowPlaceholderApi to build a test bundle anyway)"
+            )
+        }
+    }
+}
+
+tasks.matching { it.name == "bundleRelease" }.configureEach {
+    dependsOn(verifyReleaseApiUrl)
+}
+
+/** Signing material, read from keystore.properties next to this repository. */
+val keystorePropertiesFile = rootProject.file("keystore.properties")
+val keystoreProperties = Properties().apply {
+    if (keystorePropertiesFile.exists()) {
+        keystorePropertiesFile.inputStream().use { load(it) }
+    }
+}
+val hasReleaseKeystore = keystorePropertiesFile.exists()
 
 android {
     namespace = "com.oldmermaidman.gomoku"
@@ -14,12 +56,23 @@ android {
         applicationId = "com.oldmermaidman.gomoku"
         minSdk = 26
         targetSdk = 36
-        versionCode = 22
-        versionName = "1.21"
+        versionCode = 23
+        versionName = "1.22"
 
         // The native Rapfi engine is provided only for arm64-v8a (see TZ §7).
         ndk {
             abiFilters += listOf("arm64-v8a")
+        }
+    }
+
+    signingConfigs {
+        if (hasReleaseKeystore) {
+            create("release") {
+                storeFile = rootProject.file(keystoreProperties.getProperty("storeFile"))
+                storePassword = keystoreProperties.getProperty("storePassword")
+                keyAlias = keystoreProperties.getProperty("keyAlias")
+                keyPassword = keystoreProperties.getProperty("keyPassword")
+            }
         }
     }
 
@@ -34,10 +87,14 @@ android {
             buildConfigField("String", "API_BASE_URL", "\"$debugApi\"")
         }
         release {
-            // Placeholder until the deployment domain exists (see USER_ACTION.md and
-            // README.md, "Online play"). Release builds only speak HTTPS: cleartext is
-            // allowed in src/debug/AndroidManifest.xml and nowhere else.
-            buildConfigField("String", "API_BASE_URL", "\"https://api.gomoku.invalid\"")
+            // The address comes from the command line (see the top of this file) and is
+            // caught by verifyReleaseApiUrl before a bundle is produced. Release builds
+            // only speak HTTPS: cleartext is allowed in src/debug/AndroidManifest.xml
+            // and nowhere else.
+            buildConfigField("String", "API_BASE_URL", "\"$releaseApiUrl\"")
+            if (hasReleaseKeystore) {
+                signingConfig = signingConfigs.getByName("release")
+            }
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),

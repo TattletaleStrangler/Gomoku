@@ -3,6 +3,7 @@ package com.oldmermaidman.gomoku.ui
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import androidx.core.net.toUri
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
@@ -13,6 +14,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SwitchCompat
+import com.oldmermaidman.gomoku.BuildConfig
 import com.oldmermaidman.gomoku.R
 import com.oldmermaidman.gomoku.crash.CrashStore
 import com.oldmermaidman.gomoku.model.ScoreBoard
@@ -260,6 +262,12 @@ class SettingsActivity : AppCompatActivity() {
 
         crashLogButton = findViewById(R.id.btnCrashLog)
         crashLogButton.setOnClickListener { startActivity(CrashLogActivity.intent(this)) }
+
+        // The policy lives on the game server next to the data it describes.
+        findViewById<Button>(R.id.btnPrivacy).setOnClickListener {
+            val url = BuildConfig.API_BASE_URL.trimEnd('/') + "/legal/privacy"
+            startActivity(Intent(Intent.ACTION_VIEW, url.toUri()))
+        }
 
         findViewById<Button>(R.id.btnCancel).setOnClickListener { finish() }
         findViewById<Button>(R.id.btnApply).setOnClickListener { applyAndFinish() }
