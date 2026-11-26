@@ -180,6 +180,15 @@
     <string name="error_banned">Этому аккаунту закрыты рейтинговые игры</string>
     <string name="crash_log_upload">Отправлять отчёты на сервер</string>
     <string name="privacy_policy">Политика конфиденциальности</string>
+    <string name="blocks_title">Заблокированные</string>
+    <string name="blocks_empty">Вы никого не блокировали.</string>
+    <string name="blocks_unblock">Разблокировать</string>
+    <string name="blocks_unblocked">%1$s снова может встретиться с вами</string>
+    <string name="blocks_deleted">удалённый игрок</string>
+    <string name="block_confirm_title">Заблокировать соперника?</string>
+    <string name="block_confirm_text">%1$s больше не будет попадаться вам в быстром подборе и в списке открытых игр. Разблокировать его можно в разделе «Онлайн» → «Заблокированные».</string>
+    <string name="block_confirm_text_generic">Этот игрок больше не будет попадаться вам в быстром подборе и в списке открытых игр. Разблокировать его можно в разделе «Онлайн» → «Заблокированные».</string>
+    <string name="block_confirm_action">Заблокировать</string>
     <string name="online_code">Код комнаты</string>
     <string name="online_join_action">Войти</string>
     <string name="online_waiting">Ожидание соперника</string>

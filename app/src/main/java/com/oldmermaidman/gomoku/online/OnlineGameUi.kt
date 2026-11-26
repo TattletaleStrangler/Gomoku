@@ -13,6 +13,14 @@ enum class OnlineOutcome { NONE, YOU_WIN, YOU_LOSE, DRAW }
 /** Why the game ended, as far as the screen cares. */
 enum class OnlineFinish { NONE, FIVE, FORBIDDEN, TIMEOUT, RESIGN, ABANDON, AGREE }
 
+/**
+ * The nickname of the other player in a snapshot, or an empty string when the server
+ * has not filled it in yet. The replay screen uses it to name the player it is about to
+ * block, the live screen takes the name from its own state.
+ */
+fun opponentNickname(snapshot: GameSnapshotDto, you: Stone): String =
+    (if (you == Stone.BLACK) snapshot.white else snapshot.black)?.nickname.orEmpty()
+
 /** A pending undo request, with the server deadline converted to epoch milliseconds. */
 data class PendingUndo(
     val requestedByMe: Boolean,

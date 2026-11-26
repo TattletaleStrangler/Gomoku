@@ -121,6 +121,17 @@ data class UndoDto(
 @Serializable
 data class ReportRequest(val reason: String)
 
+/**
+ * One entry of the block list (FUTURE.md): who was blocked, under which nickname and
+ * when. The id is what unblocking needs, so the screen does not look the account up.
+ */
+@Serializable
+data class BlockedPlayerDto(
+    val userId: String,
+    val nickname: String? = null,
+    val blockedAt: String? = null,
+)
+
 /** The opponent's answer to a draw offer. */
 @Serializable
 data class DrawDecisionRequest(val accept: Boolean)

@@ -15,6 +15,7 @@ import com.oldmermaidman.gomoku.model.Coordinates
 import com.oldmermaidman.gomoku.model.Stone
 import com.oldmermaidman.gomoku.online.OnlineReplayUi
 import com.oldmermaidman.gomoku.online.OnlineReplayViewModel
+import com.oldmermaidman.gomoku.online.opponentNickname
 import com.oldmermaidman.gomoku.prefs.AppSettings
 import kotlin.math.abs
 
@@ -42,6 +43,23 @@ class OnlineReplayActivity : AppCompatActivity() {
     private var theme: GomokuTheme = Themes.LIGHT
     private var current: OnlineReplayUi = OnlineReplayUi()
 
+    /** Asks before blocking: the button is one tap away from a finished game. */
+    private fun confirmBlock() {
+        val snapshot = current.snapshot ?: return
+        val nickname = opponentNickname(snapshot, current.you)
+        val text = if (nickname.isBlank()) {
+            getString(R.string.block_confirm_text_generic)
+        } else {
+            getString(R.string.block_confirm_text, nickname)
+        }
+        AlertDialog.Builder(this)
+            .setTitle(R.string.block_confirm_title)
+            .setMessage(text)
+            .setPositiveButton(R.string.block_confirm_action) { _, _ -> viewModel.blockOpponent() }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
+    }
+
     /** Wire values and labels of the report reasons (FUTURE.md). */
     private val reportReasons = listOf(
         "NICKNAME" to R.string.report_reason_nickname,
@@ -58,7 +76,7 @@ class OnlineReplayActivity : AppCompatActivity() {
         applyTheme()
 
         binding.btnReplayBack.setOnClickListener { finish() }
-        binding.btnBlock.setOnClickListener { viewModel.blockOpponent() }
+        binding.btnBlock.setOnClickListener { confirmBlock() }
         binding.btnReport.setOnClickListener { askReportReason() }
         binding.seekMove.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(bar: SeekBar?, progress: Int, fromUser: Boolean) {

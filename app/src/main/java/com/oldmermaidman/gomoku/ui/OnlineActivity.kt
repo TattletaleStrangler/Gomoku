@@ -77,6 +77,9 @@ class OnlineActivity : AppCompatActivity() {
         binding.btnLeaders.setOnClickListener {
             startActivity(LeaderboardActivity.intent(this))
         }
+        binding.btnBlocked.setOnClickListener {
+            startActivity(OnlineBlocksActivity.intent(this))
+        }
 
         viewModel.state.observe(this) { render(it) }
     }
@@ -164,6 +167,8 @@ class OnlineActivity : AppCompatActivity() {
         binding.btnHistory.visibility = if (ui.signedIn) View.VISIBLE else View.GONE
         binding.btnLeaders.isEnabled = !busy && ui.signedIn
         binding.btnLeaders.visibility = if (ui.signedIn) View.VISIBLE else View.GONE
+        binding.btnBlocked.isEnabled = !busy && ui.signedIn
+        binding.btnBlocked.visibility = if (ui.signedIn) View.VISIBLE else View.GONE
         binding.btnJoin.isEnabled = !busy && ui.signedIn
         binding.btnCloseRoom.isEnabled = !busy
         renderLobby(ui)

@@ -144,6 +144,14 @@
                     android:layout_marginTop="8dp"
                     android:text="@string/online_leaders" />
 
+                <!-- The way back for a block made by mistake. -->
+                <Button
+                    android:id="@+id/btnBlocked"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/blocks_title" />
+
                 <TextView
                     android:id="@+id/tvCreateTitle"
                     android:layout_width="match_parent"

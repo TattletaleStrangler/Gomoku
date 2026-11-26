@@ -180,6 +180,15 @@
     <string name="error_banned">Ranked games are closed for this account</string>
     <string name="crash_log_upload">Send reports to the server</string>
     <string name="privacy_policy">Privacy policy</string>
+    <string name="blocks_title">Blocked players</string>
+    <string name="blocks_empty">You have not blocked anyone.</string>
+    <string name="blocks_unblock">Unblock</string>
+    <string name="blocks_unblocked">%1$s can meet you again</string>
+    <string name="blocks_deleted">deleted player</string>
+    <string name="block_confirm_title">Block this opponent?</string>
+    <string name="block_confirm_text">%1$s will no longer appear in quick match or in the list of open games. You can let them back in Online → Blocked players.</string>
+    <string name="block_confirm_text_generic">This player will no longer appear in quick match or in the list of open games. You can let them back in Online → Blocked players.</string>
+    <string name="block_confirm_action">Block</string>
     <string name="online_code">Room code</string>
     <string name="online_join_action">Join</string>
     <string name="online_waiting">Waiting for an opponent</string>

@@ -92,6 +92,12 @@
             android:exported="false"
             android:label="@string/online_leaders"
             android:parentActivityName=".ui.OnlineActivity" />
+
+        <activity
+            android:name=".ui.OnlineBlocksActivity"
+            android:exported="false"
+            android:label="@string/blocks_title"
+            android:parentActivityName=".ui.OnlineActivity" />
     </application>
 
 </manifest>

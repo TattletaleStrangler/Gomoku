@@ -7,6 +7,7 @@ import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.view.View
 import androidx.activity.viewModels
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.oldmermaidman.gomoku.R
 import com.oldmermaidman.gomoku.databinding.ActivityOnlineGameBinding
@@ -73,7 +74,7 @@ class OnlineGameActivity : AppCompatActivity() {
         binding.btnDraw.setOnClickListener { viewModel.offerDraw() }
         binding.btnResign.setOnClickListener { viewModel.resign() }
         binding.btnRematch.setOnClickListener { viewModel.rematch() }
-        binding.btnBlock.setOnClickListener { viewModel.blockOpponent() }
+        binding.btnBlock.setOnClickListener { confirmBlock() }
         // The same panel answers whichever request is waiting.
         binding.btnUndoAccept.setOnClickListener { decide(true) }
         binding.btnUndoDecline.setOnClickListener { decide(false) }
@@ -237,9 +238,28 @@ class OnlineGameActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Blocking lasts until the player finds the block list, and the button sits next to
+     * a rematch on a screen the player is in a hurry to leave: ask first, and say where
+     * the way back is.
+     */
+    private fun confirmBlock() {
+        val nickname = current?.opponent.orEmpty()
+        val text = if (nickname.isBlank()) {
+            getString(R.string.block_confirm_text_generic)
+        } else {
+            getString(R.string.block_confirm_text, nickname)
+        }
+        AlertDialog.Builder(this)
+            .setTitle(R.string.block_confirm_title)
+            .setMessage(text)
+            .setPositiveButton(R.string.block_confirm_action) { _, _ -> viewModel.blockOpponent() }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
+    }
+
     /** The panel's "yes" and "no" answer whichever request is on it. */
-    private fun decide(accept: Boolean) {
-        val state = current ?: return
+    private fun decide(accept: Boolean) {        val state = current ?: return
         if (state.pendingDraw != null) {
             viewModel.decideDraw(accept)
         } else {

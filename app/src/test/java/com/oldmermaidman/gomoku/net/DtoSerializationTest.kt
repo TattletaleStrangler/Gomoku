@@ -1,5 +1,6 @@
 package com.oldmermaidman.gomoku.net
 
+import com.oldmermaidman.gomoku.net.dto.BlockedPlayerDto
 import com.oldmermaidman.gomoku.net.dto.CreateGameRequest
 import com.oldmermaidman.gomoku.net.dto.DrawDecisionRequest
 import com.oldmermaidman.gomoku.net.dto.GameEventDto
@@ -202,6 +203,18 @@ class DtoSerializationTest {
     @Test
     fun theDrawDecisionCarriesTheAnswer() {
         assertEquals("""{"accept":true}""", json.encodeToString(DrawDecisionRequest(true)))
+    }
+
+    @Test
+    fun theBlockListComesWithNames() {
+        val rows = json.decodeFromString<List<BlockedPlayerDto>>(
+            """[{"userId":"u1","nickname":"bob","blockedAt":"2026-11-26T18:00:00Z"}]""",
+        )
+
+        assertEquals(1, rows.size)
+        assertEquals("u1", rows[0].userId)
+        assertEquals("bob", rows[0].nickname)
+        assertEquals("2026-11-26T18:00:00Z", rows[0].blockedAt)
     }
 
     @Test

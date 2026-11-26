@@ -1,6 +1,7 @@
 package com.oldmermaidman.gomoku.net
 
 import android.util.Log
+import com.oldmermaidman.gomoku.net.dto.BlockedPlayerDto
 import com.oldmermaidman.gomoku.net.dto.CreateGameRequest
 import com.oldmermaidman.gomoku.net.dto.CredentialsRequest
 import com.oldmermaidman.gomoku.net.dto.CrashReportRequest
@@ -203,6 +204,14 @@ class ApiClient(
     /** Reports the opponent of this game; [reason] is one of `NICKNAME`, `STALLING`, `CHEATING`, `OTHER`. */
     suspend fun report(id: String, reason: String) {
         call("POST", url("games/$id/report"), json.encodeToString(ReportRequest(reason)))
+    }
+
+    /** Everybody the caller has blocked, newest first (FUTURE.md). */
+    suspend fun blocks(): List<BlockedPlayerDto> = decode(call("GET", url("blocks")))
+
+    /** Lets one player back into matchmaking; unblocking twice is not an error. */
+    suspend fun unblock(userId: String) {
+        call("DELETE", url("blocks/$userId"))
     }
 
     /** Asks the opponent to take the last move back (FEATURES.md, online undo). */
