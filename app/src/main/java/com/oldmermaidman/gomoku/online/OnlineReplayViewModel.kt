@@ -75,7 +75,7 @@ class OnlineReplayViewModel(
     }
 
     /**
-     * Stops being paired with this opponent again (FUTURE.md). The screen of a replayed
+     * Stops being paired with this opponent again (FEATURES.md). The screen of a replayed
      * game is the place to decide that: the game is over and the opponent is known.
      */
     fun blockOpponent() = moderate(R.string.online_block_done) { net.api.block(gameId) }

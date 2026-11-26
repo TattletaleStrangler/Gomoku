@@ -206,7 +206,7 @@ class ApiClient(
         call("POST", url("games/$id/report"), json.encodeToString(ReportRequest(reason)))
     }
 
-    /** Everybody the caller has blocked, newest first (FUTURE.md). */
+    /** Everybody the caller has blocked, newest first (FEATURES.md). */
     suspend fun blocks(): List<BlockedPlayerDto> = decode(call("GET", url("blocks")))
 
     /** Lets one player back into matchmaking; unblocking twice is not an error. */

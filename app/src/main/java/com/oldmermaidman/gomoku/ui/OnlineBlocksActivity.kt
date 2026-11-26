@@ -19,7 +19,7 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
 /**
- * The players this account has blocked (FUTURE.md).
+ * The players this account has blocked (FEATURES.md).
  *
  * "Do not pair me with this player" is one tap away on a finished game, so mistakes are
  * expected: this screen is the way back, with one button per row. A player blocked by

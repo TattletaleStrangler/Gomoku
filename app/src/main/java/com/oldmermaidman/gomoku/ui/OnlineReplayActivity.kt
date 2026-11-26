@@ -60,7 +60,7 @@ class OnlineReplayActivity : AppCompatActivity() {
             .show()
     }
 
-    /** Wire values and labels of the report reasons (FUTURE.md). */
+    /** Wire values and labels of the report reasons (FEATURES.md). */
     private val reportReasons = listOf(
         "NICKNAME" to R.string.report_reason_nickname,
         "STALLING" to R.string.report_reason_stalling,
@@ -117,7 +117,7 @@ class OnlineReplayActivity : AppCompatActivity() {
 
     /**
      * A short list of reasons, with no free text: it is enough to act on and cannot say
-     * more than the reporter meant (FUTURE.md). The replay screen is not the game, so a
+     * more than the reporter meant (FEATURES.md). The replay screen is not the game, so a
      * dialog is allowed here — the game screen itself still has none.
      */
     private fun askReportReason() {

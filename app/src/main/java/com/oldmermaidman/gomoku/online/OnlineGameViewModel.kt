@@ -136,7 +136,7 @@ class OnlineGameViewModel(
 
     /**
      * Offers a rematch of this finished game, or accepts the one already offered
-     * (FUTURE.md). The room belongs to another game, so the snapshot is not applied
+     * (FEATURES.md). The room belongs to another game, so the snapshot is not applied
      * here: the screen opens it and closes this one.
      */
     fun rematch() {
@@ -167,7 +167,7 @@ class OnlineGameViewModel(
     }
 
     /**
-     * Stops being paired with this opponent again (FUTURE.md). Offered on the finished
+     * Stops being paired with this opponent again (FEATURES.md). Offered on the finished
      * screen, where the game definitely had two players.
      */
     fun blockOpponent() {
@@ -206,7 +206,7 @@ class OnlineGameViewModel(
     }
 
     /**
-     * Offers a draw (FUTURE.md). Unlike an undo it is possible at any moment of a
+     * Offers a draw (FEATURES.md). Unlike an undo it is possible at any moment of a
      * running game; the server gives the opponent ten seconds and the attempt is spent
      * whether they agree, refuse or say nothing.
      */

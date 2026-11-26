@@ -117,12 +117,12 @@ data class UndoDto(
     val ply: Int = 0,
 )
 
-/** A complaint about the opponent of a game (FUTURE.md). */
+/** A complaint about the opponent of a game (FEATURES.md). */
 @Serializable
 data class ReportRequest(val reason: String)
 
 /**
- * One entry of the block list (FUTURE.md): who was blocked, under which nickname and
+ * One entry of the block list (FEATURES.md): who was blocked, under which nickname and
  * when. The id is what unblocking needs, so the screen does not look the account up.
  */
 @Serializable

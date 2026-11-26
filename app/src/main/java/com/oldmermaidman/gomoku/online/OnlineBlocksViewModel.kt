@@ -23,7 +23,7 @@ data class OnlineBlocksUi(
 )
 
 /**
- * The player's own block list (FUTURE.md).
+ * The player's own block list (FEATURES.md).
  *
  * A block happens in one tap on the game screen, so this is the way back: the list shows
  * who is blocked and one tap lets them back into matchmaking. Blocking somebody twice
