@@ -1,7 +1,12 @@
 <!--
     Monochrome layer for themed launcher icons (Android 13+). The system tints
-    this layer itself, so every shape must be a single solid colour: only the
-    alpha channel is used, and the row of five stones reads as a silhouette.
+    this layer itself, so only the alpha channel is used and every shape must be a
+    solid colour.
+
+    The cut cannot be painted over here — a band in the background colour would be
+    tinted as well — so the stones are drawn twice, each half clipped away from the
+    slice. The blade's glint is left out on purpose: in a single tint it would merge
+    with the stones and only narrow the gap.
 -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp"
@@ -9,19 +14,45 @@
     android:viewportWidth="108"
     android:viewportHeight="108">
 
-    <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M30,54 m -7,0 a 7,7 0 1,0 14,0 a 7,7 0 1,0 -14,0" />
-    <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M42,54 m -7,0 a 7,7 0 1,0 14,0 a 7,7 0 1,0 -14,0" />
-    <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M54,54 m -7,0 a 7,7 0 1,0 14,0 a 7,7 0 1,0 -14,0" />
-    <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M66,54 m -7,0 a 7,7 0 1,0 14,0 a 7,7 0 1,0 -14,0" />
-    <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M78,54 m -7,0 a 7,7 0 1,0 14,0 a 7,7 0 1,0 -14,0" />
+    <!-- Everything above the slice. -->
+    <group>
+        <clip-path
+            android:pathData="M172.59,35.58 L-65.09,68.86 L-81.73,-49.98 L155.95,-83.26 Z" />
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M30,54 m -7,0 a 7,7 0 1,0 14,0 a 7,7 0 1,0 -14,0" />
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M42,54 m -7,0 a 7,7 0 1,0 14,0 a 7,7 0 1,0 -14,0" />
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M54,54 m -7,0 a 7,7 0 1,0 14,0 a 7,7 0 1,0 -14,0" />
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M66,54 m -7,0 a 7,7 0 1,0 14,0 a 7,7 0 1,0 -14,0" />
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M78,54 m -7,0 a 7,7 0 1,0 14,0 a 7,7 0 1,0 -14,0" />
+    </group>
+
+    <!-- Everything below it. -->
+    <group>
+        <clip-path
+            android:pathData="M173.09,39.14 L-64.59,72.42 L-47.95,191.26 L189.73,157.98 Z" />
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M30,54 m -7,0 a 7,7 0 1,0 14,0 a 7,7 0 1,0 -14,0" />
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M42,54 m -7,0 a 7,7 0 1,0 14,0 a 7,7 0 1,0 -14,0" />
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M54,54 m -7,0 a 7,7 0 1,0 14,0 a 7,7 0 1,0 -14,0" />
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M66,54 m -7,0 a 7,7 0 1,0 14,0 a 7,7 0 1,0 -14,0" />
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M78,54 m -7,0 a 7,7 0 1,0 14,0 a 7,7 0 1,0 -14,0" />
+    </group>
 </vector>

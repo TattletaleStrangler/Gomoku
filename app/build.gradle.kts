@@ -56,8 +56,8 @@ android {
         applicationId = "com.oldmermaidman.gomoku"
         minSdk = 26
         targetSdk = 36
-        versionCode = 25
-        versionName = "1.24"
+        versionCode = 26
+        versionName = "1.25"
 
         // Only the shipped languages. Without this the libraries drag in their own
         // translations, and a device in a language the app does not ship would mix

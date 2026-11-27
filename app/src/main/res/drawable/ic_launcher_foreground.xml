@@ -3,7 +3,25 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <!-- Five stones in a row, centred in the adaptive-icon safe zone. -->
+    <!--
+        Five stones in a row, centred in the adaptive-icon safe zone, and one katana cut
+        across the whole row.
+
+        The cut is drawn in three layers, in this order:
+          1. the stones themselves;
+          2. the slice — a 3.6-unit band painted in the colour of the background layer,
+             so the row reads as cut through rather than merely crossed out;
+          3. the edge of the blade — a thin glint inside the slice, 1.8 units at its
+             widest and pointed at both ends, which is what makes the cut read as a
+             sword instead of a line.
+
+        The stroke is deliberately shallow (about 8°): at a steeper angle it would graze
+        the outermost stones instead of cutting them, and the point is that all five are
+        crossed out — five in a row is what ends the game.
+
+        The band runs past the row into the margin the launcher mask crops; since it
+        matches the background colour, that crop is invisible.
+    -->
     <path
         android:fillColor="#1A1A1A"
         android:pathData="M30,54 m -7,0 a 7,7 0 1,0 14,0 a 7,7 0 1,0 -14,0" />
@@ -19,4 +37,17 @@
     <path
         android:fillColor="#1A1A1A"
         android:pathData="M78,54 m -7,0 a 7,7 0 1,0 14,0 a 7,7 0 1,0 -14,0" />
+
+    <!-- The slice. -->
+    <path
+        android:fillColor="@color/ic_launcher_background"
+        android:pathData="M12.66,61.6 L95.84,49.96 L95.34,46.4 L12.16,58.04 Z" />
+
+    <!--
+        The blade's edge. Its points stop just short of the visible edge of the mask,
+        otherwise a round launcher would crop them and the cut would lose its tips.
+    -->
+    <path
+        android:fillColor="#EAF4FF"
+        android:pathData="M20.33,58.71 L37.27,57.15 L54.12,54.89 L71.95,52.43 L87.67,49.29 L71.73,50.85 L53.88,53.11 L37.05,55.57 Z" />
 </vector>
