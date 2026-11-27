@@ -168,7 +168,6 @@ class MainActivity : AppCompatActivity() {
     private fun applyTheme(theme: GomokuTheme) {
         ThemeSupport.applyWindow(this, binding.root, theme)
 
-        binding.topBar.setBackgroundColor(theme.background)
         binding.tvTitle.setTextColor(theme.statusText)
         binding.tvStatus.setTextColor(theme.statusText)
         binding.tvDifficulty.setTextColor(theme.accent)

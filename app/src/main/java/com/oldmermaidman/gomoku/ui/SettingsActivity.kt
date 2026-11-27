@@ -111,6 +111,13 @@ class SettingsActivity : AppCompatActivity() {
             tvVolume.text = getString(R.string.volume_percent, SoundVolume.percentOf(step))
         }
 
+        /** Name of a language in its own language, or the "follow the device" option. */
+        fun languageLabel(tag: String): String = if (tag == AppSettings.LANGUAGE_SYSTEM) {
+            getString(R.string.language_system)
+        } else {
+            getString(Locales.labelRes(tag))
+        }
+
         fun refreshStats() {
             val board: ScoreBoard = settings.loadScores()
             val normal = board.scoreOf(AppSettings.LEVEL_NORMAL)
@@ -233,6 +240,33 @@ class SettingsActivity : AppCompatActivity() {
         showVolume(sbVolume.progress)
 
         refreshStats()
+
+        // ---- language ------------------------------------------------------
+
+        // Every shipped language in its own language, plus handing the choice back to
+        // the device. Picking one applies it immediately: this screen is recreated in
+        // the new language, and the game in the background survives the recreation
+        // because its state lives in a view model.
+        val btnLanguage = findViewById<Button>(R.id.btnLanguage)
+        btnLanguage.text = languageLabel(settings.language)
+        btnLanguage.setOnClickListener {
+            val tags = listOf(AppSettings.LANGUAGE_SYSTEM) + Locales.SUPPORTED
+            AlertDialog.Builder(this)
+                .setTitle(R.string.language)
+                .setSingleChoiceItems(
+                    tags.map { languageLabel(it) }.toTypedArray(),
+                    tags.indexOf(settings.language).coerceAtLeast(0)
+                ) { dialog, which ->
+                    dialog.dismiss()
+                    val tag = tags[which]
+                    if (tag != settings.language) {
+                        settings.language = tag
+                        Locales.apply(tag)
+                    }
+                }
+                .setNegativeButton(R.string.cancel, null)
+                .show()
+        }
 
         // ---- listeners -----------------------------------------------------
 

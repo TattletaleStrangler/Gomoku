@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Ukrainian translations. -->
+<resources>
+    <string name="app_name">Gomoku</string>
+
+    <!-- Action buttons -->
+    <string name="new_game">Нова гра</string>
+    <string name="undo">Скасувати</string>
+    <string name="resign">Здатися</string>
+    <string name="theme">Тема</string>
+    <!-- Buttons shared by several screens -->
+    <string name="close">Закрити</string>
+    <string name="clear">Очистити</string>
+
+    <!-- Settings screen -->
+    <string name="settings_title">Налаштування</string>
+    <string name="apply">Застосувати</string>
+    <string name="cancel">Скасувати</string>
+    <string name="play_as">Ви граєте</string>
+    <string name="play_black">Чорними (перший хід)</string>
+    <string name="play_white">Білими (другий хід)</string>
+    <string name="difficulty">Складність</string>
+    <string name="level_normal">Нормальний</string>
+    <string name="level_strong">Складний</string>
+    <string name="forbidden_moves">Заборонені ходи чорних (рендзю)</string>
+    <string name="show_numbers">Показувати номери ходів</string>
+    <string name="sound_enabled">Звук ходу</string>
+    <string name="sound_volume">Гучність</string>
+    <string name="volume_percent">%1$d %%</string>
+    <string name="choose_theme">Тема оформлення</string>
+    <string name="theme_light">Світла</string>
+    <string name="theme_dark">Темна</string>
+    <string name="theme_warm">Тепла</string>
+
+    <!-- Вибір мови: назви мов не перекладаються і лежать у values/strings.xml. -->
+    <string name="language">Мова</string>
+    <string name="language_system">Системна мова</string>
+
+    <!-- Game mode -->
+    <string name="game_mode">Режим гри</string>
+    <string name="mode_none">Без годинника</string>
+    <string name="mode_classic">Класика</string>
+    <string name="mode_rapid">Рапід</string>
+    <string name="mode_blitz">Бліц</string>
+    <string name="mode_timing">%1$s — %2$d хв + %3$d с</string>
+
+    <!-- Statistics table -->
+    <string name="stats_title">Статистика</string>
+    <string name="stats_level">Рівень</string>
+    <string name="stats_wins">Перемоги</string>
+    <string name="stats_losses">Поразки</string>
+    <string name="stats_draws">Нічиї</string>
+    <string name="stats_value">%1$d</string>
+    <string name="reset_stats">Скинути статистику</string>
+    <string name="reset_stats_title">Скинути статистику?</string>
+    <string name="reset_stats_message">Перемоги, поразки та нічиї за обома рівнями складності буде обнулено.</string>
+    <string name="reset">Скинути</string>
+
+    <!-- Move history screen -->
+    <string name="history_title">Історія партії</string>
+    <string name="history_moves_count">Ходів: %1$d</string>
+    <string name="history_selected">Хід %1$d: %2$s, %3$s</string>
+    <string name="history_empty">Ходів ще немає</string>
+    <string name="history_continue">Продовжити з цього ходу</string>
+    <string name="history_no_rollback"> · партію програно за часом, відкат недоступний</string>
+    <string name="move_index">%1$d.</string>
+    <string name="side_black">чорні</string>
+    <string name="side_white">білі</string>
+
+    <!-- Status -->
+    <string name="your_turn">Ваш хід</string>
+    <string name="computer_turn">Хід комп\'ютера…</string>
+    <string name="computer_thinking">Комп\'ютер думає…</string>
+    <string name="black_wins">Перемогли чорні</string>
+    <string name="white_wins">Перемогли білі</string>
+    <string name="draw">Нічия</string>
+    <string name="forbidden_loss">Чорні порушили правило — перемогли білі</string>
+    <string name="time_loss">Час вийшов — переміг комп\'ютер</string>
+    <string name="clock_format">%1$d:%2$02d</string>
+
+    <string name="difficulty_label">Складність: %1$s</string>
+    <string name="engine_fallback_suffix"> · вбудований</string>
+
+    <!-- Crash journal -->
+    <string name="crash_log">Журнал збоїв</string>
+    <string name="crash_log_with_count">%1$s (%2$d)</string>
+    <string name="crash_log_summary">Записів: %1$d</string>
+    <string name="crash_log_empty">Збоїв ще не було</string>
+    <string name="crash_log_hint">Під час збою застосунок зберігає стек викликів у власній теці на цьому пристрої. Нічого не надсилається автоматично — поділіться звітом кнопкою нижче.</string>
+    <string name="crash_log_send">Надіслати</string>
+    <string name="crash_log_subject">Ґомоку: журнал збоїв</string>
+    <string name="crash_log_clear_title">Очистити журнал?</string>
+    <string name="crash_log_clear_message">Усі збережені звіти про збої буде видалено.</string>
+
+    <!-- Online play -->
+    <string name="online">Онлайн</string>
+    <string name="account_title">Акаунт</string>
+    <string name="account_nickname">Нікнейм</string>
+    <string name="account_password">Пароль</string>
+    <string name="account_sign_in">Увійти</string>
+    <string name="account_register">Зареєструватися</string>
+    <string name="account_sign_out">Вийти</string>
+    <string name="account_delete">Видалити акаунт</string>
+    <string name="account_delete_title">Видалити акаунт?</string>
+    <string name="account_delete_message">Акаунт і його партії буде видалено. Цю дію не можна скасувати.</string>
+    <string name="account_delete_confirm">Видалити</string>
+    <string name="account_delete_password">Пароль для підтвердження</string>
+    <string name="account_signed_in_as">Ви увійшли як %1$s</string>
+    <string name="account_rating">Рейтинг: %1$d</string>
+    <string name="account_stats">Перемоги %1$d · поразки %2$d · нічиї %3$d</string>
+    <string name="account_play">Грати онлайн</string>
+    <string name="account_hint">Нікнейм: 3–24 літери, цифри, підкреслення або дефіс; пароль: 8–72 символи.</string>
+    <string name="account_working">Зачекайте…</string>
+
+    <string name="online_title">Онлайн-гра</string>
+    <string name="online_create">Створити кімнату</string>
+    <string name="online_rule">Правило</string>
+    <string name="online_rule_freestyle">Фрістайл</string>
+    <string name="online_rule_renju">Рендзю</string>
+    <string name="online_play_as">Ваш колір</string>
+    <string name="online_color_any">Будь-який (вибирає суперник)</string>
+    <string name="online_join_color">Ваш колір, якщо кімната залишає вибір</string>
+    <string name="online_time_control">Контроль часу</string>
+    <string name="online_create_action">Створити</string>
+    <string name="online_join">Увійти за кодом</string>
+    <string name="online_quick">Знайти суперника</string>
+    <string name="online_lobby">Відкриті ігри</string>
+    <string name="online_lobby_refresh">Оновити</string>
+    <string name="online_lobby_empty">Відкритих ігор немає — створіть кімнату або знайдіть суперника</string>
+    <string name="online_lobby_loading">Завантаження…</string>
+    <string name="online_rating_delta">рейтинг %1$s%2$d</string>
+    <string name="online_history">Історія партій</string>
+    <string name="online_history_empty">Завершених партій ще немає</string>
+    <string name="online_replay_title">Повтор партії</string>
+    <string name="online_replay_vs">проти %1$s</string>
+    <string name="online_leaders">Таблиця лідерів</string>
+    <string name="online_leaders_empty">Ще ніхто не завершив партію</string>
+    <string name="leaderboard_rank">#%1$d %2$s</string>
+    <string name="leaderboard_record">Пер./Пор./Ніч.: %1$d/%2$d/%3$d</string>
+    <string name="online_rematch">Зіграти ще раз</string>
+    <string name="online_rematch_accept">Прийняти реванш</string>
+    <string name="online_block">Більше не грати</string>
+    <string name="online_block_done">Більше не будете паруватися із цим суперником</string>
+    <string name="online_report">Поскаржитися</string>
+    <string name="online_report_title">Скарга на суперника</string>
+    <string name="online_report_done">Скаргу надіслано</string>
+    <string name="report_reason_nickname">Нікнейм</string>
+    <string name="report_reason_stalling">Затягує гру</string>
+    <string name="report_reason_cheating">Читерство</string>
+    <string name="report_reason_other">Інше</string>
+    <string name="online_draw">Нічия</string>
+    <string name="online_draw_offered">Суперник пропонує нічию</string>
+    <string name="online_draw_accepted">Нічию прийнято</string>
+    <string name="online_draw_declined">Нічию відхилено</string>
+    <string name="online_finish_agree">за згодою</string>
+    <string name="error_draw_already">Пропозицію нічиєї вже надіслано</string>
+    <string name="error_draw_not_requested">Пропозиції нічиєї немає</string>
+    <string name="error_draw_limit">Спроби запропонувати нічию вичерпано</string>
+    <string name="error_request_pending">Спершу дайте відповідь на інший запит</string>
+    <string name="error_banned">Цьому акаунту закрито рейтингові ігри</string>
+    <string name="crash_log_upload">Надсилати звіти на сервер</string>
+    <string name="privacy_policy">Політика конфіденційності</string>
+    <string name="blocks_title">Заблоковані гравці</string>
+    <string name="blocks_empty">Ви нікого не блокували.</string>
+    <string name="blocks_unblock">Розблокувати</string>
+    <string name="blocks_unblocked">%1$s знову може зустрітися з вами</string>
+    <string name="blocks_deleted">видалений гравець</string>
+    <string name="block_confirm_title">Заблокувати суперника?</string>
+    <string name="block_confirm_text">%1$s більше не траплятиметься у швидкому підборі та в списку відкритих ігор. Повернути його можна в розділі «Онлайн» → «Заблоковані гравці».</string>
+    <string name="block_confirm_text_generic">Цей гравець більше не траплятиметься у швидкому підборі та в списку відкритих ігор. Повернути його можна в розділі «Онлайн» → «Заблоковані гравці».</string>
+    <string name="block_confirm_action">Заблокувати</string>
+    <string name="online_code">Код кімнати</string>
+    <string name="online_join_action">Увійти</string>
+    <string name="online_waiting">Очікування суперника</string>
+    <string name="online_waiting_hint">Передайте цей код супернику.</string>
+    <string name="online_cancel_room">Закрити кімнату</string>
+    <string name="online_return_to_game">Повернутися до партії</string>
+    <string name="online_signed_out">Увійдіть, щоб грати онлайн.</string>
+    <string name="online_time_untimed">Без годинника</string>
+    <string name="online_time_classic">Класика 30 + 30</string>
+    <string name="online_time_rapid">Рапід 15 + 10</string>
+    <string name="online_time_blitz">Бліц 3 + 2</string>
+
+    <string name="online_game_title">Онлайн-партія</string>
+    <string name="online_you_black">Ви граєте чорними</string>
+    <string name="online_you_white">Ви граєте білими</string>
+    <string name="online_opponent">Суперник: %1$s</string>
+    <string name="online_turn_you">Ваш хід</string>
+    <string name="online_turn_opponent">Хід суперника</string>
+    <string name="online_waiting_opponent">Очікування суперника</string>
+    <string name="online_result_you_win">Ви перемогли</string>
+    <string name="online_result_you_lose">Ви програли</string>
+    <string name="online_result_draw">Нічия</string>
+    <string name="online_finish_five">П\'ять у ряд</string>
+    <string name="online_finish_forbidden">Заборонений хід</string>
+    <string name="online_finish_timeout">Час вийшов</string>
+    <string name="online_finish_resign">Здача</string>
+    <string name="online_finish_abandon">Суперник вийшов</string>
+    <string name="online_undo">Скасувати (%1$d)</string>
+    <string name="online_undo_request_text">Суперник просить скасувати хід</string>
+    <string name="online_game_over">Партію завершено</string>
+    <string name="online_undo_accept">Прийняти</string>
+    <string name="online_undo_decline">Відхилити</string>
+    <string name="online_undo_accepted">Хід скасовано</string>
+    <string name="online_undo_declined">Запит відхилено</string>
+    <string name="online_undo_seconds">%1$d с</string>
+    <string name="online_connection_lost">З\'єднання втрачено, перепідключення…</string>
+    <string name="online_clock_you">Ви</string>
+    <string name="online_clock_opponent">Суперник</string>
+    <string name="online_back">Назад</string>
+
+    <!-- API error codes -->
+    <string name="error_network">Сервер недоступний. Перевірте з\'єднання.</string>
+    <string name="error_timeout">Сервер не відповів вчасно.</string>
+    <string name="error_malformed">Сервер надіслав неочікувану відповідь.</string>
+    <string name="error_validation">Перевірте введені дані.</string>
+    <string name="error_nickname_taken">Цей нікнейм уже зайнято.</string>
+    <string name="error_bad_credentials">Неправильний нікнейм або пароль.</string>
+    <string name="error_session_expired">Сеанс завершився. Увійдіть знову.</string>
+    <string name="error_not_participant">Ви не берете участі в цій партії.</string>
+    <string name="error_not_found">Не знайдено.</string>
+    <string name="error_game_not_found">Партії більше не існує.</string>
+    <string name="error_room_not_found">Кімнати з таким кодом немає.</string>
+    <string name="error_room_closed">Кімнату закрито.</string>
+    <string name="error_room_full">Кімната вже заповнена.</string>
+    <string name="error_self_join">Не можна увійти до власної кімнати.</string>
+    <string name="error_active_game_exists">У вас уже є незавершена партія.</string>
+    <string name="error_game_finished">Партію вже завершено.</string>
+    <string name="error_rematch_not_allowed">Реванш можливий лише після завершення партії.</string>
+    <string name="error_not_your_turn">Зараз не ваш хід.</string>
+    <string name="error_wrong_ply">Позиція змінилася. Спробуйте ще раз.</string>
+    <string name="error_cell_occupied">Клітинка зайнята.</string>
+    <string name="error_out_of_board">Клітинка поза дошкою.</string>
+    <string name="error_forbidden_move">Цей хід заборонено правилами рендзю.</string>
+    <string name="error_undo_not_allowed">Вам нічого скасовувати.</string>
+    <string name="error_undo_too_late">Уже запізно скасовувати хід.</string>
+    <string name="error_undo_limit">Спроби скасування вичерпано.</string>
+    <string name="error_undo_already">Запит уже надіслано.</string>
+    <string name="error_undo_not_requested">Запиту на скасування немає.</string>
+    <string name="error_rate_limited">Забагато запитів. Зачекайте хвилину.</string>
+    <string name="error_internal">Помилка сервера. Спробуйте пізніше.</string>
+    <string name="error_unknown">Щось пішло не так.</string>
+</resources>

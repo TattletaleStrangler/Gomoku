@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Belarusian translations. -->
+<resources>
+    <string name="app_name">Gomoku</string>
+
+    <!-- Action buttons -->
+    <string name="new_game">Новая гульня</string>
+    <string name="undo">Скасаваць</string>
+    <string name="resign">Здацца</string>
+    <string name="theme">Тэма</string>
+    <!-- Buttons shared by several screens -->
+    <string name="close">Закрыць</string>
+    <string name="clear">Ачысціць</string>
+
+    <!-- Settings screen -->
+    <string name="settings_title">Налады</string>
+    <string name="apply">Прымяніць</string>
+    <string name="cancel">Скасаваць</string>
+    <string name="play_as">Вы гуляеце</string>
+    <string name="play_black">Чорнымі (першы ход)</string>
+    <string name="play_white">Белымі (другі ход)</string>
+    <string name="difficulty">Складанасць</string>
+    <string name="level_normal">Звычайны</string>
+    <string name="level_strong">Складаны</string>
+    <string name="forbidden_moves">Забароненыя ходы чорных (рэндзю)</string>
+    <string name="show_numbers">Паказваць нумары ходаў</string>
+    <string name="sound_enabled">Гук ходу</string>
+    <string name="sound_volume">Гучнасць</string>
+    <string name="volume_percent">%1$d %%</string>
+    <string name="choose_theme">Тэма афармлення</string>
+    <string name="theme_light">Светлая</string>
+    <string name="theme_dark">Цёмная</string>
+    <string name="theme_warm">Цёплая</string>
+
+    <!-- Explicit language choice. The names of the languages live in values/strings.xml. -->
+    <string name="language">Мова</string>
+    <string name="language_system">Сістэмная мова</string>
+
+    <!-- Game mode: casual play without a clock, or one of the three preset controls. -->
+    <string name="game_mode">Рэжым гульні</string>
+    <string name="mode_none">Без таймера</string>
+    <string name="mode_classic">Класіка</string>
+    <string name="mode_rapid">Рапід</string>
+    <string name="mode_blitz">Бліц</string>
+    <string name="mode_timing">%1$s — %2$d хв + %3$d с</string>
+
+    <!-- Statistics table: cumulative, per difficulty level, stored between launches -->
+    <string name="stats_title">Статыстыка</string>
+    <string name="stats_level">Узровень</string>
+    <string name="stats_wins">Перамогі</string>
+    <string name="stats_losses">Паражэнні</string>
+    <string name="stats_draws">Нічыі</string>
+    <!-- A bare number, formatted through a resource so the digits follow the locale. -->
+    <string name="stats_value">%1$d</string>
+    <string name="reset_stats">Скінуць статыстыку</string>
+    <string name="reset_stats_title">Скінуць статыстыку?</string>
+    <string name="reset_stats_message">Перамогі, паражэнні і нічыі па абодвух узроўнях складанасці будуць ачышчаны.</string>
+    <string name="reset">Скінуць</string>
+
+    <!-- Move history screen. -->
+    <string name="history_title">Гісторыя хадоў</string>
+    <string name="history_moves_count">Хадоў: %1$d</string>
+    <string name="history_selected">Ход %1$d: %2$s, %3$s</string>
+    <string name="history_empty">Ходаў пакуль няма</string>
+    <string name="history_continue">Працягнуць з гэтага ходу</string>
+    <string name="history_no_rollback"> · партыя прайграна па часе, адкат немагчымы</string>
+    <string name="move_index">%1$d.</string>
+    <string name="side_black">чорныя</string>
+    <string name="side_white">белыя</string>
+
+    <!-- Status -->
+    <string name="your_turn">Ваш ход</string>
+    <string name="computer_turn">Ход камп\'ютара…</string>
+    <string name="computer_thinking">Камп\'ютар думае…</string>
+    <string name="black_wins">Перамаглі чорныя</string>
+    <string name="white_wins">Перамаглі белыя</string>
+    <string name="draw">Нічыя</string>
+    <string name="forbidden_loss">Чорныя парушылі правіла — перамаглі белыя</string>
+    <string name="time_loss">Час выйшаў — перамог камп\'ютар</string>
+    <!-- The player's clock, mm:ss; the seconds always take two digits. -->
+    <string name="clock_format">%1$d:%2$02d</string>
+
+    <!-- Header shows the selected difficulty rather than the engine name. -->
+    <string name="difficulty_label">Складанасць: %1$s</string>
+    <string name="engine_fallback_suffix"> · убудаваны</string>
+
+    <!-- Crash journal. -->
+    <string name="crash_log">Журнал збояў</string>
+    <string name="crash_log_with_count">%1$s (%2$d)</string>
+    <string name="crash_log_summary">Запісаў: %1$d</string>
+    <string name="crash_log_empty">Збояў не было</string>
+    <string name="crash_log_hint">Калі праграма зрываецца, яна захоўвае стэктрэйс у сваёй папцы на гэтай прыладзе. Нічога не адпраўляецца само — падзяліцеся справаздачай кнопкай ніжэй.</string>
+    <string name="crash_log_send">Адправіць</string>
+    <string name="crash_log_subject">Gomoku: журнал збояў</string>
+    <string name="crash_log_clear_title">Ачысціць журнал?</string>
+    <string name="crash_log_clear_message">Усе захаваныя справаздачы пра збоі будуць выдалены.</string>
+
+    <!-- Online play. -->
+    <string name="online">Анлайн</string>
+    <string name="account_title">Акаунт</string>
+    <string name="account_nickname">Мянушка</string>
+    <string name="account_password">Пароль</string>
+    <string name="account_sign_in">Увайсці</string>
+    <string name="account_register">Стварыць акаунт</string>
+    <string name="account_sign_out">Выйсці</string>
+    <string name="account_delete">Выдаліць акаунт</string>
+    <string name="account_delete_title">Выдаліць акаунт?</string>
+    <string name="account_delete_message">Акаунт і яго партыі будуць выдалены. Гэта нельга скасаваць.</string>
+    <string name="account_delete_confirm">Выдаліць</string>
+    <string name="account_delete_password">Пароль для пацверджання</string>
+    <string name="account_signed_in_as">Вы ўвайшлі як %1$s</string>
+    <string name="account_rating">Рэйтынг: %1$d</string>
+    <string name="account_stats">Перамогі %1$d · паражэнні %2$d · нічыі %3$d</string>
+    <string name="account_play">Гуляць анлайн</string>
+    <string name="account_hint">Мянушка з 3–24 літар, лічбаў, знакаў падкрэслівання або злучкі; пароль з 8–72 сімвалаў.</string>
+    <string name="account_working">Пачакайце…</string>
+
+    <string name="online_title">Гульня анлайн</string>
+    <string name="online_create">Стварыць пакой</string>
+    <string name="online_rule">Правіла</string>
+    <string name="online_rule_freestyle">Фрыстайл</string>
+    <string name="online_rule_renju">Рэндзю</string>
+    <string name="online_play_as">Ваш колер</string>
+    <string name="online_color_any">Любы (выберае супернік)</string>
+    <string name="online_join_color">Ваш колер, калі пакой пакідае выбар</string>
+    <string name="online_time_control">Кантроль часу</string>
+    <string name="online_create_action">Стварыць</string>
+    <string name="online_join">Далучыцца па кодзе</string>
+    <string name="online_quick">Знайсці суперніка</string>
+    <string name="online_lobby">Адкрытыя гульні</string>
+    <string name="online_lobby_refresh">Абнавіць</string>
+    <string name="online_lobby_empty">Адкрытых гульняў няма — стварыце пакой або знайдзіце суперніка</string>
+    <string name="online_lobby_loading">Загрузка…</string>
+    <string name="online_rating_delta">рэйтынг %1$s%2$d</string>
+    <string name="online_history">Гісторыя партый</string>
+    <string name="online_history_empty">Завершаных партый пакуль няма</string>
+    <string name="online_replay_title">Паўтор партыі</string>
+    <string name="online_replay_vs">супраць %1$s</string>
+    <string name="online_leaders">Табліца лідараў</string>
+    <string name="online_leaders_empty">Пакуль ніхто не завяршыў партыю</string>
+    <string name="leaderboard_rank">#%1$d %2$s</string>
+    <string name="leaderboard_record">П/П/Н: %1$d/%2$d/%3$d</string>
+    <string name="online_rematch">Згуляць яшчэ</string>
+    <string name="online_rematch_accept">Прыняць рэванш</string>
+    <string name="online_block">Больш не гуляць</string>
+    <string name="online_block_done">Вы больш не будзеце сустракацца з гэтым супернікам</string>
+    <string name="online_report">Паскардзіцца</string>
+    <string name="online_report_title">Скарга на суперніка</string>
+    <string name="online_report_done">Скарга адпраўлена</string>
+    <string name="report_reason_nickname">Мянушка</string>
+    <string name="report_reason_stalling">Зацягвае гульню</string>
+    <string name="report_reason_cheating">Чыцерства</string>
+    <string name="report_reason_other">Іншае</string>
+    <string name="online_draw">Нічыя</string>
+    <string name="online_draw_offered">Супернік прапануе нічыю</string>
+    <string name="online_draw_accepted">Нічыя</string>
+    <string name="online_draw_declined">Нічыя адхілена</string>
+    <string name="online_finish_agree">па згодзе</string>
+    <string name="error_draw_already">Прапанова нічыі ўжо адпраўлена</string>
+    <string name="error_draw_not_requested">Прапановы нічыі няма</string>
+    <string name="error_draw_limit">Спробы прапанаваць нічыю скончыліся</string>
+    <string name="error_request_pending">Спачатку дачакайцеся адказу на іншы запыт</string>
+    <string name="error_banned">Гэтаму акаунту зачыненыя рэйтынгавыя гульні</string>
+    <string name="crash_log_upload">Адпраўляць справаздачы на сервер</string>
+    <string name="privacy_policy">Палітыка прыватнасці</string>
+    <string name="blocks_title">Заблакаваныя гульцы</string>
+    <string name="blocks_empty">Вы нікога не блакавалі.</string>
+    <string name="blocks_unblock">Разблакаваць</string>
+    <string name="blocks_unblocked">%1$s зноў можа сустрэцца з вамі</string>
+    <string name="blocks_deleted">выдалены гулец</string>
+    <string name="block_confirm_title">Заблакаваць суперніка?</string>
+    <string name="block_confirm_text">%1$s больш не будзе трапляцца вам у хуткім падборы і ў спісе адкрытых гульняў. Разблакаваць яго можна ў раздзеле «Анлайн» → «Заблакаваныя гульцы».</string>
+    <string name="block_confirm_text_generic">Гэты гулец больш не будзе трапляцца вам у хуткім падборы і ў спісе адкрытых гульняў. Разблакаваць яго можна ў раздзеле «Анлайн» → «Заблакаваныя гульцы».</string>
+    <string name="block_confirm_action">Заблакаваць</string>
+    <string name="online_code">Код пакоя</string>
+    <string name="online_join_action">Далучыцца</string>
+    <string name="online_waiting">Чаканне суперніка</string>
+    <string name="online_waiting_hint">Перадайце гэты код суперніку.</string>
+    <string name="online_cancel_room">Закрыць пакой</string>
+    <string name="online_return_to_game">Вярнуцца ў партыю</string>
+    <string name="online_signed_out">Увайдзіце, каб гуляць анлайн.</string>
+    <string name="online_time_untimed">Без таймера</string>
+    <string name="online_time_classic">Класіка 30 + 30</string>
+    <string name="online_time_rapid">Рапід 15 + 10</string>
+    <string name="online_time_blitz">Бліц 3 + 2</string>
+
+    <string name="online_game_title">Партыя анлайн</string>
+    <string name="online_you_black">Вы гуляеце чорнымі</string>
+    <string name="online_you_white">Вы гуляеце белымі</string>
+    <string name="online_opponent">Супернік: %1$s</string>
+    <string name="online_turn_you">Ваш ход</string>
+    <string name="online_turn_opponent">Ход суперніка</string>
+    <string name="online_waiting_opponent">Чаканне суперніка</string>
+    <string name="online_result_you_win">Вы перамаглі</string>
+    <string name="online_result_you_lose">Вы прайгралі</string>
+    <string name="online_result_draw">Нічыя</string>
+    <string name="online_finish_five">Пяць у рад</string>
+    <string name="online_finish_forbidden">Забаронены ход</string>
+    <string name="online_finish_timeout">Час выйшаў</string>
+    <string name="online_finish_resign">Здача</string>
+    <string name="online_finish_abandon">Супернік выйшаў</string>
+    <string name="online_undo">Скасаваць (%1$d)</string>
+    <string name="online_undo_request_text">Супернік просіць скасаваць ход</string>
+    <string name="online_game_over">Партыя завершана</string>
+    <string name="online_undo_accept">Так</string>
+    <string name="online_undo_decline">Не</string>
+    <string name="online_undo_accepted">Ход скасаваны</string>
+    <string name="online_undo_declined">Адмоўлена</string>
+    <string name="online_undo_seconds">%1$d с</string>
+    <string name="online_connection_lost">Злучэнне страчана, перападключэнне…</string>
+    <string name="online_clock_you">Вы</string>
+    <string name="online_clock_opponent">Супернік</string>
+    <string name="online_back">Назад</string>
+
+    <!-- Error codes of the API, translated. -->
+    <string name="error_network">Сервер недаступны. Праверце злучэнне.</string>
+    <string name="error_timeout">Сервер не адказаў своечасова.</string>
+    <string name="error_malformed">Сервер прыслаў нечаканы адказ.</string>
+    <string name="error_validation">Праверце ўведзеныя даныя.</string>
+    <string name="error_nickname_taken">Гэтая мянушка ўжо занята.</string>
+    <string name="error_bad_credentials">Няправільная мянушка або пароль.</string>
+    <string name="error_session_expired">Сесія скончылася. Увайдзіце зноў.</string>
+    <string name="error_not_participant">Вы не ўдзельнічаеце ў гэтай партыі.</string>
+    <string name="error_not_found">Не знойдзена.</string>
+    <string name="error_game_not_found">Партыі больш не існуе.</string>
+    <string name="error_room_not_found">Пакоя з такім кодам няма.</string>
+    <string name="error_room_closed">Пакой закрыты.</string>
+    <string name="error_room_full">Пакой ужо поўны.</string>
+    <string name="error_self_join">Нельга далучыцца да свайго пакоя.</string>
+    <string name="error_active_game_exists">У вас ужо ёсць незавершаная партыя.</string>
+    <string name="error_game_finished">Партыя ўжо завершана.</string>
+    <string name="error_rematch_not_allowed">Рэванш магчымы толькі пасля завершанай партыі.</string>
+    <string name="error_not_your_turn">Зараз не ваш ход.</string>
+    <string name="error_wrong_ply">Пазіцыя змянілася. Паспрабуйце зноў.</string>
+    <string name="error_cell_occupied">Клетка занята.</string>
+    <string name="error_out_of_board">Клетка па-за дошкай.</string>
+    <string name="error_forbidden_move">Гэты ход забаронены правіламі рэндзю.</string>
+    <string name="error_undo_not_allowed">Вам няма чаго скасоўваць.</string>
+    <string name="error_undo_too_late">Занадта позна скасоўваць ход.</string>
+    <string name="error_undo_limit">Спробы скасавання скончыліся.</string>
+    <string name="error_undo_already">Запыт ужо адпраўлены.</string>
+    <string name="error_undo_not_requested">Запыту на скасаванне няма.</string>
+    <string name="error_rate_limited">Занадта шмат запытаў. Пачакайце хвіліну.</string>
+    <string name="error_internal">Памылка сервера. Паспрабуйце пазней.</string>
+    <string name="error_unknown">Нешта пайшло не так.</string>
+</resources>

@@ -56,8 +56,15 @@ android {
         applicationId = "com.oldmermaidman.gomoku"
         minSdk = 26
         targetSdk = 36
-        versionCode = 24
-        versionName = "1.23"
+        versionCode = 25
+        versionName = "1.24"
+
+        // Only the shipped languages. Without this the libraries drag in their own
+        // translations, and a device in a language the app does not ship would mix
+        // them with our English (see README.md, "Localization").
+        resourceConfigurations += listOf(
+            "en", "ru", "uk", "be", "kk", "es", "de", "fi", "hi", "zh", "ja"
+        )
 
         // The native Rapfi engine is provided only for arm64-v8a (see TZ §7).
         ndk {

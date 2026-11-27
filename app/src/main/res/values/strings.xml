@@ -37,6 +37,25 @@
     <string name="theme_warm">Warm</string>
 
     <!--
+        Explicit language choice. "System language" follows the device and is what a
+        fresh install uses. The names of the languages are never translated: the picker
+        must stay readable whatever locale is active right now.
+    -->
+    <string name="language">Language</string>
+    <string name="language_system">System language</string>
+    <string name="language_en" translatable="false">English</string>
+    <string name="language_ru" translatable="false">Русский</string>
+    <string name="language_uk" translatable="false">Українська</string>
+    <string name="language_be" translatable="false">Беларуская</string>
+    <string name="language_kk" translatable="false">Қазақша</string>
+    <string name="language_es" translatable="false">Español</string>
+    <string name="language_de" translatable="false">Deutsch</string>
+    <string name="language_fi" translatable="false">Suomi</string>
+    <string name="language_hi" translatable="false">हिन्दी</string>
+    <string name="language_zh" translatable="false">中文</string>
+    <string name="language_ja" translatable="false">日本語</string>
+
+    <!--
         Game mode: casual play without a clock, or one of the three preset controls.
         Only the name of a mode is stored here; the numbers come from TimeControl,
         so the label cannot drift away from the control it describes.

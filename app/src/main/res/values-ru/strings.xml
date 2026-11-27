@@ -36,6 +36,10 @@
     <string name="theme_dark">Тёмная</string>
     <string name="theme_warm">Тёплая</string>
 
+    <!-- Выбор языка: названия языков не переводятся и лежат в values/strings.xml. -->
+    <string name="language">Язык</string>
+    <string name="language_system">Системный язык</string>
+
     <!--
         Game mode: casual play without a clock, or one of the three preset controls.
         Only the name of a mode is stored here; the numbers come from TimeControl,

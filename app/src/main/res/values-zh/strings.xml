@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Chinese translations. -->
+<resources>
+    <string name="app_name">Gomoku</string>
+
+    <!-- Action buttons -->
+    <string name="new_game">新对局</string>
+    <string name="undo">悔棋</string>
+    <string name="resign">认输</string>
+    <string name="theme">主题</string>
+    <!-- Buttons shared by several screens -->
+    <string name="close">关闭</string>
+    <string name="clear">清除</string>
+
+    <!-- Settings screen -->
+    <string name="settings_title">设置</string>
+    <string name="apply">应用</string>
+    <string name="cancel">取消</string>
+    <string name="play_as">你执</string>
+    <string name="play_black">黑棋（先手）</string>
+    <string name="play_white">白棋（后手）</string>
+    <string name="difficulty">难度</string>
+    <string name="level_normal">普通</string>
+    <string name="level_strong">困难</string>
+    <string name="forbidden_moves">黑棋禁手（连珠）</string>
+    <string name="show_numbers">显示手数</string>
+    <string name="sound_enabled">落子音效</string>
+    <string name="sound_volume">音量</string>
+    <string name="volume_percent">%1$d %%</string>
+    <string name="choose_theme">配色主题</string>
+    <string name="theme_light">浅色</string>
+    <string name="theme_dark">深色</string>
+    <string name="theme_warm">暖色</string>
+
+    <!-- Language choice; the language names live in the default resources. -->
+    <string name="language">语言</string>
+    <string name="language_system">系统语言</string>
+
+    <!-- Game mode -->
+    <string name="game_mode">对局模式</string>
+    <string name="mode_none">不限时</string>
+    <string name="mode_classic">慢棋</string>
+    <string name="mode_rapid">快棋</string>
+    <string name="mode_blitz">超快棋</string>
+    <string name="mode_timing">%1$s — %2$d 分钟 + %3$d 秒</string>
+
+    <!-- Statistics -->
+    <string name="stats_title">统计</string>
+    <string name="stats_level">级别</string>
+    <string name="stats_wins">胜</string>
+    <string name="stats_losses">负</string>
+    <string name="stats_draws">和</string>
+    <string name="stats_value">%1$d</string>
+    <string name="reset_stats">重置统计</string>
+    <string name="reset_stats_title">重置统计？</string>
+    <string name="reset_stats_message">两个难度级别的胜、负、和记录都将清空。</string>
+    <string name="reset">重置</string>
+
+    <!-- Move history -->
+    <string name="history_title">对局记录</string>
+    <string name="history_moves_count">手数：%1$d</string>
+    <string name="history_selected">第 %1$d 手：%2$s，%3$s</string>
+    <string name="history_empty">还没有落子</string>
+    <string name="history_continue">从这一手继续</string>
+    <string name="history_no_rollback"> · 超时判负，无法回退</string>
+    <string name="move_index">%1$d.</string>
+    <string name="side_black">黑棋</string>
+    <string name="side_white">白棋</string>
+
+    <!-- Status -->
+    <string name="your_turn">轮到你</string>
+    <string name="computer_turn">轮到电脑…</string>
+    <string name="computer_thinking">电脑思考中…</string>
+    <string name="black_wins">黑棋胜</string>
+    <string name="white_wins">白棋胜</string>
+    <string name="draw">和棋</string>
+    <string name="forbidden_loss">黑棋违规 — 白棋胜</string>
+    <string name="time_loss">超时 — 电脑胜</string>
+    <string name="clock_format">%1$d:%2$02d</string>
+
+    <!-- Difficulty header -->
+    <string name="difficulty_label">难度：%1$s</string>
+    <string name="engine_fallback_suffix"> · 内置</string>
+
+    <!-- Crash journal -->
+    <string name="crash_log">崩溃日志</string>
+    <string name="crash_log_with_count">%1$s (%2$d)</string>
+    <string name="crash_log_summary">记录：%1$d</string>
+    <string name="crash_log_empty">暂无崩溃记录</string>
+    <string name="crash_log_hint">应用崩溃时会把堆栈信息保存在本机自己的目录中。不会自动发送到任何地方 — 请用下方按钮分享报告。</string>
+    <string name="crash_log_send">发送</string>
+    <string name="crash_log_subject">Gomoku：崩溃日志</string>
+    <string name="crash_log_clear_title">清空日志？</string>
+    <string name="crash_log_clear_message">所有已保存的崩溃报告都将被删除。</string>
+
+    <!-- Online play -->
+    <string name="online">联网</string>
+    <string name="account_title">账号</string>
+    <string name="account_nickname">昵称</string>
+    <string name="account_password">密码</string>
+    <string name="account_sign_in">登录</string>
+    <string name="account_register">注册账号</string>
+    <string name="account_sign_out">退出登录</string>
+    <string name="account_delete">删除账号</string>
+    <string name="account_delete_title">删除账号？</string>
+    <string name="account_delete_message">账号及其对局将被删除，此操作无法撤销。</string>
+    <string name="account_delete_confirm">删除</string>
+    <string name="account_delete_password">输入密码确认</string>
+    <string name="account_signed_in_as">已登录为 %1$s</string>
+    <string name="account_rating">等级分：%1$d</string>
+    <string name="account_stats">胜 %1$d · 负 %2$d · 和 %3$d</string>
+    <string name="account_play">联网对局</string>
+    <string name="account_hint">昵称由 3–24 个字母、数字、下划线或连字符组成；密码 8–72 个字符。</string>
+    <string name="account_working">请稍候…</string>
+
+    <string name="online_title">联网对局</string>
+    <string name="online_create">创建房间</string>
+    <string name="online_rule">规则</string>
+    <string name="online_rule_freestyle">自由规则</string>
+    <string name="online_rule_renju">连珠</string>
+    <string name="online_play_as">你的颜色</string>
+    <string name="online_color_any">任意（由对手选择）</string>
+    <string name="online_join_color">你的颜色（若房间允许选择）</string>
+    <string name="online_time_control">时间控制</string>
+    <string name="online_create_action">创建</string>
+    <string name="online_join">按代码加入</string>
+    <string name="online_quick">寻找对手</string>
+    <string name="online_lobby">公开对局</string>
+    <string name="online_lobby_refresh">刷新</string>
+    <string name="online_lobby_empty">没有公开对局 — 创建房间或寻找对手</string>
+    <string name="online_lobby_loading">加载中…</string>
+    <string name="online_rating_delta">等级分 %1$s%2$d</string>
+    <string name="online_history">对局历史</string>
+    <string name="online_history_empty">还没有已结束的对局</string>
+    <string name="online_replay_title">复盘</string>
+    <string name="online_replay_vs">对阵 %1$s</string>
+    <string name="online_leaders">排行榜</string>
+    <string name="online_leaders_empty">还没有人完成对局</string>
+    <string name="leaderboard_rank">#%1$d %2$s</string>
+    <string name="leaderboard_record">胜/负/和：%1$d/%2$d/%3$d</string>
+    <string name="online_rematch">再来一局</string>
+    <string name="online_rematch_accept">接受再战</string>
+    <string name="online_block">不再与此人配对</string>
+    <string name="online_block_done">不会再与该对手配对</string>
+    <string name="online_report">举报</string>
+    <string name="online_report_title">举报对手</string>
+    <string name="online_report_done">举报已发送</string>
+    <string name="report_reason_nickname">昵称</string>
+    <string name="report_reason_stalling">拖延</string>
+    <string name="report_reason_cheating">作弊</string>
+    <string name="report_reason_other">其他</string>
+    <string name="online_draw">和棋</string>
+    <string name="online_draw_offered">对手提出和棋</string>
+    <string name="online_draw_accepted">双方同意和棋</string>
+    <string name="online_draw_declined">和棋被拒绝</string>
+    <string name="online_finish_agree">协议和棋</string>
+    <string name="error_draw_already">已有一个和棋提议在等待回应</string>
+    <string name="error_draw_not_requested">没有和棋提议</string>
+    <string name="error_draw_limit">和棋提议次数已用完</string>
+    <string name="error_request_pending">请先回应待处理的请求</string>
+    <string name="error_banned">该账号已被禁止参加排位对局</string>
+    <string name="crash_log_upload">向服务器发送报告</string>
+    <string name="privacy_policy">隐私政策</string>
+    <string name="blocks_title">已屏蔽玩家</string>
+    <string name="blocks_empty">你还没有屏蔽任何人。</string>
+    <string name="blocks_unblock">取消屏蔽</string>
+    <string name="blocks_unblocked">%1$s 可以再次与你匹配</string>
+    <string name="blocks_deleted">已删除的玩家</string>
+    <string name="block_confirm_title">屏蔽该对手？</string>
+    <string name="block_confirm_text">%1$s 将不再出现在快速匹配和公开对局列表中。你可以在「联网」→「已屏蔽玩家」中恢复。</string>
+    <string name="block_confirm_text_generic">该玩家将不再出现在快速匹配和公开对局列表中。你可以在「联网」→「已屏蔽玩家」中恢复。</string>
+    <string name="block_confirm_action">屏蔽</string>
+    <string name="online_code">房间代码</string>
+    <string name="online_join_action">加入</string>
+    <string name="online_waiting">等待对手</string>
+    <string name="online_waiting_hint">把这个代码告诉对手。</string>
+    <string name="online_cancel_room">关闭房间</string>
+    <string name="online_return_to_game">返回对局</string>
+    <string name="online_signed_out">登录后才能联网对局。</string>
+    <string name="online_time_untimed">不限时</string>
+    <string name="online_time_classic">慢棋 30 + 30</string>
+    <string name="online_time_rapid">快棋 15 + 10</string>
+    <string name="online_time_blitz">超快棋 3 + 2</string>
+
+    <string name="online_game_title">联网对局</string>
+    <string name="online_you_black">你执黑棋</string>
+    <string name="online_you_white">你执白棋</string>
+    <string name="online_opponent">对手：%1$s</string>
+    <string name="online_turn_you">轮到你</string>
+    <string name="online_turn_opponent">轮到对手</string>
+    <string name="online_waiting_opponent">等待对手</string>
+    <string name="online_result_you_win">你赢了</string>
+    <string name="online_result_you_lose">你输了</string>
+    <string name="online_result_draw">和棋</string>
+    <string name="online_finish_five">五子连珠</string>
+    <string name="online_finish_forbidden">禁手</string>
+    <string name="online_finish_timeout">超时</string>
+    <string name="online_finish_resign">认输</string>
+    <string name="online_finish_abandon">对手离开</string>
+    <string name="online_undo">悔棋（%1$d）</string>
+    <string name="online_undo_request_text">对手请求撤销这一手</string>
+    <string name="online_game_over">对局结束</string>
+    <string name="online_undo_accept">接受</string>
+    <string name="online_undo_decline">拒绝</string>
+    <string name="online_undo_accepted">该手已撤销</string>
+    <string name="online_undo_declined">请求已被拒绝</string>
+    <string name="online_undo_seconds">%1$d 秒</string>
+    <string name="online_connection_lost">连接中断，正在重连…</string>
+    <string name="online_clock_you">你</string>
+    <string name="online_clock_opponent">对手</string>
+    <string name="online_back">返回</string>
+
+    <!-- API error codes -->
+    <string name="error_network">无法连接服务器，请检查网络。</string>
+    <string name="error_timeout">服务器没有及时响应。</string>
+    <string name="error_malformed">服务器返回了意外的响应。</string>
+    <string name="error_validation">请检查输入的内容。</string>
+    <string name="error_nickname_taken">该昵称已被占用。</string>
+    <string name="error_bad_credentials">昵称或密码错误。</string>
+    <string name="error_session_expired">会话已过期，请重新登录。</string>
+    <string name="error_not_participant">你不是本局的玩家。</string>
+    <string name="error_not_found">未找到。</string>
+    <string name="error_game_not_found">该对局已不存在。</string>
+    <string name="error_room_not_found">没有该代码对应的房间。</string>
+    <string name="error_room_closed">房间已关闭。</string>
+    <string name="error_room_full">房间已满。</string>
+    <string name="error_self_join">不能加入自己的房间。</string>
+    <string name="error_active_game_exists">你已有一局未结束的对局。</string>
+    <string name="error_game_finished">对局已结束。</string>
+    <string name="error_rematch_not_allowed">只有对局结束后才能再战。</string>
+    <string name="error_not_your_turn">还没轮到你。</string>
+    <string name="error_wrong_ply">局面已变化，请重试。</string>
+    <string name="error_cell_occupied">该交叉点已被占用。</string>
+    <string name="error_out_of_board">该点不在棋盘内。</string>
+    <string name="error_forbidden_move">这一手在连珠规则下是禁手。</string>
+    <string name="error_undo_not_allowed">你没有可悔的棋。</string>
+    <string name="error_undo_too_late">现在悔棋已经太晚了。</string>
+    <string name="error_undo_limit">悔棋次数已用完。</string>
+    <string name="error_undo_already">请求已在等待中。</string>
+    <string name="error_undo_not_requested">没有悔棋请求。</string>
+    <string name="error_rate_limited">请求过多，请等一分钟。</string>
+    <string name="error_internal">服务器错误，请稍后再试。</string>
+    <string name="error_unknown">出了点问题。</string>
+</resources>

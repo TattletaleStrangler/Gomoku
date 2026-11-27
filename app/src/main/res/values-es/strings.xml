@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Spanish translations. -->
+<resources>
+    <string name="app_name">Gomoku</string>
+
+    <!-- Action buttons -->
+    <string name="new_game">Nueva partida</string>
+    <string name="undo">Deshacer</string>
+    <string name="resign">Rendirse</string>
+    <string name="theme">Tema</string>
+    <!-- Buttons shared by several screens -->
+    <string name="close">Cerrar</string>
+    <string name="clear">Borrar</string>
+
+    <!-- Settings screen -->
+    <string name="settings_title">Ajustes</string>
+    <string name="apply">Aplicar</string>
+    <string name="cancel">Cancelar</string>
+    <string name="play_as">Juegas con</string>
+    <string name="play_black">Negras (primer movimiento)</string>
+    <string name="play_white">Blancas (segundo movimiento)</string>
+    <string name="difficulty">Dificultad</string>
+    <string name="level_normal">Normal</string>
+    <string name="level_strong">Difícil</string>
+    <string name="forbidden_moves">Movimientos prohibidos para las negras (renju)</string>
+    <string name="show_numbers">Mostrar los números de jugada</string>
+    <string name="sound_enabled">Sonido de jugada</string>
+    <string name="sound_volume">Volumen</string>
+    <string name="volume_percent">%1$d %%</string>
+    <string name="choose_theme">Tema de color</string>
+    <string name="theme_light">Claro</string>
+    <string name="theme_dark">Oscuro</string>
+    <string name="theme_warm">Cálido</string>
+
+    <string name="language">Idioma</string>
+    <string name="language_system">Idioma del sistema</string>
+
+    <string name="game_mode">Modo de juego</string>
+    <string name="mode_none">Sin reloj</string>
+    <string name="mode_classic">Clásico</string>
+    <string name="mode_rapid">Rápido</string>
+    <string name="mode_blitz">Blitz</string>
+    <string name="mode_timing">%1$s — %2$d min + %3$d s</string>
+
+    <!-- Statistics table: cumulative, per difficulty level, stored between launches -->
+    <string name="stats_title">Estadísticas</string>
+    <string name="stats_level">Nivel</string>
+    <string name="stats_wins">Victorias</string>
+    <string name="stats_losses">Derrotas</string>
+    <string name="stats_draws">Empates</string>
+    <string name="stats_value">%1$d</string>
+    <string name="reset_stats">Restablecer las estadísticas</string>
+    <string name="reset_stats_title">¿Restablecer las estadísticas?</string>
+    <string name="reset_stats_message">Se borrarán las victorias, las derrotas y los empates de ambos niveles de dificultad.</string>
+    <string name="reset">Restablecer</string>
+
+    <string name="history_title">Historial de jugadas</string>
+    <string name="history_moves_count">Jugadas: %1$d</string>
+    <string name="history_selected">Jugada %1$d: %2$s, %3$s</string>
+    <string name="history_empty">Aún no hay jugadas</string>
+    <string name="history_continue">Continuar desde esta jugada</string>
+    <string name="history_no_rollback"> · partida perdida por tiempo, sin retroceso</string>
+    <string name="move_index">%1$d.</string>
+    <string name="side_black">negras</string>
+    <string name="side_white">blancas</string>
+
+    <!-- Status -->
+    <string name="your_turn">Tu turno</string>
+    <string name="computer_turn">Turno de la computadora…</string>
+    <string name="computer_thinking">La computadora está pensando…</string>
+    <string name="black_wins">Ganan las negras</string>
+    <string name="white_wins">Ganan las blancas</string>
+    <string name="draw">Empate</string>
+    <string name="forbidden_loss">Las negras infringieron la regla: ganan las blancas</string>
+    <string name="time_loss">Se acabó el tiempo: gana la computadora</string>
+    <string name="clock_format">%1$d:%2$02d</string>
+
+    <string name="difficulty_label">Dificultad: %1$s</string>
+    <string name="engine_fallback_suffix"> · integrado</string>
+
+    <string name="crash_log">Registro de fallos</string>
+    <string name="crash_log_with_count">%1$s (%2$d)</string>
+    <string name="crash_log_summary">Informes: %1$d</string>
+    <string name="crash_log_empty">Aún no ha habido fallos</string>
+    <string name="crash_log_hint">Cuando la aplicación falla, guarda el seguimiento de pila en su propia carpeta de este dispositivo. No se envía nada por sí solo: comparte un informe con el botón de abajo.</string>
+    <string name="crash_log_send">Enviar</string>
+    <string name="crash_log_subject">Gomoku: registro de fallos</string>
+    <string name="crash_log_clear_title">¿Borrar el registro?</string>
+    <string name="crash_log_clear_message">Se eliminarán todos los informes de fallos guardados.</string>
+
+    <string name="online">En línea</string>
+    <string name="account_title">Cuenta</string>
+    <string name="account_nickname">Nombre de usuario</string>
+    <string name="account_password">Contraseña</string>
+    <string name="account_sign_in">Iniciar sesión</string>
+    <string name="account_register">Crear una cuenta</string>
+    <string name="account_sign_out">Cerrar sesión</string>
+    <string name="account_delete">Eliminar la cuenta</string>
+    <string name="account_delete_title">¿Eliminar la cuenta?</string>
+    <string name="account_delete_message">Se eliminarán la cuenta y sus partidas. Esta acción no se puede deshacer.</string>
+    <string name="account_delete_confirm">Eliminar</string>
+    <string name="account_delete_password">Contraseña para confirmar</string>
+    <string name="account_signed_in_as">Sesión iniciada como %1$s</string>
+    <string name="account_rating">Puntuación: %1$d</string>
+    <string name="account_stats">Victorias %1$d · derrotas %2$d · empates %3$d</string>
+    <string name="account_play">Jugar en línea</string>
+    <string name="account_hint">El nombre de usuario debe tener de 3 a 24 letras, dígitos, guion bajo o guion; la contraseña, de 8 a 72 caracteres.</string>
+    <string name="account_working">Espera un momento…</string>
+
+    <string name="online_title">Partida en línea</string>
+    <string name="online_create">Crear una sala</string>
+    <string name="online_rule">Regla</string>
+    <string name="online_rule_freestyle">Freestyle</string>
+    <string name="online_rule_renju">Renju</string>
+    <string name="online_play_as">Tu color</string>
+    <string name="online_color_any">Cualquiera (lo elige el rival)</string>
+    <string name="online_join_color">Tu color, si la sala lo deja libre</string>
+    <string name="online_time_control">Control de tiempo</string>
+    <string name="online_create_action">Crear</string>
+    <string name="online_join">Unirse con un código</string>
+    <string name="online_quick">Buscar rival</string>
+    <string name="online_lobby">Partidas abiertas</string>
+    <string name="online_lobby_refresh">Actualizar</string>
+    <string name="online_lobby_empty">No hay partidas abiertas: crea una sala o busca un rival</string>
+    <string name="online_lobby_loading">Cargando…</string>
+    <string name="online_rating_delta">puntuación %1$s%2$d</string>
+    <string name="online_history">Historial de partidas</string>
+    <string name="online_history_empty">Aún no hay partidas terminadas</string>
+    <string name="online_replay_title">Repetición</string>
+    <string name="online_replay_vs">vs %1$s</string>
+    <string name="online_leaders">Tabla de clasificación</string>
+    <string name="online_leaders_empty">Todavía nadie ha terminado una partida</string>
+    <string name="leaderboard_rank">#%1$d %2$s</string>
+    <string name="leaderboard_record">V/D/E: %1$d/%2$d/%3$d</string>
+    <string name="online_rematch">Jugar otra vez</string>
+    <string name="online_rematch_accept">Aceptar la revancha</string>
+    <string name="online_block">No jugar con este rival</string>
+    <string name="online_block_done">Ya no te emparejarán con este rival</string>
+    <string name="online_report">Denunciar</string>
+    <string name="online_report_title">Denunciar al rival</string>
+    <string name="online_report_done">Denuncia enviada</string>
+    <string name="report_reason_nickname">Nombre de usuario</string>
+    <string name="report_reason_stalling">Retrasar la partida</string>
+    <string name="report_reason_cheating">Trampas</string>
+    <string name="report_reason_other">Otro</string>
+    <string name="online_draw">Empate</string>
+    <string name="online_draw_offered">El rival ofrece un empate</string>
+    <string name="online_draw_accepted">Empate acordado</string>
+    <string name="online_draw_declined">Empate rechazado</string>
+    <string name="online_finish_agree">por acuerdo</string>
+    <string name="error_draw_already">Ya hay una oferta de empate pendiente</string>
+    <string name="error_draw_not_requested">No hay ninguna oferta de empate</string>
+    <string name="error_draw_limit">No quedan ofertas de empate</string>
+    <string name="error_request_pending">Responde primero a la solicitud pendiente</string>
+    <string name="error_banned">Las partidas con clasificación están cerradas para esta cuenta</string>
+    <string name="crash_log_upload">Enviar los informes al servidor</string>
+    <string name="privacy_policy">Política de privacidad</string>
+    <string name="blocks_title">Jugadores bloqueados</string>
+    <string name="blocks_empty">No has bloqueado a nadie.</string>
+    <string name="blocks_unblock">Desbloquear</string>
+    <string name="blocks_unblocked">%1$s puede volver a encontrarse contigo</string>
+    <string name="blocks_deleted">jugador eliminado</string>
+    <string name="block_confirm_title">¿Bloquear a este rival?</string>
+    <string name="block_confirm_text">%1$s ya no aparecerá en el emparejamiento rápido ni en la lista de partidas abiertas. Puedes volver a admitirlo en En línea → Jugadores bloqueados.</string>
+    <string name="block_confirm_text_generic">Este jugador ya no aparecerá en el emparejamiento rápido ni en la lista de partidas abiertas. Puedes volver a admitirlo en En línea → Jugadores bloqueados.</string>
+    <string name="block_confirm_action">Bloquear</string>
+    <string name="online_code">Código de la sala</string>
+    <string name="online_join_action">Unirse</string>
+    <string name="online_waiting">Esperando a un rival</string>
+    <string name="online_waiting_hint">Pasa este código a tu rival.</string>
+    <string name="online_cancel_room">Cerrar la sala</string>
+    <string name="online_return_to_game">Volver a la partida</string>
+    <string name="online_signed_out">Inicia sesión para jugar en línea.</string>
+    <string name="online_time_untimed">Sin reloj</string>
+    <string name="online_time_classic">Clásico 30 + 30</string>
+    <string name="online_time_rapid">Rápido 15 + 10</string>
+    <string name="online_time_blitz">Blitz 3 + 2</string>
+
+    <string name="online_game_title">Partida en línea</string>
+    <string name="online_you_black">Juegas con negras</string>
+    <string name="online_you_white">Juegas con blancas</string>
+    <string name="online_opponent">Rival: %1$s</string>
+    <string name="online_turn_you">Tu turno</string>
+    <string name="online_turn_opponent">Turno del rival</string>
+    <string name="online_waiting_opponent">Esperando a un rival</string>
+    <string name="online_result_you_win">Ganas</string>
+    <string name="online_result_you_lose">Pierdes</string>
+    <string name="online_result_draw">Empate</string>
+    <string name="online_finish_five">Cinco en línea</string>
+    <string name="online_finish_forbidden">Movimiento prohibido</string>
+    <string name="online_finish_timeout">Tiempo agotado</string>
+    <string name="online_finish_resign">Abandono</string>
+    <string name="online_finish_abandon">El rival se marchó</string>
+    <string name="online_undo">Deshacer (%1$d)</string>
+    <string name="online_undo_request_text">Tu rival pide retirar la jugada</string>
+    <string name="online_game_over">Partida terminada</string>
+    <string name="online_undo_accept">Aceptar</string>
+    <string name="online_undo_decline">Rechazar</string>
+    <string name="online_undo_accepted">Se retiró la jugada</string>
+    <string name="online_undo_declined">Se rechazó la solicitud</string>
+    <string name="online_undo_seconds">%1$d s</string>
+    <string name="online_connection_lost">Conexión perdida, reconectando…</string>
+    <string name="online_clock_you">Tú</string>
+    <string name="online_clock_opponent">Rival</string>
+    <string name="online_back">Atrás</string>
+
+    <!-- Error codes of the API -->
+    <string name="error_network">No se puede acceder al servidor. Comprueba la conexión.</string>
+    <string name="error_timeout">El servidor no respondió a tiempo.</string>
+    <string name="error_malformed">El servidor envió una respuesta inesperada.</string>
+    <string name="error_validation">Revisa los datos introducidos.</string>
+    <string name="error_nickname_taken">Este nombre de usuario ya está en uso.</string>
+    <string name="error_bad_credentials">Nombre de usuario o contraseña incorrectos.</string>
+    <string name="error_session_expired">La sesión ha caducado. Inicia sesión de nuevo.</string>
+    <string name="error_not_participant">No eres jugador de esta partida.</string>
+    <string name="error_not_found">No encontrado.</string>
+    <string name="error_game_not_found">La partida ya no existe.</string>
+    <string name="error_room_not_found">No hay ninguna sala con ese código.</string>
+    <string name="error_room_closed">La sala se cerró.</string>
+    <string name="error_room_full">La sala ya está llena.</string>
+    <string name="error_self_join">No puedes unirte a tu propia sala.</string>
+    <string name="error_active_game_exists">Ya tienes una partida en curso.</string>
+    <string name="error_game_finished">La partida ya ha terminado.</string>
+    <string name="error_rematch_not_allowed">Solo se puede jugar la revancha cuando la partida ha terminado.</string>
+    <string name="error_not_your_turn">No es tu turno.</string>
+    <string name="error_wrong_ply">La posición ha cambiado. Inténtalo de nuevo.</string>
+    <string name="error_cell_occupied">Esa casilla está ocupada.</string>
+    <string name="error_out_of_board">La casilla está fuera del tablero.</string>
+    <string name="error_forbidden_move">Ese movimiento está prohibido por las reglas del renju.</string>
+    <string name="error_undo_not_allowed">No tienes ninguna jugada que retirar.</string>
+    <string name="error_undo_too_late">Es demasiado tarde para retirar la jugada.</string>
+    <string name="error_undo_limit">No quedan solicitudes para deshacer.</string>
+    <string name="error_undo_already">La solicitud ya está pendiente.</string>
+    <string name="error_undo_not_requested">No hay ninguna solicitud para deshacer.</string>
+    <string name="error_rate_limited">Demasiadas solicitudes. Espera un minuto.</string>
+    <string name="error_internal">Error del servidor. Inténtalo más tarde.</string>
+    <string name="error_unknown">Algo salió mal.</string>
+</resources>

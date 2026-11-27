@@ -26,11 +26,15 @@
         tools:targetApi="33">
 
         <!-- Orientation is intentionally NOT locked: Android 16+ ignores a fixed
-             orientation on large screens, and a square board adapts fine. -->
+             orientation on large screens. Rotation must recreate the activity, so
+             `configChanges` is not set here: the two orientations have their own
+             layouts (layout/ and layout-land/), and a re-inflated one is the only way
+             the board gets the whole height in landscape. The game survives the
+             recreation twice over — the view model is retained, and every move is
+             written to preferences anyway (README.md, §8). -->
         <activity
             android:name=".MainActivity"
-            android:exported="true"
-            android:configChanges="orientation|screenSize|keyboardHidden">
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

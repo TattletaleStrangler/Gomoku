@@ -5,6 +5,8 @@ import com.oldmermaidman.gomoku.crash.CrashHandler
 import com.oldmermaidman.gomoku.crash.CrashStore
 import com.oldmermaidman.gomoku.crash.CrashUploader
 import com.oldmermaidman.gomoku.net.NetContainer
+import com.oldmermaidman.gomoku.prefs.AppSettings
+import com.oldmermaidman.gomoku.ui.Locales
 
 /**
  * Installs the crash journal before any other component runs (see README.md,
@@ -24,6 +26,11 @@ class GomokuApp : Application() {
 
     override fun onCreate() {
         super.onCreate()
+
+        // The interface language is settled before the first screen is created: the
+        // system's per-app choice when it says something, the stored one otherwise, and
+        // on the very first launch the language of the device (README.md, §12).
+        Locales.install(AppSettings(this))
 
         val previous = Thread.getDefaultUncaughtExceptionHandler()
         val version = "${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})"

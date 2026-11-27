@@ -74,6 +74,18 @@ class AppSettings(context: Context) {
         set(value) = prefs.edit { putInt(KEY_MODE, value) }
 
     /**
+     * Interface language: a shipped tag such as `ru`, or [LANGUAGE_SYSTEM] to follow
+     * the device. The first launch writes the language the device asks for, so the
+     * choice is explicit from the start (see [com.oldmermaidman.gomoku.ui.Locales]).
+     */
+    var language: String
+        get() = prefs.getString(KEY_LANGUAGE, LANGUAGE_SYSTEM) ?: LANGUAGE_SYSTEM
+        set(value) = prefs.edit { putString(KEY_LANGUAGE, value) }
+
+    /** False until a language was settled, i.e. on the very first launch. */
+    fun hasLanguage(): Boolean = prefs.contains(KEY_LANGUAGE)
+
+    /**
      * Time left on the player's clock, in milliseconds, or [NO_CLOCK_SAVED] when
      * nothing is stored yet. It belongs to the running game: a new game starts from
      * the main time of its control again.
@@ -121,6 +133,9 @@ class AppSettings(context: Context) {
         /** [clockRemainingMs] before anything was stored. */
         const val NO_CLOCK_SAVED = -1L
 
+        /** [language] before anything was chosen: follow the language of the device. */
+        const val LANGUAGE_SYSTEM = ""
+
         private const val PREFS_NAME = "gomoku_prefs"
         private const val KEY_COLOR = "player_color"
         private const val KEY_FORBIDDEN = "forbidden_moves"
@@ -131,6 +146,7 @@ class AppSettings(context: Context) {
         private const val KEY_LEVEL = "ai_level"
         private const val KEY_THEME = "theme"
         private const val KEY_MODE = "game_mode"
+        private const val KEY_LANGUAGE = "language"
         private const val KEY_CLOCK_LEFT = "clock_remaining_ms"
         private const val KEY_GAME = "game_state"
         private const val KEY_STATS = "stats_by_level"

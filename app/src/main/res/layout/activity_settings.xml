@@ -30,6 +30,24 @@
             android:paddingEnd="24dp"
             android:paddingBottom="8dp">
 
+            <!--
+                Interface language. It sits above the game settings because picking one
+                rewords everything below it at once: the screen is recreated in the
+                chosen language straight away.
+            -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/language"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/btnLanguage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="8dp" />
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
